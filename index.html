@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy Birthday 💖</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to top, #ffdde1, #ee9ca7);
+  overflow-x: hidden;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+  color: white;
+  text-shadow: 2px 2px 5px #000;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Cake */
+#cake {
+  display: none;
+  font-size: 80px;
+  margin: 20px;
+}
+
+/* Message */
+#message {
+  display: none;
+  font-size: 22px;
+  color: white;
+  margin: 20px;
+}
+
+/* Balloons */
+.balloon {
+  position: absolute;
+  bottom: -100px;
+  width: 40px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  animation: floatUp 6s linear infinite;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(0); }
+  to { transform: translateY(-110vh); }
+}
+
+/* Gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 20px;
+}
+
+.gallery img {
+  width: 100%;
+  border-radius: 10px;
+}
+</style>
+</head>
+<body>
+
+<h1>🎉 Happy Birthday Surprise 🎉</h1>
+
+<button onclick="showCake()">Open Surprise 🎁</button>
+
+<div id="cake">🎂</div>
+
+<div id="message">
+  Happy Birthday! 💖<br>
+  You are special and loved always ✨
+</div>
+
+<h2 style="color:white;">Memories 📸</h2>
+<div class="gallery">
+  <img src="img1.jpg">
+  <img src="img2.jpg">
+  <img src="img3.jpg">
+  <img src="img4.jpg">
+  <img src="img5.jpg">
+  <img src="img6.jpg">
+  <img src="img7.jpg">
+  <img src="img8.jpg">
+  <img src="img9.jpg">
+  <img src="img10.jpg">
+</div>
+
+<script>
+// Show cake + message
+function showCake() {
+  document.getElementById("cake").style.display = "block";
+  document.getElementById("message").style.display = "block";
+  launchBalloons();
+}
+
+// Floating balloons
+function launchBalloons() {
+  for (let i = 0; i < 20; i++) {
+    let b = document.createElement("div");
+    b.className = "balloon";
+    b.style.left = Math.random() * window.innerWidth + "px";
+    b.style.background = randomColor();
+
+    b.onclick = () => b.remove(); // pop balloon
+
+    document.body.appendChild(b);
+
+    setTimeout(() => {
+      b.remove();
+    }, 6000);
+  }
+}
+
+// Random balloon color
+function randomColor() {
+  const colors = ["red", "blue", "yellow", "pink", "purple", "orange"];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+</script>
+
+</body>
+</html>
