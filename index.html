@@ -1,46 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Birthday Surprise</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Riri</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Background canvas for effects -->
-  <canvas id="confetti"></canvas>
-
-  <!-- Main Scene (hidden until permission granted) -->
-  <div id="scene" class="hidden">
-
-    <div id="message">BLOW THE CANDLES!!</div>
-
-    <div class="cake-wrapper">
-      <div class="cake">
-
-        <!-- top decorations -->
-        <div class="top-row">
-          <div class="swirl candle-slot"><div class="candle"></div></div>
-          <div class="swirl candle-slot"><div class="candle"></div></div>
-          <div class="swirl candle-slot"><div class="candle"></div></div>
-          <div class="strawberry candle-slot large-center">
-            <div class="candle center"></div>
-          </div>
-          <div class="swirl candle-slot"><div class="candle"></div></div>
-          <div class="swirl candle-slot"><div class="candle"></div></div>
-          <div class="swirl candle-slot"><div class="candle"></div></div>
+    <!-- Microphone Permission Screen -->
+    <div id="permission-screen" class="permission-screen">
+        <div class="permission-content">
+            <div class="microphone-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M19 11C19 15.42 15.87 19 12 19C8.13 19 5 15.42 5 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 19V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <p class="permission-text">Please allow microphone access<br>to blow out the candles</p>
         </div>
-
-        <!-- cake body -->
-        <div class="cake-body"></div>
-
-      </div>
     </div>
 
-    <button id="relightBtn">Relight the candles</button>
-  </div>
+    <!-- Main Birthday Scene -->
+    <div id="birthday-scene" class="birthday-scene hidden">
+        <!-- Background Elements -->
+        <div class="bg-gradient"></div>
+        <div class="sparkles"></div>
 
-  <script src="script.js"></script>
+        <!-- Message Display -->
+        <div id="message" class="message">BLOW THE CANDLES!!</div>
+
+        <!-- Cake Container -->
+        <div class="cake-container">
+            <!-- Cake -->
+            <div class="cake">
+                <!-- Cake Plate -->
+                <div class="cake-plate"></div>
+                
+                <!-- Cake Base -->
+                <div class="cake-base">
+                    <!-- Bottom Piped Border -->
+                    <div class="piped-border">
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                        <div class="piped-dot"></div>
+                    </div>
+                    
+                    <!-- Side Decorations -->
+                    <div class="side-flowers">
+                        <div class="side-flower"></div>
+                        <div class="side-flower"></div>
+                        <div class="side-flower"></div>
+                        <div class="side-flower"></div>
+                    </div>
+                    
+                    <!-- Sprinkles -->
+                    <div class="sprinkles">
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                        <div class="sprinkle"></div>
+                    </div>
+                </div>
+                
+                <!-- Cake Top -->
+                <div class="cake-top">
+                    <!-- Drip Frosting -->
+                    <div class="drip-frosting">
+                        <div class="drip drip-1"></div>
+                        <div class="drip drip-2"></div>
+                        <div class="drip drip-3"></div>
+                        <div class="drip drip-4"></div>
+                        <div class="drip drip-5"></div>
+                        <div class="drip drip-6"></div>
+                        <div class="drip drip-7"></div>
+                        <div class="drip drip-8"></div>
+                    </div>
+                    
+                    <!-- Icing Swirls -->
+                    <div class="icing-swirls">
+                        <div class="swirl swirl-1">
+                            <div class="candle">
+                                <div class="candle-body">
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                </div>
+                                <div class="flame-container">
+                                    <div class="flame"></div>
+                                    <div class="flame-glow"></div>
+                                </div>
+                                <div class="smoke"></div>
+                            </div>
+                        </div>
+                        <div class="swirl swirl-2">
+                            <div class="candle">
+                                <div class="candle-body">
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                </div>
+                                <div class="flame-container">
+                                    <div class="flame"></div>
+                                    <div class="flame-glow"></div>
+                                </div>
+                                <div class="smoke"></div>
+                            </div>
+                        </div>
+                        <div class="swirl swirl-3">
+                            <div class="candle">
+                                <div class="candle-body">
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                </div>
+                                <div class="flame-container">
+                                    <div class="flame"></div>
+                                    <div class="flame-glow"></div>
+                                </div>
+                                <div class="smoke"></div>
+                            </div>
+                        </div>
+                        <div class="swirl swirl-4">
+                            <div class="candle">
+                                <div class="candle-body">
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                </div>
+                                <div class="flame-container">
+                                    <div class="flame"></div>
+                                    <div class="flame-glow"></div>
+                                </div>
+                                <div class="smoke"></div>
+                            </div>
+                        </div>
+                        <div class="swirl swirl-5">
+                            <div class="candle">
+                                <div class="candle-body">
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                </div>
+                                <div class="flame-container">
+                                    <div class="flame"></div>
+                                    <div class="flame-glow"></div>
+                                </div>
+                                <div class="smoke"></div>
+                            </div>
+                        </div>
+                        <div class="swirl swirl-6">
+                            <div class="candle">
+                                <div class="candle-body">
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                    <div class="candle-stripe"></div>
+                                </div>
+                                <div class="flame-container">
+                                    <div class="flame"></div>
+                                    <div class="flame-glow"></div>
+                                </div>
+                                <div class="smoke"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Center Strawberry -->
+                    <div class="strawberry-container">
+                        <div class="strawberry">
+                            <div class="strawberry-body"></div>
+                            <div class="strawberry-seeds">
+                                <div class="seed"></div>
+                                <div class="seed"></div>
+                                <div class="seed"></div>
+                                <div class="seed"></div>
+                                <div class="seed"></div>
+                                <div class="seed"></div>
+                            </div>
+                            <div class="strawberry-leaves">
+                                <div class="leaf"></div>
+                                <div class="leaf"></div>
+                                <div class="leaf"></div>
+                            </div>
+                        </div>
+                        <!-- Main Center Candle -->
+                        <div class="candle main-candle">
+                            <div class="candle-body">
+                                <div class="candle-stripe"></div>
+                                <div class="candle-stripe"></div>
+                                <div class="candle-stripe"></div>
+                                <div class="candle-stripe"></div>
+                            </div>
+                            <div class="flame-container">
+                                <div class="flame"></div>
+                                <div class="flame-glow"></div>
+                            </div>
+                            <div class="smoke"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cake Shadow -->
+            <div class="cake-shadow"></div>
+        </div>
+
+        <!-- Relight Button -->
+        <button id="relight-btn" class="relight-btn hidden">Relight the candles</button>
+
+        <!-- Celebration Elements -->
+        <canvas id="confetti-canvas"></canvas>
+        <div id="balloons" class="balloons"></div>
+        
+        <!-- Party Poppers -->
+        <div class="party-poppers">
+            <div class="popper popper-left"></div>
+            <div class="popper popper-right"></div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <script src="script.js"></script>
 </body>
 </html>
