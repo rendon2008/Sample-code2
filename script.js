@@ -1,147 +1,537 @@
-const scene = document.getElementById("scene");
-const message = document.getElementById("message");
-const relightBtn = document.getElementById("relightBtn");
+let audioContext = null;
+let microphoneStream = null;
+let analyser = null;
+let dataArray = null;
+let isListening = false;
+let blowDetectionInterval = null;
 
-let audioContext;
-let analyser;
-let dataArray;
-let micStream;
+// ===== State Variables =====
+let candlesExtinguished = false;
+let celebrationStarted = false;
 
-let flames = [];
-let blown = false;
+// ===== Configuration =====
+const BLOW_THRESHOLD = 35; // Volume threshold for blow detection (0-255)
+const BLOW_DURATION = 200; // Minimum duration to consider as a blow (ms)
+let blowStartTime = null;
 
-/* ---------------- MIC SETUP ---------------- */
-async function initMic() {
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+// ===== DOM Elements =====
+const permissionScreen = document.getElementById('permission-screen');
+const birthdayScene = document.getElementById('birthday-scene');
+const message = document.getElementById('message');
+const relightBtn = document.getElementById('relight-btn');
+const candles = document.querySelectorAll('.candle');
+const confettiCanvas = document.getElementById('confetti-canvas');
+const balloonsContainer = document.getElementById('balloons');
+const poppers = document.querySelectorAll('.popper');
 
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(micStream);
+// ===== Initialization =====
+document.addEventListener('DOMContentLoaded', () => {
+    requestMicrophoneAccess();
+    setupRelightButton();
+});
 
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 512;
+// ===== Microphone Permission =====
+async function requestMicrophoneAccess() {
+    try {
+        // Check for browser support
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showError('Microphone access not supported in this browser');
+            return;
+        }
 
-    source.connect(analyser);
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
+        // Request microphone access
+        microphoneStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+            }
+        });
 
-    startScene();
-    detectBlow();
-
-  } catch (err) {
-    console.log("Mic denied, retrying...");
-    setTimeout(initMic, 1500);
-  }
-}
-
-/* ---------------- START SCENE ---------------- */
-function startScene() {
-  scene.classList.remove("hidden");
-  createFlames();
-}
-
-/* ---------------- FLAMES ---------------- */
-function createFlames() {
-  document.querySelectorAll(".candle").forEach(candle => {
-    const flame = document.createElement("div");
-    flame.classList.add("flame");
-    candle.appendChild(flame);
-    flames.push(flame);
-  });
-}
-
-/* ---------------- BLOW DETECTION ---------------- */
-function detectBlow() {
-  function loop() {
-    analyser.getByteFrequencyData(dataArray);
-
-    let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
-
-    if (volume > 45 && !blown) {
-      blowOutCandles();
+        // Initialize audio context
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create analyser
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.3;
+        
+        // Connect microphone to analyser
+        const microphone = audioContext.createMediaStreamSource(microphoneStream);
+        microphone.connect(analyser);
+        
+        // Create data array for analysis
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        
+        // Start blow detection
+        isListening = true;
+        startBlowDetection();
+        
+        // Transition to birthday scene
+        transitionToBirthdayScene();
+        
+    } catch (error) {
+        console.error('Microphone access denied:', error);
+        // Keep requesting permission - retry after delay
+        setTimeout(requestMicrophoneAccess, 2000);
     }
-
-    requestAnimationFrame(loop);
-  }
-  loop();
 }
 
-/* ---------------- BLOW OUT ---------------- */
-function blowOutCandles() {
-  blown = true;
-
-  flames.forEach((flame, i) => {
+// ===== Transition to Birthday Scene =====
+function transitionToBirthdayScene() {
+    // Hide permission screen
+    permissionScreen.classList.add('hidden');
+    
+    // Show birthday scene
     setTimeout(() => {
-      flame.style.transition = "0.5s";
-      flame.style.opacity = "0";
-      flame.style.transform = "scale(0)";
-    }, i * 100);
-  });
-
-  message.textContent = "HAPPIEST 17TH BIRTHDAY BABYY RIRI\nI LOVE U 3000";
-
-  launchConfetti();
-  launchBalloons();
+        birthdayScene.classList.remove('hidden');
+        birthdayScene.classList.add('visible');
+        
+        // Start candle animations
+        startCandleAnimations();
+    }, 500);
 }
 
-/* ---------------- RELIGHT ---------------- */
-relightBtn.onclick = () => {
-  blown = false;
-  flames.forEach(f => {
-    f.style.opacity = "1";
-    f.style.transform = "scale(1)";
-  });
+// ===== Blow Detection System =====
+function startBlowDetection() {
+    blowDetectionInterval = setInterval(() => {
+        if (!isListening || candlesExtinguished) return;
+        
+        // Get audio data
+        analyser.getByteFrequencyData(dataArray);
+        
+        // Calculate average volume
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+        }
+        const average = sum / dataArray.length;
+        
+        // Detect blow (high volume indicates blowing)
+        if (average > BLOW_THRESHOLD) {
+            if (blowStartTime === null) {
+                blowStartTime = Date.now();
+            } else if (Date.now() - blowStartTime > BLOW_DURATION) {
+                // Blow detected!
+                extinguishCandles();
+            }
+        } else {
+            blowStartTime = null;
+        }
+        
+    }, 50); // Check every 50ms
+}
 
-  message.textContent = "BLOW THE CANDLES!!";
-};
-
-/* ---------------- CONFETTI ---------------- */
-const canvas = document.getElementById("confetti");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let particles = [];
-
-function launchConfetti() {
-  for (let i = 0; i < 150; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: 0,
-      r: Math.random() * 6 + 2,
-      d: Math.random() * 5 + 2,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+// ===== Candle Animations =====
+function startCandleAnimations() {
+    candles.forEach((candle, index) => {
+        // Add slight random delay to each candle's flame for natural effect
+        const flame = candle.querySelector('.flame');
+        const glow = candle.querySelector('.flame-glow');
+        
+        if (flame && glow) {
+            flame.style.animationDelay = `${Math.random() * 0.5}s`;
+            glow.style.animationDelay = `${Math.random() * 0.3}s`;
+        }
     });
-  }
-  animateConfetti();
 }
 
-function animateConfetti() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  particles.forEach(p => {
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fill();
-
-    p.y += p.d;
-  });
-
-  requestAnimationFrame(animateConfetti);
+// ===== Extinguish Candles =====
+function extinguishCandles() {
+    if (candlesExtinguished) return;
+    
+    candlesExtinguished = true;
+    
+    // Extinguish each candle with staggered timing
+    candles.forEach((candle, index) => {
+        setTimeout(() => {
+            candle.classList.add('extinguished');
+        }, index * 100);
+    });
+    
+    // Start celebration after all candles are out
+    setTimeout(() => {
+        startCelebration();
+    }, candles.length * 100 + 500);
 }
 
-/* ---------------- BALLOONS ---------------- */
+// ===== Start Celebration =====
+function startCelebration() {
+    if (celebrationStarted) return;
+    
+    celebrationStarted = true;
+    
+    // Update message
+    updateMessage();
+    
+    // Play sound effects
+    playCelebrationSounds();
+    
+    // Launch balloons
+    launchBalloons();
+    
+    // Fire party poppers
+    firePartyPoppers();
+    
+    // Start confetti
+    startConfetti();
+    
+    // Show relight button
+    setTimeout(() => {
+        relightBtn.classList.remove('hidden');
+        relightBtn.classList.add('visible');
+    }, 2000);
+}
+
+// ===== Update Message =====
+function updateMessage() {
+    message.style.opacity = '0';
+    message.style.transform = 'translateX(-50%) scale(0.8)';
+    
+    setTimeout(() => {
+        message.innerHTML = 'HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span>';
+        message.style.color = '#FF69B4';
+        message.style.textShadow = `
+            0 0 10px rgba(255, 105, 180, 0.8),
+            0 0 20px rgba(255, 105, 180, 0.6),
+            0 0 30px rgba(255, 182, 193, 0.5),
+            2px 2px 4px rgba(0,0,0,0.1)
+        `;
+        message.style.opacity = '1';
+        message.style.transform = 'translateX(-50%) scale(1)';
+    }, 400);
+}
+
+// ===== Celebration Sounds =====
+function playCelebrationSounds() {
+    // Play party pop sound
+    playPartyPopSound();
+    
+    // Play Happy Birthday melody after pop
+    setTimeout(() => {
+        playHappyBirthdayMelody();
+    }, 500);
+}
+
+// ===== Party Pop Sound (Synthesized) =====
+function playPartyPopSound() {
+    const ctx = audioContext;
+    const now = ctx.currentTime;
+    
+    // Create noise burst for pop
+    const bufferSize = ctx.sampleRate * 0.3; // 300ms
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.05));
+    }
+    
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'highpass';
+    noiseFilter.frequency.value = 1000;
+    
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.5, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+    
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    
+    noise.start(now);
+    
+    // Add a tone for the "pop" effect
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.exponentialRampToValueAtTime(200, now + 0.2);
+    
+    const oscGain = ctx.createGain();
+    oscGain.gain.setValueAtTime(0.3, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    
+    osc.connect(oscGain);
+    oscGain.connect(ctx.destination);
+    
+    osc.start(now);
+    osc.stop(now + 0.3);
+}
+
+// ===== Happy Birthday Melody (Synthesized) =====
+function playHappyBirthdayMelody() {
+    const ctx = audioContext;
+    const now = ctx.currentTime;
+    
+    // Happy Birthday notes (frequencies in Hz)
+    const notes = [
+        { freq: 264, duration: 0.25 }, // C4
+        { freq: 264, duration: 0.25 }, // C4
+        { freq: 297, duration: 0.5 },  // D4
+        { freq: 264, duration: 0.5 },  // C4
+        { freq: 352, duration: 0.5 },  // F4
+        { freq: 330, duration: 1 },    // E4
+        
+        { freq: 264, duration: 0.25 }, // C4
+        { freq: 264, duration: 0.25 }, // C4
+        { freq: 297, duration: 0.5 },  // D4
+        { freq: 264, duration: 0.5 },  // C4
+        { freq: 396, duration: 0.5 },  // G4
+        { freq: 352, duration: 1 },    // F4
+        
+        { freq: 264, duration: 0.25 }, // C4
+        { freq: 264, duration: 0.25 }, // C4
+        { freq: 523, duration: 0.5 },  // C5
+        { freq: 440, duration: 0.5 },  // A4
+        { freq: 352, duration: 0.5 },  // F4
+        { freq: 330, duration: 0.5 },  // E4
+        { freq: 297, duration: 0.75 }, // D4
+        
+        { freq: 466, duration: 0.25 }, // A#4
+        { freq: 466, duration: 0.25 }, // A#4
+        { freq: 440, duration: 0.5 },  // A4
+        { freq: 352, duration: 0.5 },  // F4
+        { freq: 396, duration: 0.5 },  // G4
+        { freq: 352, duration: 1 }     // F4
+    ];
+    
+    let currentTime = now;
+    
+    notes.forEach((note, index) => {
+        // Create oscillator for note
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = note.freq;
+        
+        // Create gain node for envelope
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0, currentTime);
+        gain.gain.linearRampToValueAtTime(0.2, currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.15, currentTime + note.duration * 0.7);
+        gain.gain.exponentialRampToValueAtTime(0.01, currentTime + note.duration);
+        
+        // Add some harmonics for a richer sound
+        const osc2 = ctx.createOscillator();
+        osc2.type = 'triangle';
+        osc2.frequency.value = note.freq * 2;
+        
+        const gain2 = ctx.createGain();
+        gain2.gain.setValueAtTime(0, currentTime);
+        gain2.gain.linearRampToValueAtTime(0.05, currentTime + 0.05);
+        gain2.gain.exponentialRampToValueAtTime(0.01, currentTime + note.duration);
+        
+        // Connect nodes
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        
+        // Play note
+        osc.start(currentTime);
+        osc.stop(currentTime + note.duration);
+        
+        osc2.start(currentTime);
+        osc2.stop(currentTime + note.duration);
+        
+        // Advance time
+        currentTime += note.duration;
+    });
+}
+
+// ===== Balloons =====
 function launchBalloons() {
-  for (let i = 0; i < 10; i++) {
-    const b = document.createElement("div");
-    b.className = "balloon";
-    b.style.left = Math.random() * 100 + "vw";
-    document.body.appendChild(b);
-
-    setTimeout(() => b.remove(), 5000);
-  }
+    const colors = ['pink', 'blue', 'yellow', 'green', 'purple'];
+    const balloonCount = 15;
+    
+    for (let i = 0; i < balloonCount; i++) {
+        setTimeout(() => {
+            createBalloon(colors[Math.floor(Math.random() * colors.length)]);
+        }, i * 300);
+    }
+    
+    // Continue launching balloons
+    setInterval(() => {
+        if (celebrationStarted) {
+            createBalloon(colors[Math.floor(Math.random() * colors.length)]);
+        }
+    }, 2000);
 }
 
-/* ---------------- INIT ---------------- */
-initMic();
+function createBalloon(color) {
+    const balloon = document.createElement('div');
+    balloon.className = `balloon ${color}`;
+    balloon.style.left = `${Math.random() * 90 + 5}%`;
+    balloon.style.animationDuration = `${6 + Math.random() * 4}s`;
+    
+    balloonsContainer.appendChild(balloon);
+    
+    // Remove balloon after animation
+    setTimeout(() => {
+        balloon.remove();
+    }, 10000);
+}
+
+// ===== Party Poppers =====
+function firePartyPoppers() {
+    poppers.forEach((popper, index) => {
+        setTimeout(() => {
+            popper.classList.add('explode');
+            
+            // Reset after animation
+            setTimeout(() => {
+                popper.classList.remove('explode');
+            }, 1000);
+        }, index * 200);
+    });
+}
+
+// ===== Confetti System =====
+function startConfetti() {
+    const ctx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    
+    const confetti = [];
+    const colors = ['#FFB6C1', '#FF69B4', '#FFD700', '#87CEEB', '#98FB98', '#DDA0DD', '#FFA500'];
+    
+    // Create initial burst
+    for (let i = 0; i < 150; i++) {
+        confetti.push(createConfettiPiece(colors, true));
+    }
+    
+    // Animation loop
+    let animationId;
+    
+    function animate() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        
+        confetti.forEach((piece, index) => {
+            // Update position
+            piece.x += piece.vx;
+            piece.y += piece.vy;
+            piece.rotation += piece.rotationSpeed;
+            
+            // Add gravity
+            piece.vy += 0.1;
+            
+            // Add air resistance
+            piece.vx *= 0.99;
+            piece.vy *= 0.99;
+            
+            // Draw confetti
+            ctx.save();
+            ctx.translate(piece.x, piece.y);
+            ctx.rotate(piece.rotation);
+            ctx.fillStyle = piece.color;
+            ctx.fillRect(-piece.size / 2, -piece.size / 2, piece.size, piece.size);
+            ctx.restore();
+            
+            // Remove if off screen
+            if (piece.y > confettiCanvas.height + 50) {
+                confetti.splice(index, 1);
+            }
+        });
+        
+        // Add new confetti occasionally
+        if (celebrationStarted && Math.random() < 0.1) {
+            confetti.push(createConfettiPiece(colors, false));
+        }
+        
+        if (confetti.length > 0 || celebrationStarted) {
+            animationId = requestAnimationFrame(animate);
+        }
+    }
+    
+    animate();
+    
+    // Handle resize
+    window.addEventListener('resize', () => {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+    });
+}
+
+function createConfettiPiece(colors, isBurst) {
+    const x = isBurst ? window.innerWidth / 2 + (Math.random() - 0.5) * 200 : Math.random() * window.innerWidth;
+    const y = isBurst ? window.innerHeight / 2 : -20;
+    
+    return {
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * (isBurst ? 15 : 2),
+        vy: isBurst ? (Math.random() - 1) * 15 : Math.random() * 2 + 1,
+        size: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.2
+    };
+}
+
+// ===== Relight Button =====
+function setupRelightButton() {
+    relightBtn.addEventListener('click', () => {
+        relightCandles();
+    });
+}
+
+function relightCandles() {
+    // Reset state
+    candlesExtinguished = false;
+    celebrationStarted = false;
+    blowStartTime = null;
+    
+    // Remove extinguished class from all candles
+    candles.forEach(candle => {
+        candle.classList.remove('extinguished');
+    });
+    
+    // Reset message
+    message.style.opacity = '0';
+    message.style.transform = 'translateX(-50%) scale(0.8)';
+    
+    setTimeout(() => {
+        message.innerHTML = 'BLOW THE CANDLES!!';
+        message.style.color = '';
+        message.style.textShadow = '';
+        message.style.opacity = '1';
+        message.style.transform = 'translateX(-50%) scale(1)';
+    }, 400);
+    
+    // Hide relight button
+    relightBtn.classList.remove('visible');
+    relightBtn.classList.add('hidden');
+    
+    // Clear balloons
+    balloonsContainer.innerHTML = '';
+    
+    // Restart candle animations
+    startCandleAnimations();
+    
+    // Restart blow detection
+    if (!blowDetectionInterval) {
+        startBlowDetection();
+    }
+}
+
+// ===== Error Handling =====
+function showError(message) {
+    console.error(message);
+    // Could show a visual error message here
+}
+
+// ===== Cleanup on Page Unload =====
+window.addEventListener('beforeunload', () => {
+    if (blowDetectionInterval) {
+        clearInterval(blowDetectionInterval);
+    }
+    if (microphoneStream) {
+        microphoneStream.getTracks().forEach(track => track.stop());
+    }
+    if (audioContext) {
+        audioContext.close();
+    }
+});
