@@ -1,99 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Blow the Candle</title>
+  <title>Blow the Candle</title>
 
-<style>
-body{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  background:#111;
-}
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+    }
 
-.candle{
-  position:relative;
-  width:40px;
-  height:120px;
-  background:#fff;
-  border-radius:10px;
-}
+    /* SCREEN CONTROL */
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
 
-.flame{
-  position:absolute;
-  top:-40px;
-  left:50%;
-  transform:translateX(-50%);
-  width:20px;
-  height:40px;
-  background:orange;
-  border-radius:50%;
-  box-shadow:0 0 20px orange;
-  transition:opacity 0.3s;
-}
+    .active {
+      display: flex;
+    }
 
-.flame.off{
-  opacity:0;
-}
-</style>
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
 
+    .msg {
+      margin-top: 10px;
+      color: red;
+      text-align: center;
+    }
+
+    /* CANDLE */
+    .candle {
+      width: 30px;
+      height: 100px;
+      background: #fff3c4;
+      position: relative;
+      margin-top: 40px;
+      border-radius: 5px;
+    }
+
+    .flame {
+      width: 20px;
+      height: 30px;
+      background: orange;
+      border-radius: 50%;
+      position: absolute;
+      top: -30px;
+      left: 5px;
+      animation: flicker 0.2s infinite;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    .off {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="candle">
-  <div id="flame" class="flame"></div>
+<!-- SCREEN 1: Permission -->
+<div id="screen1" class="screen active">
+  <h2>Enable Microphone to Start 🎤</h2>
+  <button onclick="startMic()">Enable Microphone</button>
+  <div class="msg" id="msg1"></div>
+</div>
+
+<!-- SCREEN 2: Candle -->
+<div id="screen2" class="screen">
+  <h2>Blow the candle 🕯️</h2>
+
+  <div class="candle">
+    <div class="flame" id="flame"></div>
+  </div>
+
+  <div class="msg" id="msg2"></div>
 </div>
 
 <script>
+function startMic() {
+  const msg = document.getElementById("msg1");
 
-navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
 
-  const audioContext = new AudioContext();
-  const mic = audioContext.createMediaStreamSource(stream);
-  const analyser = audioContext.createAnalyser();
+      // SWITCH SCREEN
+      document.getElementById("screen1").classList.remove("active");
+      document.getElementById("screen2").classList.add("active");
 
-  analyser.fftSize = 512;
+      const audioContext = new AudioContext();
+      const mic = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
 
-  const data = new Uint8Array(analyser.frequencyBinCount);
+      mic.connect(analyser);
 
-  mic.connect(analyser);
+      const data = new Uint8Array(analyser.fftSize);
 
-  let hitCount = 0;
+      function detectSound() {
+        analyser.getByteTimeDomainData(data);
 
-  function detectBlow(){
+        let volume = 0;
+        for (let i = 0; i < data.length; i++) {
+          volume += Math.abs(data[i] - 128);
+        }
 
-    analyser.getByteFrequencyData(data);
+        if (volume > 2000) {
+          document.getElementById("flame").classList.add("off");
+          document.getElementById("msg2").style.color = "lightgreen";
+          document.getElementById("msg2").innerText = "Candle blown out! 🎉";
+        }
 
-    let volume = 0;
+        requestAnimationFrame(detectSound);
+      }
 
-    for(let i = 0; i < data.length; i++){
-      volume += data[i];
-    }
-
-    volume = volume / data.length;
-
-    if(volume > 60){   // sensitivity (increase = harder to trigger)
-      hitCount++;
-    } else {
-      hitCount = 0;
-    }
-
-    if(hitCount > 5){
-      document.getElementById("flame").classList.add("off");
-    }
-
-    requestAnimationFrame(detectBlow);
-  }
-
-  detectBlow();
-
-}).catch(err => {
-  alert("Please allow microphone access to blow the candle.");
-});
-
+      detectSound();
+    })
+    .catch(err => {
+      msg.innerText = "Microphone permission denied. Please allow access.";
+    });
+}
 </script>
 
 </body>
