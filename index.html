@@ -1,157 +1,46 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birthday Surprise</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-const Index = () => {
-  const [micAllowed, setMicAllowed] = useState(false);
-  const [flameOn, setFlameOn] = useState(true);
-  const [blowIntensity, setBlowIntensity] = useState(0);
-  const [smokeVisible, setSmokeVisible] = useState(false);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const animFrameRef = useRef<number>(0);
-  const flameRef = useRef(true);
+  <!-- Background canvas for effects -->
+  <canvas id="confetti"></canvas>
 
-  useEffect(() => {
-    flameRef.current = flameOn;
-  }, [flameOn]);
+  <!-- Main Scene (hidden until permission granted) -->
+  <div id="scene" class="hidden">
 
-  const askPermission = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const source = ctx.createMediaStreamSource(stream);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      analyserRef.current = analyser;
-      setMicAllowed(true);
-    } catch {
-      // will retry on button click
-    }
-  }, []);
+    <div id="message">BLOW THE CANDLES!!</div>
 
-  useEffect(() => {
-    askPermission();
-  }, [askPermission]);
+    <div class="cake-wrapper">
+      <div class="cake">
 
-  // Separate effect for the animation loop — no dependency on flameOn
-  useEffect(() => {
-    if (!micAllowed || !analyserRef.current) return;
+        <!-- top decorations -->
+        <div class="top-row">
+          <div class="swirl candle-slot"><div class="candle"></div></div>
+          <div class="swirl candle-slot"><div class="candle"></div></div>
+          <div class="swirl candle-slot"><div class="candle"></div></div>
+          <div class="strawberry candle-slot large-center">
+            <div class="candle center"></div>
+          </div>
+          <div class="swirl candle-slot"><div class="candle"></div></div>
+          <div class="swirl candle-slot"><div class="candle"></div></div>
+          <div class="swirl candle-slot"><div class="candle"></div></div>
+        </div>
 
-    const analyser = analyserRef.current;
-    const data = new Uint8Array(analyser.frequencyBinCount);
+        <!-- cake body -->
+        <div class="cake-body"></div>
 
-    const check = () => {
-      analyser.getByteFrequencyData(data);
-      const avg = data.reduce((a, b) => a + b, 0) / data.length;
-      const intensity = Math.min(avg / 60, 1);
-      setBlowIntensity(intensity);
-
-      if (avg > 35 && flameRef.current) {
-        flameRef.current = false;
-        setFlameOn(false);
-        setSmokeVisible(true);
-        setTimeout(() => setSmokeVisible(false), 3000);
-      }
-      animFrameRef.current = requestAnimationFrame(check);
-    };
-    check();
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [micAllowed]);
-
-  if (!micAllowed) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-candle-bg text-candle-text gap-6">
-        <div className="text-6xl">🎂</div>
-        <h1 className="text-2xl font-bold">Birthday Candle</h1>
-        <p className="text-candle-muted text-center max-w-sm">
-          We need microphone access so you can blow out the candle!
-        </p>
-        <button
-          onClick={askPermission}
-          className="px-6 py-3 rounded-full bg-candle-flame text-candle-bg font-semibold hover:opacity-90 transition-opacity"
-        >
-          Allow Microphone
-        </button>
       </div>
-    );
-  }
-
-  const flickerOffset = blowIntensity * 12;
-
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-candle-bg gap-8 select-none">
-      <h1 className="text-candle-text text-2xl font-bold tracking-wide">
-        Blow to extinguish!
-      </h1>
-
-      <svg width="200" height="360" viewBox="0 0 200 360">
-        {flameOn && (
-          <circle cx="100" cy="120" r="60" fill="url(#glow)" opacity={0.4 - blowIntensity * 0.3} />
-        )}
-
-        {flameOn && (
-          <g style={{ transform: `translateX(${flickerOffset}px)`, transformOrigin: "100px 180px", transition: "transform 0.05s" }}>
-            <ellipse cx={100} cy={130} rx={16 - blowIntensity * 6} ry={40 - blowIntensity * 15} fill="url(#flameOuter)" className="animate-candle-flicker" />
-            <ellipse cx={100} cy={145} rx={7 - blowIntensity * 2} ry={20 - blowIntensity * 8} fill="url(#flameInner)" className="animate-candle-flicker-alt" />
-          </g>
-        )}
-
-        {smokeVisible && (
-          <>
-            <circle cx="100" cy="140" r="4" fill="#888" className="animate-smoke" />
-            <circle cx="95" cy="130" r="3" fill="#999" className="animate-smoke delay-100" />
-            <circle cx="105" cy="120" r="3" fill="#777" className="animate-smoke delay-200" />
-          </>
-        )}
-
-        <line x1="100" y1="170" x2="100" y2="185" stroke="#555" strokeWidth="2" />
-        <rect x="80" y="185" width="40" height="120" rx="4" fill="url(#candleBody)" />
-        <ellipse cx="100" cy="185" rx="20" ry="5" fill="url(#candleRim)" />
-        <ellipse cx="100" cy="305" rx="22" ry="6" fill="#1a1a1a" />
-        <rect x="75" y="305" width="50" height="12" rx="3" fill="#2a2a2a" />
-        <rect x="70" y="317" width="60" height="6" rx="3" fill="#222" />
-
-        <defs>
-          <radialGradient id="glow">
-            <stop offset="0%" stopColor="#ff9500" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#ff9500" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="flameOuter" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#ff4500" />
-            <stop offset="50%" stopColor="#ff8c00" />
-            <stop offset="100%" stopColor="#ffcc00" />
-          </linearGradient>
-          <linearGradient id="flameInner" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#ffcc00" />
-            <stop offset="100%" stopColor="#ffffee" />
-          </linearGradient>
-          <linearGradient id="candleBody" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1a1a1a" />
-            <stop offset="50%" stopColor="#333" />
-            <stop offset="100%" stopColor="#111" />
-          </linearGradient>
-          <linearGradient id="candleRim" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#222" />
-            <stop offset="50%" stopColor="#444" />
-            <stop offset="100%" stopColor="#222" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      {!flameOn && (
-        <button
-          onClick={() => {
-            flameRef.current = true;
-            setFlameOn(true);
-            setSmokeVisible(false);
-          }}
-          className="px-6 py-3 rounded-full bg-candle-flame text-candle-bg font-semibold hover:opacity-90 transition-opacity"
-        >
-          Relight Candle
-        </button>
-      )}
     </div>
-  );
-};
 
-export default Index;
+    <button id="relightBtn">Relight the candles</button>
+  </div>
 
+  <script src="script.js"></script>
+</body>
+</html>
