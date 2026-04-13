@@ -124,7 +124,7 @@ function startMic() {
 
         // 🧠 REAL blow detection logic
         const spike = volume > lastVolume * 1.8;   // sudden burst
-        const strong = volume > 4000;              // minimum strength
+        const strong = volume > 1200;              // minimum strength
         const isBlow = spike && strong;
 
         if (isBlow) {
