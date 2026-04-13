@@ -15,11 +15,11 @@
       font-family: sans-serif;
     }
 
-    /* SCREEN CONTROL */
     .screen {
       display: none;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
 
     .active {
@@ -39,7 +39,6 @@
       text-align: center;
     }
 
-    /* CANDLE */
     .candle {
       width: 30px;
       height: 100px;
@@ -74,14 +73,14 @@
 
 <body>
 
-<!-- SCREEN 1: Permission -->
+<!-- SCREEN 1 -->
 <div id="screen1" class="screen active">
   <h2>Enable Microphone to Start 🎤</h2>
   <button onclick="startMic()">Enable Microphone</button>
   <div class="msg" id="msg1"></div>
 </div>
 
-<!-- SCREEN 2: Candle -->
+<!-- SCREEN 2 -->
 <div id="screen2" class="screen">
   <h2>Blow the candle 🕯️</h2>
 
@@ -99,7 +98,7 @@ function startMic() {
   navigator.mediaDevices.getUserMedia({ audio: true })
     .then(stream => {
 
-      // SWITCH SCREEN
+      // switch screens
       document.getElementById("screen1").classList.remove("active");
       document.getElementById("screen2").classList.add("active");
 
@@ -111,6 +110,9 @@ function startMic() {
 
       const data = new Uint8Array(analyser.fftSize);
 
+      // 🔥 improved detection system
+      let hitCount = 0;
+
       function detectSound() {
         analyser.getByteTimeDomainData(data);
 
@@ -119,7 +121,15 @@ function startMic() {
           volume += Math.abs(data[i] - 128);
         }
 
-        if (volume > 2000) {
+        // 🎯 sensitivity + stability filter
+        if (volume > 3500) {
+          hitCount++;
+        } else {
+          hitCount = 0;
+        }
+
+        // 🕯️ trigger only if consistent blow detected
+        if (hitCount > 3) {
           document.getElementById("flame").classList.add("off");
           document.getElementById("msg2").style.color = "lightgreen";
           document.getElementById("msg2").innerText = "Candle blown out! 🎉";
