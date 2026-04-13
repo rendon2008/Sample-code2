@@ -98,7 +98,7 @@ function startMic() {
   navigator.mediaDevices.getUserMedia({ audio: true })
     .then(stream => {
 
-      // switch screens
+      // switch screen
       document.getElementById("screen1").classList.remove("active");
       document.getElementById("screen2").classList.add("active");
 
@@ -110,8 +110,9 @@ function startMic() {
 
       const data = new Uint8Array(analyser.fftSize);
 
-      // 🔥 improved detection system
+      // 🔥 advanced detection variables
       let hitCount = 0;
+      let lastVolume = 0;
 
       function detectSound() {
         analyser.getByteTimeDomainData(data);
@@ -121,19 +122,25 @@ function startMic() {
           volume += Math.abs(data[i] - 128);
         }
 
-        // 🎯 sensitivity + stability filter
-        if (volume > 5000) {
+        // 🧠 REAL blow detection logic
+        const spike = volume > lastVolume * 1.8;   // sudden burst
+        const strong = volume > 4000;              // minimum strength
+        const isBlow = spike && strong;
+
+        if (isBlow) {
           hitCount++;
         } else {
           hitCount = 0;
         }
 
-        // 🕯️ trigger only if consistent blow detected
+        // 🕯️ only trigger after consistent blow
         if (hitCount > 3) {
           document.getElementById("flame").classList.add("off");
           document.getElementById("msg2").style.color = "lightgreen";
           document.getElementById("msg2").innerText = "Candle blown out! 🎉";
         }
+
+        lastVolume = volume;
 
         requestAnimationFrame(detectSound);
       }
