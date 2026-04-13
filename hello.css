@@ -1,0 +1,142 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+  background: radial-gradient(circle at top, #ffe6f0, #ffd1e8);
+}
+
+/* hidden scene */
+.hidden {
+  display: none;
+}
+
+/* MESSAGE */
+#message {
+  position: absolute;
+  top: 5%;
+  width: 100%;
+  text-align: center;
+  font-size: clamp(24px, 4vw, 48px);
+  font-weight: bold;
+  color: #ff4fa3;
+  text-shadow: 0 0 15px #ff9bd0;
+  transition: all 1s ease;
+}
+
+/* CAKE WRAPPER */
+.cake-wrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cake {
+  position: relative;
+  transform: scale(1);
+}
+
+/* TOP DECORATIONS */
+.top-row {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 8px;
+  margin-bottom: -10px;
+}
+
+.swirl, .strawberry {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.swirl {
+  background: radial-gradient(circle, #ffb3d9, #ff6fb1);
+}
+
+.strawberry {
+  background: #ff3b6b;
+}
+
+/* CAKE BODY */
+.cake-body {
+  width: min(300px, 70vw);
+  height: 180px;
+  background: linear-gradient(180deg, #ff9ecb, #ff6fa8);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+/* candles */
+.candle-slot {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.candle {
+  width: 6px;
+  height: 25px;
+  background: #fff;
+  position: absolute;
+  top: -25px;
+  border-radius: 3px;
+}
+
+.candle.center {
+  height: 35px;
+  background: #ffe08a;
+}
+
+.flame {
+  width: 10px;
+  height: 10px;
+  background: orange;
+  border-radius: 50%;
+  position: absolute;
+  top: -12px;
+  left: -2px;
+  animation: flicker 0.2s infinite;
+  box-shadow: 0 0 10px orange;
+}
+
+@keyframes flicker {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* BUTTON */
+#relightBtn {
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  background: #ff4fa3;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ff9bd0;
+}
+
+/* CONFETTI */
+#confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
