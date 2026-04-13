@@ -119,7 +119,7 @@ function startMic() {
           volume += Math.abs(data[i] - 128);
         }
 
-        if (volume > 3000) {
+        if (volume > 5000) {
           document.getElementById("flame").classList.add("off");
           document.getElementById("msg2").style.color = "lightgreen";
           document.getElementById("msg2").innerText = "Candle blown out! 🎉";
