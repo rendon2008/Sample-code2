@@ -202,13 +202,32 @@
 
         <button id="relight-btn" class="relight-btn hidden">Relight the candles</button>
 
+
+
+
+        
+
+        
 <div id="message-btn" class="message-btn hidden">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="4" width="20" height="16" rx="2" ry="2" fill="#FF1493"/>
-        <polyline points="2,4 12,13 22,4" fill="none" stroke="#FFCCCC" stroke-width="2"/>
+    <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Envelope body -->
+        <rect x="2" y="2" width="96" height="76" rx="8" ry="8" fill="white" stroke="#333" stroke-width="3"/>
+        <!-- Back flap lines -->
+        <line x1="2" y1="78" x2="38" y2="40" stroke="#333" stroke-width="2.5"/>
+        <line x1="98" y1="78" x2="62" y2="40" stroke="#333" stroke-width="2.5"/>
+        <!-- Top flap lines -->
+        <line x1="2" y1="2" x2="38" y2="40" stroke="#333" stroke-width="2.5"/>
+        <line x1="98" y1="2" x2="62" y2="40" stroke="#333" stroke-width="2.5"/>
+        <!-- Heart -->
+        <path d="M50 58 C50 58 28 44 28 32 C28 24 34 19 40 19 C44 19 48 22 50 25 C52 22 56 19 60 19 C66 19 72 24 72 32 C72 44 50 58 50 58Z" fill="#FF1493" stroke="#333" stroke-width="2"/>
     </svg>
 </div>
 
+
+
+
+
+        
         <!-- Celebration Elements -->
         <canvas id="confetti-canvas"></canvas>
         <div id="balloons" class="balloons"></div>
