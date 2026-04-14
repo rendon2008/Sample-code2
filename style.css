@@ -852,10 +852,10 @@ html, body {
     bottom: 16%;
     left: 50%;
     transform: translateX(-50%);
-    width: 55px;
-    height: 55px;
+    width: 70px;
+    height: 70px;
     background: #FFCCCC;
-    border-radius: 50%;
+    clip-path: path('M35 62 C35 62 5 45 5 22 C5 10 15 2 25 2 C30 2 35 6 35 6 C35 6 40 2 45 2 C55 2 65 10 65 22 C65 45 35 62 35 62Z');
     display: flex;
     justify-content: center;
     align-items: center;
@@ -866,8 +866,9 @@ html, body {
 }
 
 .message-btn svg {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
+    margin-top: 8px;
 }
 
 .message-btn.visible {
