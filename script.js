@@ -180,11 +180,10 @@ function startCelebration() {
 setTimeout(() => {
     relightBtn.classList.remove('hidden');
     relightBtn.classList.add('visible');
-    
-    document.getElementById('message-btn').classList.remove('visible');
-    document.getElementById('message-btn').classList.add('hidden');
-    document.getElementById('message-btn').classList.remove('hidden');
-    document.getElementById('message-btn').classList.add('visible');
+
+    const messageBtn = document.getElementById('message-btn');
+    messageBtn.classList.remove('hidden');
+    messageBtn.classList.add('visible');
 }, 2000);
 }
 
@@ -506,15 +505,15 @@ function relightCandles() {
         message.style.transform = 'translateX(-50%) scale(1)';
     }, 400);
     
-    // Hide relight button
-    relightBtn.classList.remove('visible');
-    relightBtn.classList.add('hidden');
-    
-    // Clear balloons
-    balloonsContainer.innerHTML = '';
-    
-    // Restart candle animations
-    startCandleAnimations();
+// Hide relight button
+relightBtn.classList.remove('visible');
+relightBtn.classList.add('hidden');
+
+// Clear balloons
+balloonsContainer.innerHTML = '';
+
+// Restart candle animations
+startCandleAnimations();
     
     // Restart blow detection
     if (!blowDetectionInterval) {
