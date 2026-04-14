@@ -309,8 +309,8 @@ function playHappyBirthdayMelody() {
         // Create gain node for envelope
         const gain = ctx.createGain();
         gain.gain.setValueAtTime(0, currentTime);
-        gain.gain.linearRampToValueAtTime(0.8, currentTime + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.6, currentTime + note.duration * 0.7);
+        gain.gain.linearRampToValueAtTime(1.0, currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.8, currentTime + note.duration * 0.7);
         gain.gain.exponentialRampToValueAtTime(0.01, currentTime + note.duration);
         
         // Add some harmonics for a richer sound
@@ -320,7 +320,7 @@ function playHappyBirthdayMelody() {
         
         const gain2 = ctx.createGain();
         gain2.gain.setValueAtTime(0, currentTime);
-        gain2.gain.linearRampToValueAtTime(0.02, currentTime + 0.05);
+        gain2.gain.linearRampToValueAtTime(0.04, currentTime + 0.05);
         gain2.gain.exponentialRampToValueAtTime(0.01, currentTime + note.duration);
         
         // Connect nodes
