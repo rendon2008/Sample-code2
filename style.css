@@ -235,7 +235,7 @@ html, body {
 /* Cake Plate */
 .cake-plate {
     position: absolute;
-    bottom: -15px;
+    bottom: -25px;
     left: 50%;
     transform: translateX(-50%);
     width: 130%;
@@ -251,7 +251,7 @@ html, body {
 /* Cake Base (Body) */
 .cake-base {
     position: absolute;
-    bottom: 0;
+    bottom: 5;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -387,7 +387,7 @@ html, body {
 /* ===== Cake Top ===== */
 .cake-top {
     position: absolute;
-    top: 0;
+    top: 10;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
