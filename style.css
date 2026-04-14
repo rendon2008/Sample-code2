@@ -768,33 +768,6 @@ html, body {
 
 
 
-
-
-.message-btn.visible {
-    opacity: 1;
-    visibility: visible;
-    animation: buttonAppear 0.5s ease, shakeAttention 1.2s infinite;
-}
-
-
-@keyframes shakeAttention {
-    0%   { transform: translateX(-50%) rotate(0deg); }
-    15%  { transform: translateX(-50%) translateY(-3px) rotate(-5deg); }
-    30%  { transform: translateX(-50%) translateY(3px) rotate(5deg); }
-    45%  { transform: translateX(-50%) translateY(-3px) rotate(-5deg); }
-    60%  { transform: translateX(-50%) translateY(3px) rotate(5deg); }
-    100% { transform: translateX(-50%) rotate(0deg); }
-}
-
-
-
-
-
-
-
-
-
-
 @keyframes buttonAppear {
     0% { transform: translateX(-50%) scale(0.8); opacity: 0; }
     100% { transform: translateX(-50%) scale(1); opacity: 1; }
@@ -891,7 +864,7 @@ html, body {
     position: absolute;
     bottom: 18%;
     left: 50%;
-    transform: none;
+    transform: translateX(-50%)  
     width: 80px;
     height: 80px;
     background: transparent;
