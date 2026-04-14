@@ -23,8 +23,8 @@
     --sprinkle-pink: #FFB8C9;
     
     /* Background */
-    --bg-gradient-start: #FFF0F5;
-    --bg-gradient-end: #FFE4EC;
+    --bg-gradient-start: #FFB6C1;
+    --bg-gradient-end: #FF85A1;
     
     /* Shadows */
     --cake-shadow: rgba(200, 150, 170, 0.3);
@@ -123,9 +123,9 @@ html, body {
     height: 100%;
     background: linear-gradient(180deg, 
         var(--bg-gradient-start) 0%, 
-        #FFF5F8 30%,
+        #FFB6C1 30%,
         var(--bg-gradient-end) 70%,
-        #FFE8F0 100%);
+        #FF85A1 100%);
     z-index: -2;
 }
 
@@ -177,7 +177,7 @@ html, body {
 /* ===== Message Display ===== */
 .message {
     position: absolute;
-    top: 15%;
+    top: 12%;
     left: 50%;
     transform: translateX(-50%);
     font-size: clamp(1.8rem, 5vw, 3.5rem);
