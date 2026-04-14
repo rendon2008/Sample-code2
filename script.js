@@ -509,6 +509,11 @@ function relightCandles() {
 relightBtn.classList.remove('visible');
 relightBtn.classList.add('hidden');
 
+// Hide message button
+const messageBtn = document.getElementById('message-btn');
+messageBtn.classList.remove('visible');
+messageBtn.classList.add('hidden');
+
 // Clear balloons
 balloonsContainer.innerHTML = '';
 
