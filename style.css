@@ -891,7 +891,7 @@ html, body {
     position: absolute;
     bottom: 18%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: none;
     width: 80px;
     height: 80px;
     background: transparent;
