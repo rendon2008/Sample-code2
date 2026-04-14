@@ -860,7 +860,7 @@ html, body {
 
 .message-btn {
     position: absolute;
-    bottom: 16%;
+    bottom: 23%;
     left: 50%;
     transform: translateX(-50%);
     width: 80px;
