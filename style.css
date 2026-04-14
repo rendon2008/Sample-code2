@@ -403,33 +403,6 @@ html, body {
 }
 
 /* Drip Frosting */
-.drip-frosting {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 6;
-    display: none;
-}
-
-.drip {
-    position: absolute;
-    background: linear-gradient(180deg, 
-        var(--cream-white) 0%, 
-        var(--cream-drip) 100%);
-    border-radius: 0 0 50% 50%;
-    box-shadow: inset -2px 0 4px rgba(255,255,255,0.5);
-}
-
-.drip-1 { left: 5%; width: 15px; height: 45px; top: 30%; }
-.drip-2 { left: 18%; width: 12px; height: 35px; top: 40%; }
-.drip-3 { left: 32%; width: 18px; height: 50px; top: 25%; }
-.drip-4 { left: 48%; width: 14px; height: 40px; top: 35%; }
-.drip-5 { right: 32%; width: 16px; height: 48px; top: 28%; }
-.drip-6 { right: 18%; width: 12px; height: 38px; top: 38%; }
-.drip-7 { right: 5%; width: 15px; height: 42px; top: 32%; }
-.drip-8 { left: 45%; width: 10px; height: 30px; top: 45%; }
 
 /* ===== Icing Swirls ===== */
 .icing-swirls {
