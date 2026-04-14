@@ -183,7 +183,7 @@ html, body {
     font-size: clamp(1.8rem, 5vw, 3.5rem);
     font-weight: 800;
     text-align: center;
-    color: var(--cake-pink-dark);
+    color: #FF69B4;
     text-shadow: 
         0 0 10px rgba(248, 200, 220, 0.8),
         0 0 20px rgba(248, 200, 220, 0.6),
