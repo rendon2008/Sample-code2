@@ -841,6 +841,47 @@ html, body {
 .balloon.green { background: linear-gradient(135deg, #98FB98 0%, #32CD32 100%); }
 .balloon.purple { background: linear-gradient(135deg, #DDA0DD 0%, #9370DB 100%); }
 
+
+
+
+
+
+
+.message-btn {
+    position: absolute;
+    bottom: 16%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55px;
+    height: 55px;
+    background: #FFCCCC;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+    cursor: pointer;
+}
+
+.message-btn svg {
+    width: 28px;
+    height: 28px;
+}
+
+.message-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    animation: buttonAppear 0.5s ease;
+}
+
+
+
+
+
+
+
 /* Confetti Canvas */
 #confetti-canvas {
     position: fixed;
