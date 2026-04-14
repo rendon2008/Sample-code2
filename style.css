@@ -177,7 +177,7 @@ html, body {
 /* ===== Message Display ===== */
 .message {
     position: absolute;
-    top: 25%;
+    top: 15%;
     left: 50%;
     transform: translateX(-50%);
     font-size: clamp(1.8rem, 5vw, 3.5rem);
