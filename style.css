@@ -190,7 +190,8 @@ html, body {
         0 0 30px rgba(248, 200, 220, 0.4),
         2px 2px 4px rgba(0,0,0,0.1);
     animation: messageGlow 2s ease-in-out infinite;
-    white-space: nowrap;
+    white-space: normal;
+    width: 90%;
     z-index: 10;
     transition: all 0.8s ease;
     letter-spacing: 2px;
