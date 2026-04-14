@@ -724,6 +724,11 @@ html, body {
     filter: blur(5px);
 }
 
+
+
+
+
+
 /* ===== Relight Button ===== */
 .relight-btn {
     position: absolute;
@@ -754,6 +759,12 @@ html, body {
     visibility: visible;
     animation: buttonAppear 0.5s ease;
 }
+
+
+
+
+
+
 
 @keyframes buttonAppear {
     0% { transform: translateX(-50%) scale(0.8); opacity: 0; }
