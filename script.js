@@ -177,10 +177,15 @@ function startCelebration() {
     startConfetti();
     
     // Show relight button
-    setTimeout(() => {
-        relightBtn.classList.remove('hidden');
-        relightBtn.classList.add('visible');
-    }, 2000);
+setTimeout(() => {
+    relightBtn.classList.remove('hidden');
+    relightBtn.classList.add('visible');
+    
+    document.getElementById('message-btn').classList.remove('visible');
+    document.getElementById('message-btn').classList.add('hidden');
+    document.getElementById('message-btn').classList.remove('hidden');
+    document.getElementById('message-btn').classList.add('visible');
+}, 2000);
 }
 
 // ===== Update Message =====
