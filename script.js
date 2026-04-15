@@ -501,16 +501,37 @@ document.getElementById('message-btn').addEventListener('click', () => {
     envFlap.classList.remove('open');
     envLetter.classList.remove('risen');
     heartSeal.classList.remove('hidden');
+});
 
-    setTimeout(() => {
+document.getElementById('envWrapper').addEventListener('click', () => {
+    if (!envelopeOpened) {
         heartSeal.classList.add('hidden');
         envFlap.classList.add('open');
-    }, 400);
 
-    setTimeout(() => {
-        envLetter.classList.add('risen');
-        envelopeOpened = true;
-    }, 900);
+        setTimeout(() => {
+            envLetter.classList.add('risen');
+            envelopeOpened = true;
+        }, 700);
+    }
+});
+
+envOverlay.addEventListener('click', (e) => {
+    if (envelopeOpened && e.target === envOverlay) {
+        envLetter.classList.remove('risen');
+        envelopeOpened = false;
+
+        setTimeout(() => {
+            envFlap.classList.remove('open');
+        }, 400);
+
+        setTimeout(() => {
+            heartSeal.classList.remove('hidden');
+        }, 900);
+
+        setTimeout(() => {
+            envOverlay.classList.remove('show');
+        }, 1200);
+    }
 });
 
 envOverlay.addEventListener('click', () => {
