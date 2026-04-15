@@ -512,8 +512,15 @@ document.getElementById('envWrapper').addEventListener('click', () => {
 
         setTimeout(() => {
             envLetter.classList.add('risen');
-            envelopeOpened = true;
         }, 700);
+
+        setTimeout(() => {
+            envLetter.classList.add('opened');
+        }, 1400);
+
+        setTimeout(() => {
+            envelopeOpened = true;
+        }, 1800);
     }
 });
 
