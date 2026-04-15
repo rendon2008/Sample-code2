@@ -833,7 +833,7 @@ animation: buttonAppear 0.5s ease;
   position: absolute;
   left: 50%; bottom: 10px;
   transform: translateX(-50%) translateY(0);
-  width: min(300px, 85vw);
+  width: min(500px, 85vw);
   max-height: 80vh;
   overflow-y: auto;
   background: #fff;
