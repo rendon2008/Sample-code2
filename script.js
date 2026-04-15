@@ -515,7 +515,20 @@ document.getElementById('message-btn').addEventListener('click', () => {
 
 envOverlay.addEventListener('click', () => {
     if (envelopeOpened) {
-        envOverlay.classList.remove('show');
+        envLetter.classList.remove('risen');
+        envelopeOpened = false;
+
+        setTimeout(() => {
+            envFlap.classList.remove('open');
+        }, 400);
+
+        setTimeout(() => {
+            heartSeal.classList.remove('hidden');
+        }, 900);
+
+        setTimeout(() => {
+            envOverlay.classList.remove('show');
+        }, 1200);
     }
 });
 
