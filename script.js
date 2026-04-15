@@ -271,35 +271,35 @@ function playHappyBirthdayMelody() {
     const now = ctx.currentTime;
     
     // Happy Birthday notes (frequencies in Hz)
- const notes = [
-    { freq: 396, duration: 0.25 }, // C4
-    { freq: 396, duration: 0.25 }, // C4
-    { freq: 445, duration: 0.5 },  // D4
-    { freq: 396, duration: 0.5 },  // C4
-    { freq: 528, duration: 0.5 },  // F4
-    { freq: 495, duration: 1 },    // E4
+const notes = [
+    { freq: 528, duration: 0.25 },
+    { freq: 528, duration: 0.25 },
+    { freq: 594, duration: 0.5 },
+    { freq: 528, duration: 0.5 },
+    { freq: 704, duration: 0.5 },
+    { freq: 660, duration: 1 },
     
-    { freq: 396, duration: 0.25 }, // C4
-    { freq: 396, duration: 0.25 }, // C4
-    { freq: 445, duration: 0.5 },  // D4
-    { freq: 396, duration: 0.5 },  // C4
-    { freq: 594, duration: 0.5 },  // G4
-    { freq: 528, duration: 1 },    // F4
+    { freq: 528, duration: 0.25 },
+    { freq: 528, duration: 0.25 },
+    { freq: 594, duration: 0.5 },
+    { freq: 528, duration: 0.5 },
+    { freq: 792, duration: 0.5 },
+    { freq: 704, duration: 1 },
     
-    { freq: 396, duration: 0.25 }, // C4
-    { freq: 396, duration: 0.25 }, // C4
-    { freq: 784, duration: 0.5 },  // C5
-    { freq: 660, duration: 0.5 },  // A4
-    { freq: 528, duration: 0.5 },  // F4
-    { freq: 495, duration: 0.5 },  // E4
-    { freq: 445, duration: 0.75 }, // D4
+    { freq: 528, duration: 0.25 },
+    { freq: 528, duration: 0.25 },
+    { freq: 1046, duration: 0.5 },
+    { freq: 880, duration: 0.5 },
+    { freq: 704, duration: 0.5 },
+    { freq: 660, duration: 0.5 },
+    { freq: 594, duration: 0.75 },
     
-    { freq: 699, duration: 0.25 }, // A#4
-    { freq: 699, duration: 0.25 }, // A#4
-    { freq: 660, duration: 0.5 },  // A4
-    { freq: 528, duration: 0.5 },  // F4
-    { freq: 594, duration: 0.5 },  // G4
-    { freq: 528, duration: 1 }     // F4
+    { freq: 932, duration: 0.25 },
+    { freq: 932, duration: 0.25 },
+    { freq: 880, duration: 0.5 },
+    { freq: 704, duration: 0.5 },
+    { freq: 792, duration: 0.5 },
+    { freq: 704, duration: 1 }
 ];
     
     let currentTime = now;
