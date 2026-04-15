@@ -272,36 +272,35 @@ function playHappyBirthdayMelody() {
     
     // Happy Birthday notes (frequencies in Hz)
 const notes = [
-    { freq: 528, duration: 0.25 },
-    { freq: 528, duration: 0.25 },
-    { freq: 594, duration: 0.5 },
-    { freq: 528, duration: 0.5 },
-    { freq: 704, duration: 0.5 },
-    { freq: 660, duration: 1 },
+    { freq: 792, duration: 0.15 },
+    { freq: 792, duration: 0.15 },
+    { freq: 891, duration: 0.35 },
+    { freq: 792, duration: 0.35 },
+    { freq: 1056, duration: 0.35 },
+    { freq: 990, duration: 0.7 },
     
-    { freq: 528, duration: 0.25 },
-    { freq: 528, duration: 0.25 },
-    { freq: 594, duration: 0.5 },
-    { freq: 528, duration: 0.5 },
-    { freq: 792, duration: 0.5 },
-    { freq: 704, duration: 1 },
+    { freq: 792, duration: 0.15 },
+    { freq: 792, duration: 0.15 },
+    { freq: 891, duration: 0.35 },
+    { freq: 792, duration: 0.35 },
+    { freq: 1188, duration: 0.35 },
+    { freq: 1056, duration: 0.7 },
     
-    { freq: 528, duration: 0.25 },
-    { freq: 528, duration: 0.25 },
-    { freq: 1046, duration: 0.5 },
-    { freq: 880, duration: 0.5 },
-    { freq: 704, duration: 0.5 },
-    { freq: 660, duration: 0.5 },
-    { freq: 594, duration: 0.75 },
+    { freq: 792, duration: 0.15 },
+    { freq: 792, duration: 0.15 },
+    { freq: 1569, duration: 0.35 },
+    { freq: 1320, duration: 0.35 },
+    { freq: 1056, duration: 0.35 },
+    { freq: 990, duration: 0.35 },
+    { freq: 891, duration: 0.5 },
     
-    { freq: 932, duration: 0.25 },
-    { freq: 932, duration: 0.25 },
-    { freq: 880, duration: 0.5 },
-    { freq: 704, duration: 0.5 },
-    { freq: 792, duration: 0.5 },
-    { freq: 704, duration: 1 }
+    { freq: 1398, duration: 0.15 },
+    { freq: 1398, duration: 0.15 },
+    { freq: 1320, duration: 0.35 },
+    { freq: 1056, duration: 0.35 },
+    { freq: 1188, duration: 0.35 },
+    { freq: 1056, duration: 0.7 }
 ];
-    
     let currentTime = now;
     
     notes.forEach((note, index) => {
