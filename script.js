@@ -482,6 +482,51 @@ function setupRelightButton() {
     });
 }
 
+
+
+
+
+
+
+// ===== Envelope / Letter Animation =====
+const envOverlay = document.getElementById('envOverlay');
+const envFlap = document.getElementById('envFlap');
+const envLetter = document.getElementById('letter');
+const heartSeal = document.getElementById('heartSeal');
+let envelopeOpened = false;
+
+document.getElementById('message-btn').addEventListener('click', () => {
+    envOverlay.classList.add('show');
+    envelopeOpened = false;
+    envFlap.classList.remove('open');
+    envLetter.classList.remove('risen');
+    heartSeal.classList.remove('hidden');
+
+    setTimeout(() => {
+        heartSeal.classList.add('hidden');
+        envFlap.classList.add('open');
+    }, 400);
+
+    setTimeout(() => {
+        envLetter.classList.add('risen');
+        envelopeOpened = true;
+    }, 900);
+});
+
+envOverlay.addEventListener('click', () => {
+    if (envelopeOpened) {
+        envOverlay.classList.remove('show');
+    }
+});
+
+
+
+
+
+
+
+
+
 function relightCandles() {
     // Reset state
     candlesExtinguished = false;
