@@ -495,6 +495,8 @@ const envLetter = document.getElementById('letter');
 const heartSeal = document.getElementById('heartSeal');
 let envelopeOpened = false;
 
+
+
 document.getElementById('message-btn').addEventListener('click', () => {
     envOverlay.classList.add('show');
     envelopeOpened = false;
@@ -516,21 +518,25 @@ document.getElementById('envWrapper').addEventListener('click', () => {
 });
 
 envOverlay.addEventListener('click', (e) => {
-    if (envelopeOpened && e.target === envOverlay) {
-        envLetter.classList.remove('risen');
-        envelopeOpened = false;
+    if (e.target === envOverlay) {
+        if (envelopeOpened) {
+            envLetter.classList.remove('risen');
+            envelopeOpened = false;
 
-        setTimeout(() => {
-            envFlap.classList.remove('open');
-        }, 400);
+            setTimeout(() => {
+                envFlap.classList.remove('open');
+            }, 400);
 
-        setTimeout(() => {
-            heartSeal.classList.remove('hidden');
-        }, 900);
+            setTimeout(() => {
+                heartSeal.classList.remove('hidden');
+            }, 900);
 
-        setTimeout(() => {
+            setTimeout(() => {
+                envOverlay.classList.remove('show');
+            }, 1200);
+        } else {
             envOverlay.classList.remove('show');
-        }, 1200);
+        }
     }
 });
 
