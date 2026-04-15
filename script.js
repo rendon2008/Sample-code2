@@ -272,34 +272,34 @@ function playHappyBirthdayMelody() {
     
     // Happy Birthday notes (frequencies in Hz)
 const notes = [
-    { freq: 792, duration: 0.15 },
-    { freq: 792, duration: 0.15 },
-    { freq: 891, duration: 0.35 },
-    { freq: 792, duration: 0.35 },
-    { freq: 1056, duration: 0.35 },
-    { freq: 990, duration: 0.7 },
+    { freq: 792, duration: 0.19 },
+    { freq: 792, duration: 0.19 },
+    { freq: 891, duration: 0.38 },
+    { freq: 792, duration: 0.38 },
+    { freq: 1056, duration: 0.38 },
+    { freq: 990, duration: 0.77 },
     
-    { freq: 792, duration: 0.15 },
-    { freq: 792, duration: 0.15 },
-    { freq: 891, duration: 0.35 },
-    { freq: 792, duration: 0.35 },
-    { freq: 1188, duration: 0.35 },
-    { freq: 1056, duration: 0.7 },
+    { freq: 792, duration: 0.19 },
+    { freq: 792, duration: 0.19 },
+    { freq: 891, duration: 0.38 },
+    { freq: 792, duration: 0.38 },
+    { freq: 1188, duration: 0.38 },
+    { freq: 1056, duration: 0.77 },
     
-    { freq: 792, duration: 0.15 },
-    { freq: 792, duration: 0.15 },
-    { freq: 1569, duration: 0.35 },
-    { freq: 1320, duration: 0.35 },
-    { freq: 1056, duration: 0.35 },
-    { freq: 990, duration: 0.35 },
-    { freq: 891, duration: 0.5 },
+    { freq: 792, duration: 0.19 },
+    { freq: 792, duration: 0.19 },
+    { freq: 1569, duration: 0.38 },
+    { freq: 1320, duration: 0.38 },
+    { freq: 1056, duration: 0.38 },
+    { freq: 990, duration: 0.38 },
+    { freq: 891, duration: 0.58 },
     
-    { freq: 1398, duration: 0.15 },
-    { freq: 1398, duration: 0.15 },
-    { freq: 1320, duration: 0.35 },
-    { freq: 1056, duration: 0.35 },
-    { freq: 1188, duration: 0.35 },
-    { freq: 1056, duration: 0.7 }
+    { freq: 1398, duration: 0.19 },
+    { freq: 1398, duration: 0.19 },
+    { freq: 1320, duration: 0.38 },
+    { freq: 1056, duration: 0.38 },
+    { freq: 1188, duration: 0.38 },
+    { freq: 1056, duration: 0.77 }
 ];
     let currentTime = now;
     
