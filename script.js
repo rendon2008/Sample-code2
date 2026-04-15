@@ -271,36 +271,36 @@ function playHappyBirthdayMelody() {
     const now = ctx.currentTime;
     
     // Happy Birthday notes (frequencies in Hz)
-    const notes = [
-        { freq: 264, duration: 0.25 }, // C4
-        { freq: 264, duration: 0.25 }, // C4
-        { freq: 297, duration: 0.5 },  // D4
-        { freq: 264, duration: 0.5 },  // C4
-        { freq: 352, duration: 0.5 },  // F4
-        { freq: 330, duration: 1 },    // E4
-        
-        { freq: 264, duration: 0.25 }, // C4
-        { freq: 264, duration: 0.25 }, // C4
-        { freq: 297, duration: 0.5 },  // D4
-        { freq: 264, duration: 0.5 },  // C4
-        { freq: 396, duration: 0.5 },  // G4
-        { freq: 352, duration: 1 },    // F4
-        
-        { freq: 264, duration: 0.25 }, // C4
-        { freq: 264, duration: 0.25 }, // C4
-        { freq: 523, duration: 0.5 },  // C5
-        { freq: 440, duration: 0.5 },  // A4
-        { freq: 352, duration: 0.5 },  // F4
-        { freq: 330, duration: 0.5 },  // E4
-        { freq: 297, duration: 0.75 }, // D4
-        
-        { freq: 466, duration: 0.25 }, // A#4
-        { freq: 466, duration: 0.25 }, // A#4
-        { freq: 440, duration: 0.5 },  // A4
-        { freq: 352, duration: 0.5 },  // F4
-        { freq: 396, duration: 0.5 },  // G4
-        { freq: 352, duration: 1 }     // F4
-    ];
+ const notes = [
+    { freq: 396, duration: 0.25 }, // C4
+    { freq: 396, duration: 0.25 }, // C4
+    { freq: 445, duration: 0.5 },  // D4
+    { freq: 396, duration: 0.5 },  // C4
+    { freq: 528, duration: 0.5 },  // F4
+    { freq: 495, duration: 1 },    // E4
+    
+    { freq: 396, duration: 0.25 }, // C4
+    { freq: 396, duration: 0.25 }, // C4
+    { freq: 445, duration: 0.5 },  // D4
+    { freq: 396, duration: 0.5 },  // C4
+    { freq: 594, duration: 0.5 },  // G4
+    { freq: 528, duration: 1 },    // F4
+    
+    { freq: 396, duration: 0.25 }, // C4
+    { freq: 396, duration: 0.25 }, // C4
+    { freq: 784, duration: 0.5 },  // C5
+    { freq: 660, duration: 0.5 },  // A4
+    { freq: 528, duration: 0.5 },  // F4
+    { freq: 495, duration: 0.5 },  // E4
+    { freq: 445, duration: 0.75 }, // D4
+    
+    { freq: 699, duration: 0.25 }, // A#4
+    { freq: 699, duration: 0.25 }, // A#4
+    { freq: 660, duration: 0.5 },  // A4
+    { freq: 528, duration: 0.5 },  // F4
+    { freq: 594, duration: 0.5 },  // G4
+    { freq: 528, duration: 1 }     // F4
+];
     
     let currentTime = now;
     
