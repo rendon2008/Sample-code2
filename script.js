@@ -501,7 +501,7 @@ document.getElementById('message-btn').addEventListener('click', () => {
     envOverlay.classList.add('show');
     envelopeOpened = false;
     envFlap.classList.remove('open');
-    envLetter.classList.remove('risen');
+    envLetter.classList.remove('risen', 'closing', 'opened');
     heartSeal.classList.remove('hidden');
 });
 
@@ -511,41 +511,38 @@ document.getElementById('envWrapper').addEventListener('click', () => {
         envFlap.classList.add('open');
 
         setTimeout(() => {
+            envLetter.classList.remove('closing');
             envLetter.classList.add('risen');
-        }, 700);
-
-        setTimeout(() => {
-            envLetter.classList.add('opened');
-        }, 1400);
-
-        setTimeout(() => {
             envelopeOpened = true;
-        }, 1800);
+        }, 700);
     }
 });
 
 envOverlay.addEventListener('click', (e) => {
     if (e.target === envOverlay) {
         if (envelopeOpened) {
-            envLetter.classList.remove('risen');
             envelopeOpened = false;
+            envLetter.classList.remove('risen');
+            envLetter.classList.add('closing');
 
             setTimeout(() => {
                 envFlap.classList.remove('open');
-            }, 400);
+            }, 700);
 
             setTimeout(() => {
                 heartSeal.classList.remove('hidden');
-            }, 900);
+            }, 1100);
 
             setTimeout(() => {
                 envOverlay.classList.remove('show');
-            }, 1200);
+            }, 1400);
         } else {
             envOverlay.classList.remove('show');
         }
     }
 });
+
+
 
 envOverlay.addEventListener('click', () => {
     if (envelopeOpened) {
