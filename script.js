@@ -505,7 +505,8 @@ document.getElementById('message-btn').addEventListener('click', () => {
     heartSeal.classList.remove('hidden');
 });
 
-document.getElementById('envWrapper').addEventListener('click', () => {
+document.getElementById('envWrapper').addEventListener('click', (e) => {
+    e.stopPropagation();
     if (!envelopeOpened) {
         heartSeal.classList.add('hidden');
         envFlap.classList.add('open');
@@ -516,6 +517,11 @@ document.getElementById('envWrapper').addEventListener('click', () => {
             envelopeOpened = true;
         }, 700);
     }
+});
+
+document.getElementById('letter').addEventListener('click', (e) => {
+    e.stopPropagation();
+    envOverlay.click();
 });
 
 envOverlay.addEventListener('click', (e) => {
@@ -543,25 +549,6 @@ envOverlay.addEventListener('click', (e) => {
 });
 
 
-
-envOverlay.addEventListener('click', () => {
-    if (envelopeOpened) {
-        envLetter.classList.remove('risen');
-        envelopeOpened = false;
-
-        setTimeout(() => {
-            envFlap.classList.remove('open');
-        }, 400);
-
-        setTimeout(() => {
-            heartSeal.classList.remove('hidden');
-        }, 900);
-
-        setTimeout(() => {
-            envOverlay.classList.remove('show');
-        }, 1200);
-    }
-});
 
 
 
