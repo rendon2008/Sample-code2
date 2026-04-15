@@ -856,6 +856,7 @@ animation: buttonAppear 0.5s ease;
 
 .letter.risen {
   animation: letterOpen 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: all;
 }
 
 .letter.closing {
