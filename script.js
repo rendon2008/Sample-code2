@@ -40,16 +40,23 @@ const poppers            = document.querySelectorAll('.popper');
 // INITIALIZATION
 // =====================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupRelightButton();
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ DOMContentLoaded fired');
     
-    // Add click listener to request mic button
     const requestMicBtn = document.getElementById('request-mic-btn');
+    console.log('🔘 Button found:', !!requestMicBtn);
+    
     if (requestMicBtn) {
         requestMicBtn.addEventListener('click', () => {
+            console.log('🎤 Button clicked!');
             requestMicrophoneAccess();
         });
+        console.log('✅ Click listener attached');
+    } else {
+        console.error('❌ Button element not found in DOM');
     }
+    
+    setupRelightButton();
 });
 
 
