@@ -992,32 +992,39 @@ function showFinalMessage() {
     
     // Start typewriter animation after 1 second delay
     setTimeout(() => {
-        typewriterAnimation(textElement, textWrapper);
+        typewriterAnimationWordByWord(textElement, textWrapper);
     }, 1000);
 }
 
-function typewriterAnimation(textElement, textWrapper) {
-    let index = 0;
-    let lastHeight = 0;
+function typewriterAnimationWordByWord(textElement, textWrapper) {
+    // Split message into words
+    const words = FINAL_MESSAGE.split(' ');
+    let wordIndex = 0;
+    let currentText = '';
+    let lastScrollHeight = 0;
     
     const typeInterval = setInterval(() => {
-        if (index < FINAL_MESSAGE.length) {
-            // Add character to temporary text
-            textElement.textContent += FINAL_MESSAGE[index];
-            index++;
+        if (wordIndex < words.length) {
+            const word = words[wordIndex];
+            const testText = currentText + (currentText ? ' ' : '') + word;
             
-            // Check if height changed (wrapped to next line)
-            const currentHeight = textElement.scrollHeight;
+            // Set test text to check height
+            textElement.textContent = testText;
+            const newHeight = textElement.scrollHeight;
             
-            // If text wrapped to new line and user isn't scrolling, auto-scroll
-            if (currentHeight > lastHeight) {
+            // If height increased (wrapped to new line), auto-scroll if not user scrolling
+            if (newHeight > lastScrollHeight && !isUserScrolling) {
                 textWrapper.scrollTop = textWrapper.scrollHeight;
-                lastHeight = currentHeight;
+                lastScrollHeight = newHeight;
             }
+            
+            // Add word to current text
+            currentText = testText;
+            wordIndex++;
         } else {
             clearInterval(typeInterval);
         }
-    }, 60); // Faster typing speed (30ms per character)
+    }, 150); // 150ms per word
 }
 
     
