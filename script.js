@@ -1054,7 +1054,7 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
     // Typing speed: base ms per character, with slight random variance for feel
     const BASE_MS = 55;
 
-    function nextTick() {
+  function nextTick() {
         // All lines done
         if (lineIdx >= lines.length) {
             if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
@@ -1073,7 +1073,15 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
 
         if (charIdx < line.length) {
             // Insert character text node before cursor
-            currentLineEl.insertBefore(document.createTextNode(line[charIdx]), cursor);
+            const ch = line[charIdx];
+            if (/\p{Emoji}/u.test(ch)) {
+                const emojiSpan = document.createElement('span');
+                emojiSpan.style.cssText = '-webkit-text-fill-color: initial; font-style: normal;';
+                emojiSpan.textContent = ch;
+                currentLineEl.insertBefore(emojiSpan, cursor);
+            } else {
+                currentLineEl.insertBefore(document.createTextNode(ch), cursor);
+            }
             charIdx++;
 
             if (!getIsScrolling()) {
@@ -1081,7 +1089,6 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
             }
 
             // Slight pause after punctuation for a natural, romantic cadence
-            const ch = line[charIdx - 1];
             const delay = /[,.]/.test(ch) ? BASE_MS * 6
                         : /[!?]/.test(ch)  ? BASE_MS * 4
                         : BASE_MS + (Math.random() * 28 - 10); // gentle variance
@@ -1096,7 +1103,6 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
 
     nextTick();
 }
-
     
 
     
