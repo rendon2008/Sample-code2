@@ -554,11 +554,13 @@ envOverlay.addEventListener('click', (e) => {
 (function () {
 
     // ---- Config: add/remove image filenames freely ----
-    const IMAGES = [
-        'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg',
-        'image5.jpg', 'image6.jpg', 'image7.jpg', 'image8.jpg'
-    ];
-
+const IMAGES = [
+    'image1.png', 'image2.png', 'image3.png', 'image4.png',
+    'image5.png', 'image6.png', 'image7.png', 'image8.png',
+    'image9.png', 'image10.png', 'image11.png', 'image12.png',
+    'image13.png'
+];
+    
     const FALLBACK_EMOJI  = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
     const VISIBLE_CARDS   = 4;
 
