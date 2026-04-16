@@ -807,8 +807,8 @@ function onDragEnd() {
         // Snap back — restore background cards too
         const TRANS = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
         topCard.style.transition = TRANS;
-        topCard.style.transform  = 'translateX(0) translateY(0) rotate(0deg)';
-        topCard.style.cursor     = 'grab';
+        const topNudge = cardNudges[parseInt(topCard.dataset.imgIdx)] || { x: 0, rot: 0 };
+        topCard.style.transform  = `translateX(${topNudge.x}px) translateY(0px) rotate(${topNudge.rot}deg)`;        topCard.style.cursor     = 'grab';
 
         for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
             const imgIdx = currentIndex + offset;
@@ -844,8 +844,9 @@ function flyCard(flyX, flyY) {
         const scale  = 1 - (offset - 1) * 0.045;
         const yOff   = (offset - 1) * 12;
         const zIdx   = String(IMAGES.length + VISIBLE_CARDS - (offset - 1));
-        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
-        card.style.zIndex     = zIdx;
+        const nudge = cardNudges[parseInt(card.dataset.imgIdx)] || { x: 0, rot: 0 };
+        card.style.transform  = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;    
+        card.style.zIndex     = zIdx;        
         card.style.opacity    = '1';
         card.style.boxShadow  = (offset - 1) === 0
             ? '0 12px 40px rgba(0,0,0,0.45)'
