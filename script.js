@@ -899,7 +899,16 @@ function showFinalMessage() {
         overflow: hidden;
         box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
         animation: fadeInMessage 0.6s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+    `;
+    
+    const textWrapper = document.createElement('div');
+    textWrapper.style.cssText = `
+        width: 100%;
+        height: 100%;
         padding: 40px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
     `;
     
     const textElement = document.createElement('div');
@@ -916,11 +925,11 @@ function showFinalMessage() {
         word-wrap: break-word;
         text-align: left;
         font-family: 'Georgia', serif;
-        max-height: 100%;
-        overflow-y: auto;
+        min-height: 100%;
     `;
     
-    messageContainer.appendChild(textElement);
+    textWrapper.appendChild(textElement);
+    messageContainer.appendChild(textWrapper);
     cardStack.appendChild(messageContainer);
     
     // Add animation keyframes
@@ -938,22 +947,76 @@ function showFinalMessage() {
                     transform: scale(1);
                 }
             }
+            
+            /* Smooth scrollbar */
+            div::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            div::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+            }
+            
+            div::-webkit-scrollbar-thumb {
+                background: rgba(255, 105, 180, 0.5);
+                border-radius: 10px;
+            }
+            
+            div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 105, 180, 0.8);
+            }
         `;
         document.head.appendChild(style);
     }
     
+    let isUserScrolling = false;
+    let scrollTimeout;
+    
+    // Detect user scrolling
+    textWrapper.addEventListener('wheel', () => {
+        isUserScrolling = true;
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            isUserScrolling = false;
+        }, 1500);
+    }, { passive: true });
+    
+    textWrapper.addEventListener('touchmove', () => {
+        isUserScrolling = true;
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            isUserScrolling = false;
+        }, 1500);
+    }, { passive: true });
+    
     // Typewriter animation
     let index = 0;
+    let lastHeight = 0;
+    
     const typeInterval = setInterval(() => {
         if (index < FINAL_MESSAGE.length) {
             textElement.textContent += FINAL_MESSAGE[index];
             index++;
+            
+            // Auto-scroll when text overflows (only if user isn't scrolling)
+            if (!isUserScrolling) {
+                const currentHeight = textElement.scrollHeight;
+                
+                // Scroll smoothly when content grows
+                if (currentHeight > lastHeight) {
+                    textWrapper.scrollTop = textWrapper.scrollHeight;
+                    lastHeight = currentHeight;
+                }
+            }
         } else {
             clearInterval(typeInterval);
         }
-    }, 40); // Adjust speed here (40ms per character - faster for long text)
+    }, 40); // Adjust speed here (40ms per character)
 }
 
+
+    
 // ---- Open / Close ----
 function openSlider() {
     // Reset everything
