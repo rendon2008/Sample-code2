@@ -1052,7 +1052,7 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
     let currentLineEl = null;
 
     // Typing speed: base ms per character, with slight random variance for feel
-    const BASE_MS = 55;
+    const BASE_MS = 40;
 
   function nextTick() {
         // All lines done
