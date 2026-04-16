@@ -887,6 +887,37 @@ function flyCard(flyX, flyY) {
 // Final ILY card
 // -------------------------------------------------------
 function showFinalMessage() {
+    // Inject styles once
+    if (!document.getElementById('slider-animation-styles')) {
+        const style = document.createElement('style');
+        style.id = 'slider-animation-styles';
+        style.textContent = `
+            @keyframes fadeInMessage {
+                0%   { opacity: 0; transform: scale(0.95); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+            @keyframes blinkCursor {
+                0%, 100% { opacity: 1; }
+                50%       { opacity: 0; }
+            }
+            .type-cursor {
+                display: inline-block;
+                width: 2px;
+                height: 1.1em;
+                background: #FF69B4;
+                margin-left: 2px;
+                vertical-align: text-bottom;
+                animation: blinkCursor 0.8s ease-in-out infinite;
+            }
+            div::-webkit-scrollbar       { width: 6px; }
+            div::-webkit-scrollbar-track { background: rgba(255,255,255,0.07); border-radius: 10px; }
+            div::-webkit-scrollbar-thumb { background: rgba(255,105,180,0.45); border-radius: 10px; }
+            div::-webkit-scrollbar-thumb:hover { background: rgba(255,105,180,0.75); }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // ── Card shell — fades in immediately ──────────────────────────────
     const messageContainer = document.createElement('div');
     messageContainer.style.cssText = `
         position: absolute;
@@ -900,7 +931,7 @@ function showFinalMessage() {
         box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
         animation: fadeInMessage 0.6s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
     `;
-    
+
     const textWrapper = document.createElement('div');
     textWrapper.style.cssText = `
         width: 100%;
@@ -910,9 +941,10 @@ function showFinalMessage() {
         overflow-x: hidden;
         scroll-behavior: smooth;
     `;
-    
-    const textElement = document.createElement('div');
-    textElement.style.cssText = `
+
+    // Container for typed lines — each line is a <div>
+    const linesContainer = document.createElement('div');
+    linesContainer.style.cssText = `
         font-size: 1.2rem;
         font-weight: 500;
         background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
@@ -921,98 +953,121 @@ function showFinalMessage() {
         background-clip: text;
         letter-spacing: 0.5px;
         line-height: 1.8;
-        white-space: normal;
-        word-wrap: break-word;
         text-align: left;
         font-family: 'Georgia', serif;
         min-height: 100%;
     `;
-    
-    textWrapper.appendChild(textElement);
+
+    // Blinking cursor element
+    const cursor = document.createElement('span');
+    cursor.className = 'type-cursor';
+
+    textWrapper.appendChild(linesContainer);
     messageContainer.appendChild(textWrapper);
     cardStack.appendChild(messageContainer);
-    
-    // Add animation keyframes
-    if (!document.getElementById('slider-animation-styles')) {
-        const style = document.createElement('style');
-        style.id = 'slider-animation-styles';
-        style.textContent = `
-            @keyframes fadeInMessage {
-                0% {
-                    opacity: 0;
-                    transform: scale(0.95);
-                }
-                100% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-            }
-            
-            /* Smooth scrollbar */
-            div::-webkit-scrollbar {
-                width: 8px;
-            }
-            
-            div::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 10px;
-            }
-            
-            div::-webkit-scrollbar-thumb {
-                background: rgba(255, 105, 180, 0.5);
-                border-radius: 10px;
-            }
-            
-            div::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 105, 180, 0.8);
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
+
+    // ── User-scroll detection ───────────────────────────────────────────
     let isUserScrolling = false;
     let scrollTimeout;
-    
-    // Detect user scrolling
-    textWrapper.addEventListener('wheel', () => {
+    const onUserScroll = () => {
         isUserScrolling = true;
         clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            isUserScrolling = false;
-        }, 1500);
-    }, { passive: true });
-    
-    textWrapper.addEventListener('touchmove', () => {
-        isUserScrolling = true;
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            isUserScrolling = false;
-        }, 1500);
-    }, { passive: true });
-    
-    // Typewriter animation
-    let index = 0;
-    let lastHeight = 0;
-    
-    const typeInterval = setInterval(() => {
-        if (index < FINAL_MESSAGE.length) {
-            textElement.textContent += FINAL_MESSAGE[index];
-            index++;
-            
-            // Auto-scroll when text overflows (only if user isn't scrolling)
-            if (!isUserScrolling) {
-                const currentHeight = textElement.scrollHeight;
-                
-                // Scroll smoothly when content grows
-                if (currentHeight > lastHeight) {
-                    textWrapper.scrollTop = textWrapper.scrollHeight;
-                    lastHeight = currentHeight;
+        scrollTimeout = setTimeout(() => { isUserScrolling = false; }, 1500);
+    };
+    textWrapper.addEventListener('wheel',     onUserScroll, { passive: true });
+    textWrapper.addEventListener('touchmove', onUserScroll, { passive: true });
+
+    // ── Pre-measure: split message into lines that fit the card width ───
+    // We wait one frame after the card is in the DOM so layout is computed.
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            // Measure available width using a hidden ruler span
+            const ruler = document.createElement('span');
+            ruler.style.cssText = `
+                position: absolute;
+                visibility: hidden;
+                white-space: nowrap;
+                font-size: 1.2rem;
+                font-weight: 500;
+                letter-spacing: 0.5px;
+                font-family: 'Georgia', serif;
+                pointer-events: none;
+            `;
+            linesContainer.appendChild(ruler);
+
+            const availableWidth = linesContainer.clientWidth || (textWrapper.clientWidth - 80);
+
+            // Word-wrap: greedily pack words onto lines
+            const words = FINAL_MESSAGE.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            for (let i = 0; i < words.length; i++) {
+                const testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
+                ruler.textContent = testLine;
+                if (ruler.offsetWidth > availableWidth && currentLine !== '') {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                } else {
+                    currentLine = testLine;
                 }
             }
-        } else {
-            clearInterval(typeInterval);
+            if (currentLine) lines.push(currentLine);
+
+            linesContainer.removeChild(ruler);
+
+            // ── Start typing after card has settled (0.8 s delay) ───────
+            setTimeout(() => {
+                typeLines(lines, linesContainer, cursor, textWrapper, () => { isUserScrolling }, () => isUserScrolling);
+            }, 800);
+        });
+    });
+}
+
+// Typed line-by-line so no mid-word reflow ever happens
+function typeLines(lines, container, cursor, wrapper, _unused, getIsScrolling) {
+    let lineIdx  = 0;
+    let charIdx  = 0;
+    let currentLineEl = null;
+
+    function nextTick() {
+        // All lines done
+        if (lineIdx >= lines.length) {
+            if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+            return;
         }
-    }, 50); // Adjust speed here (40ms per character)
+
+        // Start a new line element
+        if (charIdx === 0) {
+            currentLineEl = document.createElement('div');
+            currentLineEl.style.minHeight = '1.8em'; // reserve space immediately
+            container.appendChild(currentLineEl);
+            currentLineEl.appendChild(cursor);
+        }
+
+        const line = lines[lineIdx];
+
+        if (charIdx < line.length) {
+            // Insert char before cursor
+            const textNode = document.createTextNode(line[charIdx]);
+            currentLineEl.insertBefore(textNode, cursor);
+            charIdx++;
+
+            // Auto-scroll
+            if (!getIsScrolling()) {
+                wrapper.scrollTop = wrapper.scrollHeight;
+            }
+
+            setTimeout(nextTick, 38);
+        } else {
+            // Line complete — move cursor to next line
+            lineIdx++;
+            charIdx = 0;
+            setTimeout(nextTick, 38);
+        }
+    }
+
+    nextTick();
 }
 
     
