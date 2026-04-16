@@ -577,15 +577,20 @@ envOverlay.addEventListener('click', (e) => {
     let hintTimer = null;
 
     // ---- Build visual stack ----
-    function buildStack() {
-        cardStack.innerHTML = '';
-        for (let i = VISIBLE_CARDS - 1; i >= 0; i--) {
-            const imgIdx = (currentIndex + i) % IMAGES.length;
-            const card   = createCard(imgIdx, i);
-            cardStack.appendChild(card);
-            positionCard(card, i, false);
-        }
+function buildStack() {
+    cardStack.innerHTML = '';
+    for (let i = VISIBLE_CARDS - 1; i >= 0; i--) {
+        const imgIdx = (currentIndex + i) % IMAGES.length;
+        const card   = createCard(imgIdx, i);
+        card.style.opacity = '0';
+        cardStack.appendChild(card);
+        positionCard(card, i, false);
+        requestAnimationFrame(() => {
+            card.style.transition = 'opacity 0.3s ease';
+            card.style.opacity = '1';
+        });
     }
+}
 
     function createCard(imgIdx, stackPos) {
         const card       = document.createElement('div');
