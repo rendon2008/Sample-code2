@@ -764,8 +764,8 @@ function onDragMove(e) {
         const scale     = fromScale + (toScale - fromScale) * progress;
         const yOff      = fromY   + (toY   - fromY)   * progress;
         card.style.transition = 'none';
-        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
-    }
+        const nudge = cardNudges[parseInt(card.dataset.imgIdx)] || { x: 0, rot: 0 };
+        card.style.transform  = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;    }
 
     // Also peek in the next card that's currently hidden
     const peekIdx = currentIndex + VISIBLE_CARDS;
@@ -774,8 +774,8 @@ function onDragMove(e) {
         const lastScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
         const lastY     = (VISIBLE_CARDS - 1) * 12;
         peekCard.style.transition = 'none';
-        peekCard.style.transform  = `translateY(${lastY}px) scale(${lastScale})`;
-        peekCard.style.zIndex     = String(IMAGES.length);
+        const peekNudge = cardNudges[parseInt(peekCard.dataset.imgIdx)] || { x: 0, rot: 0 };
+        peekCard.style.transform  = `translateX(${peekNudge.x}px) translateY(${lastY}px) rotate(${peekNudge.rot}deg) scale(${lastScale})`;        peekCard.style.zIndex     = String(IMAGES.length);
         peekCard.style.opacity    = String(progress);
     }
 }
