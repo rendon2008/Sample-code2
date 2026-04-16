@@ -778,7 +778,7 @@ html, body {
 
 .env-flap {
     position: absolute;
-    top: 25px; left: 0;
+    top: 20px; left: 0;
     width: 0; height: 0;
     border-style: solid;
     border-width: 88px 140px 0 140px;
