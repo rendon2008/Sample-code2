@@ -860,8 +860,8 @@ function flyCard(flyX, flyY) {
         const backScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
         const backY     = (VISIBLE_CARDS - 1) * 12;
         nextCard.style.transition = SLIDE_TRANS;
-        nextCard.style.transform  = `translateY(${backY}px) scale(${backScale})`;
-        nextCard.style.zIndex     = String(IMAGES.length);
+const nextNudge = cardNudges[parseInt(nextCard.dataset.imgIdx)] || { x: 0, rot: 0 };
+nextCard.style.transform  = `translateX(${nextNudge.x}px) translateY(${backY}px) rotate(${nextNudge.rot}deg) scale(${backScale})`;        nextCard.style.zIndex     = String(IMAGES.length);
         nextCard.style.opacity    = '1';
     }
 
