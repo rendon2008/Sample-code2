@@ -954,9 +954,6 @@ function showFinalMessage() {
     }, 40); // Adjust speed here (40ms per character - faster for long text)
 }
 
-    
-}
-
 // ---- Open / Close ----
 function openSlider() {
     // Reset everything
