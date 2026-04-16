@@ -652,7 +652,9 @@ function initializeAllCards() {
         // Hide cards that won't be visible in the initial stack
         if (i > VISIBLE_CARDS - 1) {
             card.style.opacity   = '0';
-            card.style.transform = `translateY(${(VISIBLE_CARDS - 1) * 12}px) scale(${1 - (VISIBLE_CARDS - 1) * 0.045})`;
+         const nudgeX = (Math.random() - 0.5) * 10;
+            const nudgeRot = (Math.random() - 0.5) * 6;
+            card.style.transform = `translateX(${nudgeX}px) translateY(${yOff}px) rotate(${nudgeRot}deg) scale(${scale})`;
             card.style.zIndex    = '0';
         }
         allCards[i] = card;
