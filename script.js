@@ -59,11 +59,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function requestMicrophoneAccess() {
     try {
+        console.log('🔍 Requesting microphone access...');
+        
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            console.error('❌ getUserMedia not supported');
             showError('Microphone access not supported in this browser');
             return;
         }
 
+        console.log('✅ Browser supports getUserMedia');
+        console.log('📢 Calling getUserMedia...');
+        
         microphoneStream = await navigator.mediaDevices.getUserMedia({
             audio: {
                 echoCancellation: false,
@@ -71,6 +77,8 @@ async function requestMicrophoneAccess() {
                 autoGainControl: false
             }
         });
+
+        console.log('✅ Microphone access granted!');
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -86,28 +94,29 @@ async function requestMicrophoneAccess() {
         isListening = true;
         startBlowDetection();
         transitionToBirthdayScene();
-        
-        // Hide retry button on success
-        const retryBtn = document.getElementById('retry-permission-btn');
-        if (retryBtn) retryBtn.style.display = 'none';
 
     } catch (error) {
-        console.error('Microphone access error:', error);
+        console.error('❌ Error:', error.name, '-', error.message);
         
-        // Show helpful message based on error type
         if (error.name === 'NotAllowedError') {
-            console.log('Permission was denied. Check browser settings to allow microphone access.');
-            // Show retry button if permission denied
-            const retryBtn = document.getElementById('retry-permission-btn');
-            if (retryBtn) retryBtn.style.display = 'block';
+            console.error('❌ Permission denied by user');
+            alert('You denied microphone access. Please allow it and try again.');
         } else if (error.name === 'NotFoundError') {
-            console.log('No microphone device found');
+            console.error('❌ No microphone found');
+            alert('No microphone device found on this device');
+        } else if (error.name === 'NotSupportedError') {
+            console.error('❌ getUserMedia not supported');
+            alert('Microphone access not supported on this browser');
+        } else {
+            console.error('❌ Unknown error:', error);
+            alert('Error: ' + error.message);
         }
         
-        // Keep asking every 2 seconds
+        console.log('⏳ Retrying in 2 seconds...');
         setTimeout(requestMicrophoneAccess, 2000);
     }
 }
+
 
 // =====================================================
 // SCENE TRANSITION
@@ -761,22 +770,21 @@ function buildStack() {
 
         shiftCardsForward();
 
-setTimeout(() => {
-    currentIndex = (currentIndex + 1) % IMAGES.length;
-    topCard      = null;
-    animating    = false;
-    buildStack();
-}, 200);
+        setTimeout(() => {
+            currentIndex = (currentIndex + 1) % IMAGES.length;
+            topCard      = null;
+            animating    = false;
+            buildStack();
+        }, 200);
+    }
 
-        
-
-function shiftCardsForward() {
-    const cards = [...cardStack.querySelectorAll('.photo-card')];
-    cards.forEach(card => {
-        const pos = parseInt(card.dataset.stackPos);
-        if (pos > 0) positionCard(card, pos - 1, true);
-    });
-}
+    function shiftCardsForward() {
+        const cards = [...cardStack.querySelectorAll('.photo-card')];
+        cards.forEach(card => {
+            const pos = parseInt(card.dataset.stackPos);
+            if (pos > 0) positionCard(card, pos - 1, true);
+        });
+    }
 
     // ---- Open / Close ----
     function openSlider() {
