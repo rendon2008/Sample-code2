@@ -735,9 +735,9 @@ envOverlay.addEventListener('click', (e) => {
 setTimeout(() => {
     currentIndex = (currentIndex + 1) % IMAGES.length;
     topCard      = null;
-    buildStack();
     animating    = false;
-}, 600);
+    buildStack();
+}, 200);
     }
 
     function shiftCardsForward() {
