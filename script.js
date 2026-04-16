@@ -41,13 +41,12 @@ const poppers            = document.querySelectorAll('.popper');
 // =====================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    requestMicrophoneAccess();
     setupRelightButton();
     
-    // Add retry button listener
-    const retryBtn = document.getElementById('retry-permission-btn');
-    if (retryBtn) {
-        retryBtn.addEventListener('click', () => {
+    // Add click listener to request mic button
+    const requestMicBtn = document.getElementById('request-mic-btn');
+    if (requestMicBtn) {
+        requestMicBtn.addEventListener('click', () => {
             requestMicrophoneAccess();
         });
     }
