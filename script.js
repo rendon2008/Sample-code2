@@ -635,8 +635,10 @@ function buildStack() {
     }
     
     for (let i = VISIBLE_CARDS - 1; i >= 0; i--) {
-        const imgIdx = (currentIndex + i) % IMAGES.length;
-        const card   = allCards[imgIdx];
+        const imgIdx = currentIndex + i;
+        // Don't show cards beyond the last image (no wrapping)
+        if (imgIdx >= IMAGES.length) continue;
+        const card = allCards[imgIdx];
         
         // Reset card state
         card.style.opacity = '1';
@@ -761,7 +763,7 @@ function flyCard(flyX, flyY) {
     animating = true;
 
     const rot = flyX * 0.15;
-    topCard.style.transition = 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.6s ease';
+    topCard.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.45s ease';
     topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
     topCard.style.opacity    = '0';
 
@@ -772,12 +774,24 @@ function flyCard(flyX, flyY) {
         // Update index for next card
         currentIndex = (currentIndex + 1) % IMAGES.length;
     }
-    
+
+    // Wait for fly animation to fully finish before rebuilding
     setTimeout(() => {
         buildStack();
+        // Fade in the new top card smoothly instead of popping in
+        const newTop = cardStack.querySelector('[data-stack-pos="0"]');
+        if (newTop && !hasReachedEnd) {
+            newTop.style.opacity = '0';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    newTop.style.transition = 'opacity 0.25s ease';
+                    newTop.style.opacity = '1';
+                });
+            });
+        }
         topCard = null;
         animating = false;
-    }, 300);
+    }, 560);
 }
 
 function showFinalMessage() {
@@ -792,6 +806,8 @@ function showFinalMessage() {
         border-radius: 18px;
         overflow: hidden;
         box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
+        opacity: 0;
+        transition: opacity 0.5s ease;
     `;
     
     const textElement = document.createElement('div');
@@ -815,6 +831,13 @@ function showFinalMessage() {
     
     messageContainer.appendChild(textElement);
     cardStack.appendChild(messageContainer);
+
+    // Fade in the final card smoothly
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            messageContainer.style.opacity = '1';
+        });
+    });
     
     // Typewriter animation
     let index = 0;
