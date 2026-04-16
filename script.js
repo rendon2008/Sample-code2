@@ -650,10 +650,10 @@ function initializeAllCards() {
     // Create photo cards in reverse so card 0 ends up on top
  for (let i = IMAGES.length - 1; i >= 0; i--) {
         const card = createCard(i);
-        if (i > VISIBLE_CARDS - 1) {
-            card.style.opacity   = '0';
-            card.style.zIndex    = '0';
-        }
+if (i > VISIBLE_CARDS) {
+    card.style.opacity   = '0';
+    card.style.zIndex    = '0';
+}
 
      cardNudges[i] = {
     x: (Math.random() - 0.5) * 22,
