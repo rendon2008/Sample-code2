@@ -185,9 +185,9 @@ function startCelebration() {
         relightBtn.classList.remove('hidden');
         relightBtn.classList.add('visible');
 
-        const messageBtn = document.getElementById('message-btn');
-        messageBtn.classList.remove('hidden');
-        messageBtn.classList.add('visible');
+        const bottomBtns = document.getElementById('bottom-btns');
+        bottomBtns.classList.remove('hidden');
+        bottomBtns.classList.add('visible');
     }, 2000);
 }
 
@@ -481,9 +481,9 @@ function relightCandles() {
     relightBtn.classList.remove('visible');
     relightBtn.classList.add('hidden');
 
-    const messageBtn = document.getElementById('message-btn');
-    messageBtn.classList.remove('visible');
-    messageBtn.classList.add('hidden');
+    const bottomBtns = document.getElementById('bottom-btns');
+    bottomBtns.classList.remove('visible');
+    bottomBtns.classList.add('hidden');
 
     balloonsContainer.innerHTML = '';
     startCandleAnimations();
@@ -765,10 +765,7 @@ envOverlay.addEventListener('click', (e) => {
 
     openBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Close the envelope first, then open slider
-        const envOverlayEl = document.getElementById('envOverlay');
-        envOverlayEl.classList.remove('show');
-        setTimeout(openSlider, 350);
+        openSlider();
     });
 
     sliderClose.addEventListener('click', closeSlider);
