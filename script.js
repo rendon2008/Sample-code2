@@ -596,9 +596,9 @@ const IMAGES = [
 ];
 
 const FINAL_MESSAGE = "I love u"; // EDIT THIS TEXT HERE
-    
-const FALLBACK_EMOJI  = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
-const VISIBLE_CARDS   = 4;
+
+const FALLBACK_EMOJI = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
+const VISIBLE_CARDS  = 4;
 
 const sliderOverlay = document.getElementById('sliderOverlay');
 const cardStack     = document.getElementById('cardStack');
@@ -615,81 +615,102 @@ let animating = false;
 let hintTimer = null;
 let hasReachedEnd = false;
 
-// Pre-create all cards at initialization
+// All cards live in the DOM permanently — never destroyed
 const allCards = [];
+// Final ILY card, also permanent
+let finalCard = null;
 
+// -------------------------------------------------------
+// Build all cards once and append them all to cardStack.
+// Visibility is controlled purely via CSS transforms/opacity/zIndex.
+// -------------------------------------------------------
 function initializeAllCards() {
     allCards.length = 0;
-    for (let i = 0; i < IMAGES.length; i++) {
-        allCards.push(createCard(i));
-    }
-}
-
-function buildStack() {
     cardStack.innerHTML = '';
-    
-    // If we've reached the end, show the final message instead
-    if (hasReachedEnd) {
-        showFinalMessage();
-        return;
-    }
-    
-    for (let i = VISIBLE_CARDS - 1; i >= 0; i--) {
-        const imgIdx = currentIndex + i;
-        // Don't show cards beyond the last image (no wrapping)
-        if (imgIdx >= IMAGES.length) continue;
-        const card = allCards[imgIdx];
-        
-        // Reset card state
-        card.style.opacity = '1';
-        card.style.transition = 'none';
-        card.style.transform = 'none';
-        card.dataset.stackPos = i;
-        
+
+    // Create the ILY final card first (lowest z-index, behind everything)
+    finalCard = document.createElement('div');
+    finalCard.style.cssText = `
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 0;
+        opacity: 0;
+        pointer-events: none;
+    `;
+    cardStack.appendChild(finalCard);
+
+    // Create photo cards in reverse so card 0 ends up on top
+    for (let i = IMAGES.length - 1; i >= 0; i--) {
+        const card = createCard(i);
+        // Hide cards that won't be visible in the initial stack
+        if (i > VISIBLE_CARDS - 1) {
+            card.style.opacity   = '0';
+            card.style.transform = `translateY(${(VISIBLE_CARDS - 1) * 12}px) scale(${1 - (VISIBLE_CARDS - 1) * 0.045})`;
+            card.style.zIndex    = '0';
+        }
+        allCards[i] = card;
         cardStack.appendChild(card);
-        positionCard(card, i, false);
     }
-    
-    // Reattach drag listener to top card
-    const topCardEl = cardStack.querySelector('[data-stack-pos="0"]');
-    if (topCardEl) {
-        attachDragListeners(topCardEl);
-    }
+
+    // Set initial stack positions with no animation
+    refreshStack(false);
+    attachDragListeners(allCards[0]);
 }
 
-function createCard(imgIdx) {
-    const card       = document.createElement('div');
-    card.className   = 'photo-card';
-    card.dataset.imgIdx   = imgIdx;
-
-    const img    = document.createElement('img');
-    img.src      = IMAGES[imgIdx];
-    img.alt      = '';
-    img.draggable = false;
-    img.onerror  = function () {
-        card.classList.add('placeholder');
-        card.innerHTML = FALLBACK_EMOJI[imgIdx % FALLBACK_EMOJI.length];
-    };
-    card.appendChild(img);
-
-    return card;
+// -------------------------------------------------------
+// Set each visible card to its correct stacked position.
+// Cards beyond VISIBLE_CARDS stay hidden behind card[VISIBLE_CARDS-1].
+// -------------------------------------------------------
+function refreshStack(animate) {
+    for (let offset = 0; offset < VISIBLE_CARDS; offset++) {
+        const imgIdx = currentIndex + offset;
+        if (imgIdx >= IMAGES.length) break;
+        const card = allCards[imgIdx];
+        positionCard(card, offset, animate);
+    }
 }
 
 function positionCard(card, stackPos, animate) {
     const scale = 1 - stackPos * 0.045;
     const yOff  = stackPos * 12;
+    const TRANS = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
 
-    card.style.transition = animate
-        ? 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.6s ease'
-        : 'none';
+    card.style.transition = animate ? TRANS : 'none';
     card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
-    card.style.zIndex     = VISIBLE_CARDS - stackPos;
+    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
+    card.style.opacity    = '1';
     card.style.boxShadow  = stackPos === 0
         ? '0 12px 40px rgba(0,0,0,0.45)'
         : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
 }
 
-// ---- Drag listeners ----
+function createCard(imgIdx) {
+    const card = document.createElement('div');
+    card.className = 'photo-card';
+    card.dataset.imgIdx = imgIdx;
+
+    const img = document.createElement('img');
+    img.src = IMAGES[imgIdx];
+    img.alt = '';
+    img.draggable = false;
+    img.onerror = function () {
+        card.classList.add('placeholder');
+        card.innerHTML = FALLBACK_EMOJI[imgIdx % FALLBACK_EMOJI.length];
+    };
+    card.appendChild(img);
+    return card;
+}
+
+// -------------------------------------------------------
+// Drag
+// -------------------------------------------------------
 function attachDragListeners(card) {
     card.removeEventListener('mousedown',  onDragStart);
     card.removeEventListener('touchstart', onDragStart);
@@ -703,8 +724,8 @@ function onDragStart(e) {
     topCard    = e.currentTarget;
 
     const pt = e.touches ? e.touches[0] : e;
-    startX   = pt.clientX;
-    startY   = pt.clientY;
+    startX = pt.clientX;
+    startY = pt.clientY;
     currentX = 0;
     currentY = 0;
 
@@ -722,9 +743,38 @@ function onDragMove(e) {
     const pt = e.touches ? e.touches[0] : e;
     currentX = pt.clientX - startX;
     currentY = pt.clientY - startY;
-    const rot = currentX * 0.12;
 
+    // Move top card with finger
+    const rot = currentX * 0.12;
     topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
+
+    // Animate background cards toward their next position proportionally
+    const progress = Math.min(1, Math.sqrt(currentX * currentX + currentY * currentY) / 120);
+    for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
+        const imgIdx = currentIndex + offset;
+        if (imgIdx >= IMAGES.length) break;
+        const card     = allCards[imgIdx];
+        const fromScale = 1 - offset * 0.045;
+        const toScale   = 1 - (offset - 1) * 0.045;
+        const fromY     = offset * 12;
+        const toY       = (offset - 1) * 12;
+        const scale     = fromScale + (toScale - fromScale) * progress;
+        const yOff      = fromY   + (toY   - fromY)   * progress;
+        card.style.transition = 'none';
+        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
+    }
+
+    // Also peek in the next card that's currently hidden
+    const peekIdx = currentIndex + VISIBLE_CARDS;
+    if (peekIdx < IMAGES.length) {
+        const peekCard  = allCards[peekIdx];
+        const lastScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
+        const lastY     = (VISIBLE_CARDS - 1) * 12;
+        peekCard.style.transition = 'none';
+        peekCard.style.transform  = `translateY(${lastY}px) scale(${lastScale})`;
+        peekCard.style.zIndex     = String(IMAGES.length);
+        peekCard.style.opacity    = String(progress);
+    }
 }
 
 function onDragEnd() {
@@ -736,8 +786,8 @@ function onDragEnd() {
     if (!isDragging || !topCard) { isDragging = false; return; }
     isDragging = false;
 
-    const ABS_X          = Math.abs(currentX);
-    const ABS_Y          = Math.abs(currentY);
+    const ABS_X = Math.abs(currentX);
+    const ABS_Y = Math.abs(currentY);
     const SWIPE_THRESHOLD = 80;
 
     if (ABS_X > SWIPE_THRESHOLD || ABS_Y > SWIPE_THRESHOLD) {
@@ -751,10 +801,23 @@ function onDragEnd() {
         }
         flyCard(flyX, flyY);
     } else {
-        // Snap back
-        topCard.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
+        // Snap back — restore background cards too
+        const TRANS = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
+        topCard.style.transition = TRANS;
         topCard.style.transform  = 'translateX(0) translateY(0) rotate(0deg)';
-        topCard.style.cursor = 'grab';
+        topCard.style.cursor     = 'grab';
+
+        for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
+            const imgIdx = currentIndex + offset;
+            if (imgIdx >= IMAGES.length) break;
+            positionCard(allCards[imgIdx], offset, true);
+        }
+        // Hide the peek card again
+        const peekIdx = currentIndex + VISIBLE_CARDS;
+        if (peekIdx < IMAGES.length) {
+            allCards[peekIdx].style.transition = TRANS;
+            allCards[peekIdx].style.opacity    = '0';
+        }
     }
 }
 
@@ -762,100 +825,125 @@ function flyCard(flyX, flyY) {
     if (!topCard) return;
     animating = true;
 
-    const rot = flyX * 0.15;
-    topCard.style.transition = 'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.45s ease';
+    const rot    = flyX * 0.15;
+    const FLY_MS = 420;
+    topCard.style.transition = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS * 0.8}ms ease`;
     topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
     topCard.style.opacity    = '0';
 
-    // Check if we've reached the last image
-    if (currentIndex === IMAGES.length - 1) {
-        hasReachedEnd = true;
-    } else {
-        // Update index for next card
-        currentIndex = (currentIndex + 1) % IMAGES.length;
+    // Slide background cards up immediately, in sync with the fly
+    const SLIDE_TRANS = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS}ms ease, box-shadow ${FLY_MS}ms ease`;
+    for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
+        const imgIdx = currentIndex + offset;
+        if (imgIdx >= IMAGES.length) break;
+        const card = allCards[imgIdx];
+        card.style.transition = SLIDE_TRANS;
+        const scale  = 1 - (offset - 1) * 0.045;
+        const yOff   = (offset - 1) * 12;
+        const zIdx   = String(IMAGES.length + VISIBLE_CARDS - (offset - 1));
+        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
+        card.style.zIndex     = zIdx;
+        card.style.opacity    = '1';
+        card.style.boxShadow  = (offset - 1) === 0
+            ? '0 12px 40px rgba(0,0,0,0.45)'
+            : `0 ${4 + (offset-1)*2}px ${12 + (offset-1)*6}px rgba(0,0,0,0.25)`;
     }
 
-    // Wait for fly animation to fully finish before rebuilding
+    // Slide in the next hidden card at the back of the stack
+    const nextHiddenIdx = currentIndex + VISIBLE_CARDS;
+    if (nextHiddenIdx < IMAGES.length) {
+        const nextCard = allCards[nextHiddenIdx];
+        const backScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
+        const backY     = (VISIBLE_CARDS - 1) * 12;
+        nextCard.style.transition = SLIDE_TRANS;
+        nextCard.style.transform  = `translateY(${backY}px) scale(${backScale})`;
+        nextCard.style.zIndex     = String(IMAGES.length);
+        nextCard.style.opacity    = '1';
+    }
+
+    const isLastCard = (currentIndex === IMAGES.length - 1);
+
     setTimeout(() => {
-        buildStack();
-        // Fade in the new top card smoothly instead of popping in
-        const newTop = cardStack.querySelector('[data-stack-pos="0"]');
-        if (newTop && !hasReachedEnd) {
-            newTop.style.opacity = '0';
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    newTop.style.transition = 'opacity 0.25s ease';
-                    newTop.style.opacity = '1';
-                });
-            });
+        // Sink the swiped card fully out of sight
+        topCard.style.transition = 'none';
+        topCard.style.zIndex     = '0';
+
+        if (isLastCard) {
+            hasReachedEnd = true;
+            showFinalMessage();
+        } else {
+            currentIndex++;
+            // Sync everyone's z-index cleanly for the new order
+            refreshStack(false);
+            attachDragListeners(allCards[currentIndex]);
         }
-        topCard = null;
+
+        topCard   = null;
         animating = false;
-    }, 560);
+    }, FLY_MS + 20);
 }
 
+// -------------------------------------------------------
+// Final ILY card
+// -------------------------------------------------------
 function showFinalMessage() {
-    const messageContainer = document.createElement('div');
-    messageContainer.style.cssText = `
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
-        opacity: 0;
-        transition: opacity 0.5s ease;
-    `;
-    
-    const textElement = document.createElement('div');
-    textElement.style.cssText = `
-        font-size: 4rem;
-        font-weight: 800;
-        text-align: center;
-        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: 3px;
-        padding: 40px;
-        min-height: 200px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    `;
-    
-    messageContainer.appendChild(textElement);
-    cardStack.appendChild(messageContainer);
+    // Dark card fades in first
+    finalCard.style.transition   = 'opacity 0.55s ease';
+    finalCard.style.zIndex       = String(IMAGES.length + VISIBLE_CARDS + 1);
+    finalCard.style.opacity      = '1';
+    finalCard.style.pointerEvents = 'none';
 
-    // Fade in the final card smoothly
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            messageContainer.style.opacity = '1';
-        });
-    });
-    
-    // Typewriter animation
-    let index = 0;
-    const typeInterval = setInterval(() => {
-        if (index < FINAL_MESSAGE.length) {
-            textElement.textContent += FINAL_MESSAGE[index];
-            index++;
-        } else {
-            clearInterval(typeInterval);
-        }
-    }, 100); // Adjust speed here (100ms per character)
+    // Build the text element (once)
+    if (!finalCard.dataset.built) {
+        finalCard.dataset.built = '1';
+        const textElement = document.createElement('div');
+        textElement.style.cssText = `
+            font-size: 4rem;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+            padding: 40px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        `;
+        finalCard.appendChild(textElement);
+
+        // After card fades in, start typewriter
+        setTimeout(() => {
+            textElement.style.opacity = '1';
+            let idx = 0;
+            const typeInterval = setInterval(() => {
+                if (idx < FINAL_MESSAGE.length) {
+                    textElement.textContent += FINAL_MESSAGE[idx++];
+                } else {
+                    clearInterval(typeInterval);
+                }
+            }, 100);
+        }, 600);
+    }
 }
 
 // ---- Open / Close ----
 function openSlider() {
-    currentIndex = 0;
+    // Reset everything
+    currentIndex  = 0;
     hasReachedEnd = false;
-    buildStack();
+    animating     = false;
+    isDragging    = false;
+
+    // Re-init cards fresh
+    initializeAllCards();
+
     sliderOverlay.classList.add('active');
 
     clearTimeout(hintTimer);
@@ -878,7 +966,7 @@ sliderOverlay.addEventListener('click', (e) => {
     if (e.target === sliderOverlay) closeSlider();
 });
 
-// Initialize all cards on load
+// Initialize cards on load so images preload
 initializeAllCards();
 
 })();
