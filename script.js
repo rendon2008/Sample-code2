@@ -787,13 +787,12 @@ function flyCard(flyX, flyY) {
     // Update index immediately
     currentIndex = (currentIndex + 1) % IMAGES.length;
     
-    // Rebuild stack WITHOUT delay - this moves next card into view
+    // Rebuild stack - buildStack already positions everything correctly
     setTimeout(() => {
         buildStack();
-        shiftCardsForward();
         topCard = null;
         animating = false;
-    }, 100);
+    }, 600);
 }
 
 function shiftCardsForward() {
