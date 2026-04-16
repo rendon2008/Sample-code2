@@ -624,23 +624,26 @@ function buildStack() {
         const imgIdx = (currentIndex + i) % IMAGES.length;
         const card   = allCards[imgIdx];
         
-        // Reset card state
+        // Reset card state completely
         card.style.opacity = '1';
         card.style.transition = 'none';
         card.style.transform = 'none';
         card.dataset.stackPos = i;
+        card.style.cursor = 'grab';
+        
+        // Remove old listeners
+        card.removeEventListener('mousedown',  onDragStart);
+        card.removeEventListener('touchstart', onDragStart);
         
         cardStack.appendChild(card);
         positionCard(card, i, false);
-    }
-    
-    // Reattach drag listener to top card
-    const topCardEl = cardStack.querySelector('[data-stack-pos="0"]');
-    if (topCardEl) {
-        attachDragListeners(topCardEl);
+        
+        // Attach listeners only to top card
+        if (i === 0) {
+            attachDragListeners(card);
+        }
     }
 }
-
 function createCard(imgIdx) {
     const card       = document.createElement('div');
     card.className   = 'photo-card';
@@ -787,12 +790,12 @@ function flyCard(flyX, flyY) {
     // Update index immediately
     currentIndex = (currentIndex + 1) % IMAGES.length;
     
-    // Rebuild stack - buildStack already positions everything correctly
+    // Pre-build the next stack while current card is flying out
     setTimeout(() => {
         buildStack();
         topCard = null;
         animating = false;
-    }, 600);
+    }, 300);
 }
 
 function shiftCardsForward() {
