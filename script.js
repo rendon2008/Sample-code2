@@ -741,22 +741,11 @@ function buildStack() {
         shiftCardsForward();
 
 setTimeout(() => {
-    topCard.remove();
     currentIndex = (currentIndex + 1) % IMAGES.length;
-    topCard = null;
-
-    const imgIdx  = (currentIndex + VISIBLE_CARDS - 1) % IMAGES.length;
-    const newCard = createCard(imgIdx, VISIBLE_CARDS - 1);
-    newCard.style.opacity = '0';
-    cardStack.appendChild(newCard);
-    positionCard(newCard, VISIBLE_CARDS - 1, false);
-    requestAnimationFrame(() => {
-        newCard.style.transition = 'opacity 0.4s ease';
-        newCard.style.opacity    = '1';
-    });
-
-    animating = false;
-}, 520);
+    topCard      = null;
+    animating    = false;
+    buildStack();
+}, 200);
 
         
 
@@ -764,10 +753,7 @@ function shiftCardsForward() {
     const cards = [...cardStack.querySelectorAll('.photo-card')];
     cards.forEach(card => {
         const pos = parseInt(card.dataset.stackPos);
-        if (pos > 0) {
-            card.dataset.stackPos = pos - 1;
-            positionCard(card, pos - 1, true);
-        }
+        if (pos > 0) positionCard(card, pos - 1, true);
     });
 }
 
