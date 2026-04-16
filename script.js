@@ -656,19 +656,11 @@ function createCard(imgIdx) {
     };
     card.appendChild(img);
 
-    // Add swipe indicators (without text)
-    ['left','right','up','down'].forEach(dir => {
-        const ind       = document.createElement('div');
-        ind.className   = `swipe-indicator ${dir}`;
-        ind.textContent = ''; // Empty - no text labels
-        card.appendChild(ind);
-    });
-
-    // Hide indicators by default
-    card.querySelectorAll('.swipe-indicator').forEach(i => i.style.opacity = '0');
-
     return card;
 }
+
+
+    
 function positionCard(card, stackPos, animate) {
     const scale = 1 - stackPos * 0.045;
     const yOff  = stackPos * 12;
@@ -723,23 +715,6 @@ function onDragMove(e) {
 }
 
 function showIndicator(dx, dy) {
-    if (!topCard) return;
-    const inds      = topCard.querySelectorAll('.swipe-indicator');
-    const ABS_X     = Math.abs(dx);
-    const ABS_Y     = Math.abs(dy);
-    const threshold = 30;
-
-    inds.forEach(ind => ind.style.opacity = '0');
-
-    if (ABS_X > threshold || ABS_Y > threshold) {
-        if (ABS_X >= ABS_Y) {
-            const ind = topCard.querySelector(dx > 0 ? '.swipe-indicator.right' : '.swipe-indicator.left');
-            if (ind) ind.style.opacity = Math.min(1, (ABS_X - threshold) / 60).toString();
-        } else {
-            const ind = topCard.querySelector(dy > 0 ? '.swipe-indicator.down' : '.swipe-indicator.up');
-            if (ind) ind.style.opacity = Math.min(1, (ABS_Y - threshold) / 60).toString();
-        }
-    }
 }
 
 function onDragEnd() {
