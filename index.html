@@ -185,16 +185,29 @@
         <!-- Relight Button -->
         <button id="relight-btn" class="relight-btn hidden">Relight the candles</button>
 
-        <!-- Envelope Icon Button -->
-        <div id="message-btn" class="message-btn hidden">
-            <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="2" width="96" height="76" rx="8" ry="8" fill="white" stroke="#333" stroke-width="3"/>
-                <line x1="2" y1="78" x2="38" y2="40" stroke="#333" stroke-width="2.5"/>
-                <line x1="98" y1="78" x2="62" y2="40" stroke="#333" stroke-width="2.5"/>
-                <line x1="2" y1="2" x2="38" y2="40" stroke="#333" stroke-width="2.5"/>
-                <line x1="98" y1="2" x2="62" y2="40" stroke="#333" stroke-width="2.5"/>
-                <path d="M50 58 C50 58 28 44 28 32 C28 24 34 19 40 19 C44 19 48 22 50 25 C52 22 56 19 60 19 C66 19 72 24 72 32 C72 44 50 58 50 58Z" fill="#FF1493" stroke="#333" stroke-width="2"/>
-            </svg>
+        <!-- Bottom Buttons Row -->
+        <div id="bottom-btns" class="bottom-btns hidden">
+            <!-- Envelope Icon Button -->
+            <div id="message-btn" class="message-btn">
+                <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="96" height="76" rx="8" ry="8" fill="white" stroke="#333" stroke-width="3"/>
+                    <line x1="2" y1="78" x2="38" y2="40" stroke="#333" stroke-width="2.5"/>
+                    <line x1="98" y1="78" x2="62" y2="40" stroke="#333" stroke-width="2.5"/>
+                    <line x1="2" y1="2" x2="38" y2="40" stroke="#333" stroke-width="2.5"/>
+                    <line x1="98" y1="2" x2="62" y2="40" stroke="#333" stroke-width="2.5"/>
+                    <path d="M50 58 C50 58 28 44 28 32 C28 24 34 19 40 19 C44 19 48 22 50 25 C52 22 56 19 60 19 C66 19 72 24 72 32 C72 44 50 58 50 58Z" fill="#FF1493" stroke="#333" stroke-width="2"/>
+                </svg>
+            </div>
+            <!-- Photo Slider Button -->
+            <div id="openSliderBtn" class="photo-btn">
+                <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="10" width="96" height="65" rx="8" ry="8" fill="white" stroke="#333" stroke-width="3"/>
+                    <circle cx="50" cy="43" r="18" fill="none" stroke="#FF1493" stroke-width="3"/>
+                    <circle cx="50" cy="43" r="10" fill="#FF1493"/>
+                    <rect x="30" y="10" width="20" height="10" rx="3" fill="white" stroke="#333" stroke-width="2.5"/>
+                    <circle cx="80" cy="22" r="5" fill="#FF1493"/>
+                </svg>
+            </div>
         </div>
 
         <!-- ===== Envelope Modal ===== -->
@@ -214,16 +227,6 @@
                     <div class="letter-lines" style="margin-top:10px; margin-bottom:0">
                         <div class="letter-line"></div>
                         <div class="letter-line"></div>
-                    </div>
-
-                    <!-- Tap to open photo slider -->
-                    <div class="letter-cta" id="openSliderBtn">
-                        <div class="cta-stack">
-                            <div class="cta-card cta-card-3"></div>
-                            <div class="cta-card cta-card-2"></div>
-                            <div class="cta-card cta-card-1">📸</div>
-                        </div>
-                        <div class="cta-label">swipe our photos →</div>
                     </div>
 
                     <div class="letter-heart">🌸</div>
