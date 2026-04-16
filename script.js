@@ -656,11 +656,11 @@ function createCard(imgIdx) {
     };
     card.appendChild(img);
 
-    // Add swipe indicators
+    // Add swipe indicators (without text)
     ['left','right','up','down'].forEach(dir => {
         const ind       = document.createElement('div');
         ind.className   = `swipe-indicator ${dir}`;
-        ind.textContent = dir === 'left' ? 'NOPE' : dir === 'right' ? 'LOVE' : dir === 'up' ? 'WOW' : 'CUTE';
+        ind.textContent = ''; // Empty - no text labels
         card.appendChild(ind);
     });
 
@@ -669,7 +669,6 @@ function createCard(imgIdx) {
 
     return card;
 }
-
 function positionCard(card, stackPos, animate) {
     const scale = 1 - stackPos * 0.045;
     const yOff  = stackPos * 12;
