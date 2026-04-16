@@ -595,7 +595,8 @@ const IMAGES = [
     '13.jpeg'
 ];
 
-const FINAL_MESSAGE = "I love u"; // EDIT THIS TEXT HERE
+const FINAL_MESSAGE = "
+Just look at how much u've grown🥹 I want u to know it saddens me seeing u grow, I keep looking at ur/our old photos and I cant believe how much uve grown, you've matured so much, u r no longer a baby (but will always be my baby in my eyes) and I am proud to be one of the person to be a part of your journy in life and soon to be a whole and not just a part..."; // EDIT THIS TEXT HERE
 
 const FALLBACK_EMOJI = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
 const VISIBLE_CARDS  = 4;
