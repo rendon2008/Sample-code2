@@ -926,6 +926,8 @@ function showFinalMessage() {
         text-align: left;
         font-family: 'Georgia', serif;
         min-height: 100%;
+        display: inline-block;
+        width: 100%;
     `;
     
     textWrapper.appendChild(textElement);
@@ -992,39 +994,35 @@ function showFinalMessage() {
     
     // Start typewriter animation after 1 second delay
     setTimeout(() => {
-        typewriterAnimationWordByWord(textElement, textWrapper);
+        typewriterTypeEffect(textElement, textWrapper);
     }, 1000);
 }
 
-function typewriterAnimationWordByWord(textElement, textWrapper) {
-    // Split message into words
-    const words = FINAL_MESSAGE.split(' ');
-    let wordIndex = 0;
-    let currentText = '';
-    let lastScrollHeight = 0;
+function typewriterTypeEffect(textElement, textWrapper) {
+    let index = 0;
+    let previousHeight = 0;
     
     const typeInterval = setInterval(() => {
-        if (wordIndex < words.length) {
-            const word = words[wordIndex];
-            const testText = currentText + (currentText ? ' ' : '') + word;
+        if (index < FINAL_MESSAGE.length) {
+            // Add one character at a time
+            textElement.textContent += FINAL_MESSAGE[index];
+            index++;
             
-            // Set test text to check height
-            textElement.textContent = testText;
-            const newHeight = textElement.scrollHeight;
+            // Get current height
+            const currentHeight = textElement.scrollHeight;
             
-            // If height increased (wrapped to new line), auto-scroll if not user scrolling
-            if (newHeight > lastScrollHeight && !isUserScrolling) {
-                textWrapper.scrollTop = textWrapper.scrollHeight;
-                lastScrollHeight = newHeight;
+            // If height changed, it means text wrapped to new line - auto scroll
+            if (currentHeight > previousHeight) {
+                // Use requestAnimationFrame for smooth scrolling
+                requestAnimationFrame(() => {
+                    textWrapper.scrollTop = textWrapper.scrollHeight;
+                    previousHeight = currentHeight;
+                });
             }
-            
-            // Add word to current text
-            currentText = testText;
-            wordIndex++;
         } else {
             clearInterval(typeInterval);
         }
-    }, 150); // 150ms per word
+    }, 50); // 50ms per character for typewriter effect
 }
 
     
