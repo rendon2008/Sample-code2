@@ -22,7 +22,7 @@
     --sprinkle-red: #FF6B7A;
     --sprinkle-pink: #FFB8C9;
     /* Background */
-    --bg-gradient-start: #FF4D94;
+    --bg-gradient-start: #ffffff;
     --bg-gradient-end: #FF0066;
     /* Shadows */
     --cake-shadow: rgba(200, 150, 170, 0.3);
@@ -123,7 +123,7 @@ html, body {
     width: 100%; height: 100%;
 background: linear-gradient(180deg,
     var(--bg-gradient-start) 0%,
-    var(--bg-gradient-endt) 100%);
+    var(--bg-gradient-end) 100%);
     z-index: -2;
 }
 
