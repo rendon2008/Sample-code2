@@ -43,6 +43,7 @@ const poppers            = document.querySelectorAll('.popper');
 document.addEventListener('DOMContentLoaded', () => {
     requestMicrophoneAccess();
     setupRelightButton();
+    
 });
 
 
