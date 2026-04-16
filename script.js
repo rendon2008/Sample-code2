@@ -990,31 +990,35 @@ function showFinalMessage() {
         }, 1500);
     }, { passive: true });
     
-    // Typewriter animation
+    // Start typewriter animation after 1 second delay
+    setTimeout(() => {
+        typewriterAnimation(textElement, textWrapper);
+    }, 1000);
+}
+
+function typewriterAnimation(textElement, textWrapper) {
     let index = 0;
     let lastHeight = 0;
     
     const typeInterval = setInterval(() => {
         if (index < FINAL_MESSAGE.length) {
+            // Add character to temporary text
             textElement.textContent += FINAL_MESSAGE[index];
             index++;
             
-            // Auto-scroll when text overflows (only if user isn't scrolling)
-            if (!isUserScrolling) {
-                const currentHeight = textElement.scrollHeight;
-                
-                // Scroll smoothly when content grows
-                if (currentHeight > lastHeight) {
-                    textWrapper.scrollTop = textWrapper.scrollHeight;
-                    lastHeight = currentHeight;
-                }
+            // Check if height changed (wrapped to next line)
+            const currentHeight = textElement.scrollHeight;
+            
+            // If text wrapped to new line and user isn't scrolling, auto-scroll
+            if (currentHeight > lastHeight) {
+                textWrapper.scrollTop = textWrapper.scrollHeight;
+                lastHeight = currentHeight;
             }
         } else {
             clearInterval(typeInterval);
         }
-    }, 40); // Adjust speed here (40ms per character)
+    }, 60); // Faster typing speed (30ms per character)
 }
-
 
     
 // ---- Open / Close ----
