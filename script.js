@@ -582,10 +582,6 @@ envOverlay.addEventListener('click', (e) => {
 // CARD SLIDER
 // =====================================================
 
-// =====================================================
-// CARD SLIDER
-// =====================================================
-
 (function () {
 
 const IMAGES = [
@@ -628,24 +624,20 @@ function buildStack() {
         const imgIdx = (currentIndex + i) % IMAGES.length;
         const card   = allCards[imgIdx];
         
-        // Reset card state completely
+        // Reset card state
         card.style.opacity = '1';
         card.style.transition = 'none';
         card.style.transform = 'none';
         card.dataset.stackPos = i;
-        card.style.cursor = 'grab';
-        
-        // Remove old listeners
-        card.removeEventListener('mousedown',  onDragStart);
-        card.removeEventListener('touchstart', onDragStart);
         
         cardStack.appendChild(card);
         positionCard(card, i, false);
-        
-        // Attach listeners only to top card
-        if (i === 0) {
-            attachDragListeners(card);
-        }
+    }
+    
+    // Reattach drag listener to top card
+    const topCardEl = cardStack.querySelector('[data-stack-pos="0"]');
+    if (topCardEl) {
+        attachDragListeners(topCardEl);
     }
 }
 
@@ -694,6 +686,8 @@ function positionCard(card, stackPos, animate) {
 
 // ---- Drag listeners ----
 function attachDragListeners(card) {
+    card.removeEventListener('mousedown',  onDragStart);
+    card.removeEventListener('touchstart', onDragStart);
     card.addEventListener('mousedown',  onDragStart, { passive: true });
     card.addEventListener('touchstart', onDragStart, { passive: true });
 }
@@ -793,12 +787,21 @@ function flyCard(flyX, flyY) {
     // Update index immediately
     currentIndex = (currentIndex + 1) % IMAGES.length;
     
+    // Rebuild stack WITHOUT delay - this moves next card into view
     setTimeout(() => {
-        // Completely rebuild the stack
         buildStack();
+        shiftCardsForward();
         topCard = null;
         animating = false;
-    }, 600);
+    }, 100);
+}
+
+function shiftCardsForward() {
+    const cards = [...cardStack.querySelectorAll('.photo-card')];
+    cards.forEach(card => {
+        const pos = parseInt(card.dataset.stackPos);
+        if (pos > 0) positionCard(card, pos - 1, true);
+    });
 }
 
 // ---- Open / Close ----
