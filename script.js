@@ -953,7 +953,7 @@ function showFinalMessage() {
 
     // Container for typed lines — each line is a <div>
     const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
-    const FONT_SIZE_PX = 20; // px — used for Canvas measurement too
+    const FONT_SIZE_PX = 26; // px — used for Canvas measurement too
     const LETTER_SPACING = 0.3;
 
     const linesContainer = document.createElement('div');
@@ -993,8 +993,8 @@ function showFinalMessage() {
 
     // ── Pre-measure with Canvas (pixel-perfect, no DOM reflow needed) ───
     // Wait for font to load (or up to 1.5 s), then measure.
-    const PADDING_H = 76; // 38px each side
-    const SAFETY    = 10; // extra px margin so nothing gets too close to edge
+    const PADDING_H = 60; // 38px each side, reduced for better fit
+    const SAFETY    = 2;  // minimal margin so text fills the row
 
     function buildLines(fontReady) {
         // Canvas measureText is the most reliable cross-browser measurement.
@@ -1052,7 +1052,7 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
     let currentLineEl = null;
 
     // Typing speed: base ms per character, with slight random variance for feel
-    const BASE_MS = 72;
+    const BASE_MS = 110;
 
     function nextTick() {
         // All lines done
