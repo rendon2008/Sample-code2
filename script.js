@@ -582,6 +582,10 @@ envOverlay.addEventListener('click', (e) => {
 // CARD SLIDER
 // =====================================================
 
+// =====================================================
+// CARD SLIDER
+// =====================================================
+
 (function () {
 
 const IMAGES = [
@@ -624,20 +628,24 @@ function buildStack() {
         const imgIdx = (currentIndex + i) % IMAGES.length;
         const card   = allCards[imgIdx];
         
-        // Reset card state
+        // Reset card state completely
         card.style.opacity = '1';
         card.style.transition = 'none';
         card.style.transform = 'none';
         card.dataset.stackPos = i;
+        card.style.cursor = 'grab';
+        
+        // Remove old listeners
+        card.removeEventListener('mousedown',  onDragStart);
+        card.removeEventListener('touchstart', onDragStart);
         
         cardStack.appendChild(card);
         positionCard(card, i, false);
-    }
-    
-    // Reattach drag listener to top card
-    const topCardEl = cardStack.querySelector('[data-stack-pos="0"]');
-    if (topCardEl) {
-        attachDragListeners(topCardEl);
+        
+        // Attach listeners only to top card
+        if (i === 0) {
+            attachDragListeners(card);
+        }
     }
 }
 
@@ -686,8 +694,6 @@ function positionCard(card, stackPos, animate) {
 
 // ---- Drag listeners ----
 function attachDragListeners(card) {
-    card.removeEventListener('mousedown',  onDragStart);
-    card.removeEventListener('touchstart', onDragStart);
     card.addEventListener('mousedown',  onDragStart, { passive: true });
     card.addEventListener('touchstart', onDragStart, { passive: true });
 }
@@ -775,11 +781,6 @@ function onDragEnd() {
     }
 }
 
-
-
-
-    
-
 function flyCard(flyX, flyY) {
     if (!topCard) return;
     animating = true;
@@ -792,35 +793,12 @@ function flyCard(flyX, flyY) {
     // Update index immediately
     currentIndex = (currentIndex + 1) % IMAGES.length;
     
-    // Move swiped card to back of stack after animation
     setTimeout(() => {
-        topCard.style.transition = 'none';
-        topCard.style.transform = 'none';
-        topCard.style.opacity = '1';
-        topCard.dataset.stackPos = VISIBLE_CARDS - 1;
-        positionCard(topCard, VISIBLE_CARDS - 1, false);
-        
-        // Shift other cards forward
-        const cards = [...cardStack.querySelectorAll('.photo-card')];
-        cards.forEach(card => {
-            const pos = parseInt(card.dataset.stackPos);
-            if (pos < VISIBLE_CARDS - 1 && card !== topCard) {
-                positionCard(card, pos + 1, true);
-            }
-        });
-        
+        // Completely rebuild the stack
+        buildStack();
         topCard = null;
         animating = false;
     }, 600);
-}
-
-    
-function shiftCardsForward() {
-    const cards = [...cardStack.querySelectorAll('.photo-card')];
-    cards.forEach(card => {
-        const pos = parseInt(card.dataset.stackPos);
-        if (pos > 0) positionCard(card, pos - 1, true);
-    });
 }
 
 // ---- Open / Close ----
@@ -853,7 +831,6 @@ sliderOverlay.addEventListener('click', (e) => {
 initializeAllCards();
 
 })();
-
 
 // =====================================================
 // ERROR HANDLING
