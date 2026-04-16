@@ -926,8 +926,6 @@ function showFinalMessage() {
         text-align: left;
         font-family: 'Georgia', serif;
         min-height: 100%;
-        display: inline-block;
-        width: 100%;
     `;
     
     textWrapper.appendChild(textElement);
@@ -992,38 +990,32 @@ function showFinalMessage() {
         }, 1500);
     }, { passive: true });
     
-    // Start typewriter animation after 1 second delay
-    setTimeout(() => {
-        typewriterTypeEffect(textElement, textWrapper);
-    }, 1000);
-}
-
-function typewriterTypeEffect(textElement, textWrapper) {
+    // Typewriter animation
     let index = 0;
-    let previousHeight = 0;
+    let lastHeight = 0;
     
     const typeInterval = setInterval(() => {
         if (index < FINAL_MESSAGE.length) {
-            // Add one character at a time
             textElement.textContent += FINAL_MESSAGE[index];
             index++;
             
-            // Get current height
-            const currentHeight = textElement.scrollHeight;
-            
-            // If height changed, it means text wrapped to new line - auto scroll
-            if (currentHeight > previousHeight) {
-                // Use requestAnimationFrame for smooth scrolling
-                requestAnimationFrame(() => {
+            // Auto-scroll when text overflows (only if user isn't scrolling)
+            if (!isUserScrolling) {
+                const currentHeight = textElement.scrollHeight;
+                
+                // Scroll smoothly when content grows
+                if (currentHeight > lastHeight) {
                     textWrapper.scrollTop = textWrapper.scrollHeight;
-                    previousHeight = currentHeight;
-                });
+                    lastHeight = currentHeight;
+                }
             }
         } else {
             clearInterval(typeInterval);
         }
-    }, 50); // 50ms per character for typewriter effect
+    }, 50); // Adjust speed here (40ms per character)
 }
+
+    
 
     
 // ---- Open / Close ----
