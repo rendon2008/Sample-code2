@@ -617,6 +617,7 @@ let hasReachedEnd = false;
 
 // All cards live in the DOM permanently — never destroyed
 const allCards = [];
+const cardNudges = [];
 // Final ILY card, also permanent
 let finalCard = null;
 
@@ -653,6 +654,11 @@ function initializeAllCards() {
             card.style.opacity   = '0';
             card.style.zIndex    = '0';
         }
+
+     cardNudges[i] = {
+    x: (Math.random() - 0.5) * 22,
+    rot: (Math.random() - 0.5) * 14
+};
         allCards[i] = card;
         cardStack.appendChild(card);
     }
@@ -680,10 +686,9 @@ function positionCard(card, stackPos, animate) {
     const TRANS = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
 
     card.style.transition = animate ? TRANS : 'none';
-    const nudgeX = (Math.random() - 0.5) * 10;
-    const nudgeRot = (Math.random() - 0.5) * 6;
-    card.style.transform  = `translateX(${nudgeX}px) translateY(${yOff}px) rotate(${nudgeRot}deg) scale(${scale})`;    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
-    card.style.opacity    = '1';
+    const imgIdx = parseInt(card.dataset.imgIdx);
+    const nudge = cardNudges[imgIdx] || { x: 0, rot: 0 };
+    card.style.transform  = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;
     card.style.boxShadow  = stackPos === 0
         ? '0 12px 40px rgba(0,0,0,0.45)'
         : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
