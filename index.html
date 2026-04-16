@@ -9,20 +9,19 @@
 <body>
 
     <!-- ===== Microphone Permission Screen ===== -->
-    <div id="permission-screen" class="permission-screen">
-        <div class="permission-content">
-            <div class="microphone-icon">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M19 11C19 15.42 15.87 19 12 19C8.13 19 5 15.42 5 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 19V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <p class="permission-text">Please allow microphone access<br>to blow out the candles</p>
-            <button id="retry-permission-btn" class="retry-btn" style="display: none;">Request Microphone Access</button>
+<div id="permission-screen" class="permission-screen">
+    <div class="permission-content">
+        <div class="microphone-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 11C19 15.42 15.87 19 12 19C8.13 19 5 15.42 5 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 19V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
         </div>
+        <p class="permission-text">Please allow microphone access<br>to blow out the candles</p>
+        <button id="request-mic-btn" class="request-mic-btn">Request Microphone Access</button>
     </div>
-
+</div>
     <!-- ===== Main Birthday Scene ===== -->
     <div id="birthday-scene" class="birthday-scene hidden">
 
