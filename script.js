@@ -227,7 +227,7 @@ function updateMessage() {
     message.style.transform = 'translateX(-50%) scale(0.8)';
 
     setTimeout(() => {
-        message.innerHTML = 'HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span>';
+       message.innerHTML = '<span style="font-family: \'Cormorant Garamond\', Georgia, serif; font-style: italic; font-weight: 400;">HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span></span>';
         message.style.color      = '#FF69B4';
         message.style.textShadow = `
             0 0 10px rgba(255, 105, 180, 0.8),
