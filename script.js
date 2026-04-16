@@ -584,6 +584,7 @@ envOverlay.addEventListener('click', (e) => {
 
 (function () {
 
+    // ---- Config: add/remove image filenames freely ----
 const IMAGES = [
     '1.jpeg', '2.jpeg', '3.jpeg', '4.jpeg',
     '5.jpeg', '6.jpeg', '7.jpeg', '8.jpeg',
@@ -591,251 +592,228 @@ const IMAGES = [
     '13.jpeg'
 ];
     
-const FALLBACK_EMOJI  = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
-const VISIBLE_CARDS   = 4;
+    const FALLBACK_EMOJI  = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
+    const VISIBLE_CARDS   = 4;
 
-const sliderOverlay = document.getElementById('sliderOverlay');
-const cardStack     = document.getElementById('cardStack');
-const sliderClose   = document.getElementById('sliderClose');
-const sliderHint    = document.getElementById('sliderHint');
-const openBtn       = document.getElementById('openSliderBtn');
+    const sliderOverlay = document.getElementById('sliderOverlay');
+    const cardStack     = document.getElementById('cardStack');
+    const sliderClose   = document.getElementById('sliderClose');
+    const sliderHint    = document.getElementById('sliderHint');
+    const openBtn       = document.getElementById('openSliderBtn');
 
-let currentIndex = 0;
-let isDragging   = false;
-let startX = 0, startY = 0;
-let currentX = 0, currentY = 0;
-let topCard  = null;
-let animating = false;
-let hintTimer = null;
+    let currentIndex = 0;
+    let isDragging   = false;
+    let startX = 0, startY = 0;
+    let currentX = 0, currentY = 0;
+    let topCard  = null;
+    let animating = false;
+    let hintTimer = null;
 
-// Pre-create all cards at initialization
-const allCards = [];
-
-function initializeAllCards() {
-    allCards.length = 0;
-    for (let i = 0; i < IMAGES.length; i++) {
-        allCards.push(createCard(i));
-    }
-}
-
+    // ---- Build visual stack ----
 function buildStack() {
     cardStack.innerHTML = '';
     for (let i = VISIBLE_CARDS - 1; i >= 0; i--) {
         const imgIdx = (currentIndex + i) % IMAGES.length;
-        const card   = allCards[imgIdx];
-        
-        // Reset card state completely
-        card.style.opacity = '1';
-        card.style.transition = 'none';
-        card.style.transform = 'none';
-        card.dataset.stackPos = i;
-        card.style.cursor = 'grab';
-        
-        // Remove old listeners
-        card.removeEventListener('mousedown',  onDragStart);
-        card.removeEventListener('touchstart', onDragStart);
-        
+        const card   = createCard(imgIdx, i);
+        card.style.opacity = '0';
         cardStack.appendChild(card);
         positionCard(card, i, false);
-        
-        // Attach listeners only to top card
-        if (i === 0) {
+        requestAnimationFrame(() => {
+            card.style.transition = 'opacity 0.3s ease';
+            card.style.opacity = '1';
+        });
+    }
+}
+
+    function createCard(imgIdx, stackPos) {
+        const card       = document.createElement('div');
+        card.className   = 'photo-card';
+        card.dataset.stackPos = stackPos;
+        card.dataset.imgIdx   = imgIdx;
+
+        const img    = document.createElement('img');
+        img.src      = IMAGES[imgIdx];
+        img.alt      = '';
+        img.draggable = false;
+        img.onerror  = function () {
+            card.classList.add('placeholder');
+            card.innerHTML = FALLBACK_EMOJI[imgIdx % FALLBACK_EMOJI.length];
+        };
+        card.appendChild(img);
+
+        // Add swipe indicators only to the top card
+        if (stackPos === 0) {
+            ['left','right','up','down'].forEach(dir => {
+                const ind       = document.createElement('div');
+                ind.className   = `swipe-indicator ${dir}`;
+                ind.textContent = dir === 'left' ? 'NOPE' : dir === 'right' ? 'LOVE' : dir === 'up' ? 'WOW' : 'CUTE';
+                card.appendChild(ind);
+            });
             attachDragListeners(card);
         }
+
+        return card;
     }
-}
-function createCard(imgIdx) {
-    const card       = document.createElement('div');
-    card.className   = 'photo-card';
-    card.dataset.imgIdx   = imgIdx;
 
-    const img    = document.createElement('img');
-    img.src      = IMAGES[imgIdx];
-    img.alt      = '';
-    img.draggable = false;
-    img.onerror  = function () {
-        card.classList.add('placeholder');
-        card.innerHTML = FALLBACK_EMOJI[imgIdx % FALLBACK_EMOJI.length];
-    };
-    card.appendChild(img);
+    function positionCard(card, stackPos, animate) {
+        const scale = 1 - stackPos * 0.045;
+        const yOff  = stackPos * 12;
 
-    // Add swipe indicators
-    ['left','right','up','down'].forEach(dir => {
-        const ind       = document.createElement('div');
-        ind.className   = `swipe-indicator ${dir}`;
-        ind.textContent = dir === 'left' ? 'NOPE' : dir === 'right' ? 'LOVE' : dir === 'up' ? 'WOW' : 'CUTE';
-        card.appendChild(ind);
-    });
+        card.style.transition = animate
+            ? 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.6s ease'
+            : 'none';
+        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
+        card.style.zIndex     = VISIBLE_CARDS - stackPos;
+        card.style.boxShadow  = stackPos === 0
+            ? '0 12px 40px rgba(0,0,0,0.45)'
+            : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
+    }
 
-    // Hide indicators by default
-    card.querySelectorAll('.swipe-indicator').forEach(i => i.style.opacity = '0');
+    // ---- Drag listeners ----
+    function attachDragListeners(card) {
+        card.addEventListener('mousedown',  onDragStart, { passive: true });
+        card.addEventListener('touchstart', onDragStart, { passive: true });
+    }
 
-    return card;
-}
+    function onDragStart(e) {
+        if (animating) return;
+        isDragging = true;
+        topCard    = e.currentTarget;
 
-function positionCard(card, stackPos, animate) {
-    const scale = 1 - stackPos * 0.045;
-    const yOff  = stackPos * 12;
+        const pt = e.touches ? e.touches[0] : e;
+        startX   = pt.clientX;
+        startY   = pt.clientY;
+        currentX = 0;
+        currentY = 0;
 
-    card.style.transition = animate
-        ? 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.6s ease'
-        : 'none';
-    card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
-    card.style.zIndex     = VISIBLE_CARDS - stackPos;
-    card.style.boxShadow  = stackPos === 0
-        ? '0 12px 40px rgba(0,0,0,0.45)'
-        : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
-}
+        topCard.style.transition = 'none';
+        topCard.style.cursor     = 'grabbing';
 
-// ---- Drag listeners ----
-function attachDragListeners(card) {
-    card.removeEventListener('mousedown',  onDragStart);
-    card.removeEventListener('touchstart', onDragStart);
-    card.addEventListener('mousedown',  onDragStart, { passive: true });
-    card.addEventListener('touchstart', onDragStart, { passive: true });
-}
+        document.addEventListener('mousemove',  onDragMove, { passive: true });
+        document.addEventListener('touchmove',  onDragMove, { passive: true });
+        document.addEventListener('mouseup',    onDragEnd);
+        document.addEventListener('touchend',   onDragEnd);
+    }
 
-function onDragStart(e) {
-    if (animating) return;
-    isDragging = true;
-    topCard    = e.currentTarget;
+    function onDragMove(e) {
+        if (!isDragging || !topCard) return;
+        const pt = e.touches ? e.touches[0] : e;
+        currentX = pt.clientX - startX;
+        currentY = pt.clientY - startY;
+        const rot = currentX * 0.12;
 
-    const pt = e.touches ? e.touches[0] : e;
-    startX   = pt.clientX;
-    startY   = pt.clientY;
-    currentX = 0;
-    currentY = 0;
+        topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
+        showIndicator(currentX, currentY);
+    }
 
-    topCard.style.transition = 'none';
-    topCard.style.cursor     = 'grabbing';
+    function showIndicator(dx, dy) {
+        if (!topCard) return;
+        const inds      = topCard.querySelectorAll('.swipe-indicator');
+        const ABS_X     = Math.abs(dx);
+        const ABS_Y     = Math.abs(dy);
+        const threshold = 30;
 
-    document.addEventListener('mousemove',  onDragMove, { passive: true });
-    document.addEventListener('touchmove',  onDragMove, { passive: true });
-    document.addEventListener('mouseup',    onDragEnd);
-    document.addEventListener('touchend',   onDragEnd);
-}
+        inds.forEach(ind => ind.style.opacity = '0');
 
-function onDragMove(e) {
-    if (!isDragging || !topCard) return;
-    const pt = e.touches ? e.touches[0] : e;
-    currentX = pt.clientX - startX;
-    currentY = pt.clientY - startY;
-    const rot = currentX * 0.12;
-
-    topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
-    showIndicator(currentX, currentY);
-}
-
-function showIndicator(dx, dy) {
-    if (!topCard) return;
-    const inds      = topCard.querySelectorAll('.swipe-indicator');
-    const ABS_X     = Math.abs(dx);
-    const ABS_Y     = Math.abs(dy);
-    const threshold = 30;
-
-    inds.forEach(ind => ind.style.opacity = '0');
-
-    if (ABS_X > threshold || ABS_Y > threshold) {
-        if (ABS_X >= ABS_Y) {
-            const ind = topCard.querySelector(dx > 0 ? '.swipe-indicator.right' : '.swipe-indicator.left');
-            if (ind) ind.style.opacity = Math.min(1, (ABS_X - threshold) / 60).toString();
-        } else {
-            const ind = topCard.querySelector(dy > 0 ? '.swipe-indicator.down' : '.swipe-indicator.up');
-            if (ind) ind.style.opacity = Math.min(1, (ABS_Y - threshold) / 60).toString();
+        if (ABS_X > threshold || ABS_Y > threshold) {
+            if (ABS_X >= ABS_Y) {
+                const ind = topCard.querySelector(dx > 0 ? '.swipe-indicator.right' : '.swipe-indicator.left');
+                if (ind) ind.style.opacity = Math.min(1, (ABS_X - threshold) / 60).toString();
+            } else {
+                const ind = topCard.querySelector(dy > 0 ? '.swipe-indicator.down' : '.swipe-indicator.up');
+                if (ind) ind.style.opacity = Math.min(1, (ABS_Y - threshold) / 60).toString();
+            }
         }
     }
-}
 
-function onDragEnd() {
-    document.removeEventListener('mousemove',  onDragMove);
-    document.removeEventListener('touchmove',  onDragMove);
-    document.removeEventListener('mouseup',    onDragEnd);
-    document.removeEventListener('touchend',   onDragEnd);
+    function onDragEnd() {
+        document.removeEventListener('mousemove',  onDragMove);
+        document.removeEventListener('touchmove',  onDragMove);
+        document.removeEventListener('mouseup',    onDragEnd);
+        document.removeEventListener('touchend',   onDragEnd);
 
-    if (!isDragging || !topCard) { isDragging = false; return; }
-    isDragging = false;
+        if (!isDragging || !topCard) { isDragging = false; return; }
+        isDragging = false;
 
-    const ABS_X          = Math.abs(currentX);
-    const ABS_Y          = Math.abs(currentY);
-    const SWIPE_THRESHOLD = 80;
+        const ABS_X          = Math.abs(currentX);
+        const ABS_Y          = Math.abs(currentY);
+        const SWIPE_THRESHOLD = 80;
 
-    if (ABS_X > SWIPE_THRESHOLD || ABS_Y > SWIPE_THRESHOLD) {
-        let flyX = 0, flyY = 0;
-        if (ABS_X >= ABS_Y) {
-            flyX = currentX > 0 ?  window.innerWidth  * 1.4 : -window.innerWidth  * 1.4;
-            flyY = currentY * 2;
+        if (ABS_X > SWIPE_THRESHOLD || ABS_Y > SWIPE_THRESHOLD) {
+            let flyX = 0, flyY = 0;
+            if (ABS_X >= ABS_Y) {
+                flyX = currentX > 0 ?  window.innerWidth  * 1.4 : -window.innerWidth  * 1.4;
+                flyY = currentY * 2;
+            } else {
+                flyY = currentY > 0 ?  window.innerHeight * 1.4 : -window.innerHeight * 1.4;
+                flyX = currentX * 2;
+            }
+            flyCard(flyX, flyY);
         } else {
-            flyY = currentY > 0 ?  window.innerHeight * 1.4 : -window.innerHeight * 1.4;
-            flyX = currentX * 2;
+            // Snap back
+            topCard.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
+            topCard.style.transform  = 'translateX(0) translateY(0) rotate(0deg)';
+            topCard.querySelectorAll('.swipe-indicator').forEach(i => i.style.opacity = '0');
+            topCard.style.cursor = 'grab';
         }
-        flyCard(flyX, flyY);
-    } else {
-        // Snap back
-        topCard.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
-        topCard.style.transform  = 'translateX(0) translateY(0) rotate(0deg)';
+    }
+
+    function flyCard(flyX, flyY) {
+        if (!topCard) return;
+        animating = true;
+
+        const rot = flyX * 0.15;
+        topCard.style.transition = 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.6s ease';
+        topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
+        topCard.style.opacity    = '0';
         topCard.querySelectorAll('.swipe-indicator').forEach(i => i.style.opacity = '0');
-        topCard.style.cursor = 'grab';
+
+        shiftCardsForward();
+
+        setTimeout(() => {
+            currentIndex = (currentIndex + 1) % IMAGES.length;
+            topCard      = null;
+            animating    = false;
+            buildStack();
+        }, 200);
     }
-}
 
-function flyCard(flyX, flyY) {
-    if (!topCard) return;
-    animating = true;
+    function shiftCardsForward() {
+        const cards = [...cardStack.querySelectorAll('.photo-card')];
+        cards.forEach(card => {
+            const pos = parseInt(card.dataset.stackPos);
+            if (pos > 0) positionCard(card, pos - 1, true);
+        });
+    }
 
-    const rot = flyX * 0.15;
-    topCard.style.transition = 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.6s ease';
-    topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
-    topCard.style.opacity    = '0';
-
-    // Update index immediately
-    currentIndex = (currentIndex + 1) % IMAGES.length;
-    
-    // Pre-build the next stack while current card is flying out
-    setTimeout(() => {
+    // ---- Open / Close ----
+    function openSlider() {
+        currentIndex = 0;
         buildStack();
-        topCard = null;
-        animating = false;
-    }, 300);
-}
+        sliderOverlay.classList.add('active');
 
-function shiftCardsForward() {
-    const cards = [...cardStack.querySelectorAll('.photo-card')];
-    cards.forEach(card => {
-        const pos = parseInt(card.dataset.stackPos);
-        if (pos > 0) positionCard(card, pos - 1, true);
+        clearTimeout(hintTimer);
+        sliderHint.classList.remove('fade');
+        hintTimer = setTimeout(() => sliderHint.classList.add('fade'), 3000);
+    }
+
+    function closeSlider() {
+        sliderOverlay.classList.remove('active');
+    }
+
+    openBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openSlider();
     });
-}
 
-// ---- Open / Close ----
-function openSlider() {
-    currentIndex = 0;
-    buildStack();
-    sliderOverlay.classList.add('active');
+    sliderClose.addEventListener('click', closeSlider);
 
-    clearTimeout(hintTimer);
-    sliderHint.classList.remove('fade');
-    hintTimer = setTimeout(() => sliderHint.classList.add('fade'), 3000);
-}
-
-function closeSlider() {
-    sliderOverlay.classList.remove('active');
-}
-
-openBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openSlider();
-});
-
-sliderClose.addEventListener('click', closeSlider);
-
-sliderOverlay.addEventListener('click', (e) => {
-    if (e.target === sliderOverlay) closeSlider();
-});
-
-// Initialize all cards on load
-initializeAllCards();
+    sliderOverlay.addEventListener('click', (e) => {
+        if (e.target === sliderOverlay) closeSlider();
+    });
 
 })();
+
 
 // =====================================================
 // ERROR HANDLING
