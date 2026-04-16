@@ -40,23 +40,16 @@ const poppers            = document.querySelectorAll('.popper');
 // INITIALIZATION
 // =====================================================
 
-window.addEventListener('DOMContentLoaded', () => {
-    console.log('✅ DOMContentLoaded fired');
+document.addEventListener('DOMContentLoaded', () => {
+    setupRelightButton();
     
+    // Add click listener to request mic button
     const requestMicBtn = document.getElementById('request-mic-btn');
-    console.log('🔘 Button found:', !!requestMicBtn);
-    
     if (requestMicBtn) {
         requestMicBtn.addEventListener('click', () => {
-            console.log('🎤 Button clicked!');
             requestMicrophoneAccess();
         });
-        console.log('✅ Click listener attached');
-    } else {
-        console.error('❌ Button element not found in DOM');
     }
-    
-    setupRelightButton();
 });
 
 
@@ -657,8 +650,7 @@ function initializeAllCards() {
     // Create photo cards in reverse so card 0 ends up on top
  for (let i = IMAGES.length - 1; i >= 0; i--) {
         const card = createCard(i);
-     
-if (i > VISIBLE_CARDS - 1) {
+if (i > VISIBLE_CARDS) {
     card.style.opacity   = '0';
     card.style.zIndex    = '0';
 }
@@ -868,9 +860,9 @@ function flyCard(flyX, flyY) {
         const backScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
         const backY     = (VISIBLE_CARDS - 1) * 12;
         nextCard.style.transition = SLIDE_TRANS;
-        const nextNudge = cardNudges[parseInt(nextCard.dataset.imgIdx)] || { x: 0, rot: 0 };
-        const nextNudge = cardNudges[parseInt(nextCard.dataset.imgIdx)] || { x: 0, rot: 0 };
-        nextCard.style.transform  = `translateX(${nextNudge.x}px) translateY(${backY}px) rotate(${nextNudge.rot}deg) scale(${backScale})`;
+        nextCard.style.transform  = `translateY(${backY}px) scale(${backScale})`;
+        nextCard.style.zIndex     = String(IMAGES.length);
+        nextCard.style.opacity    = '1';
     }
 
     const isLastCard = (currentIndex === IMAGES.length - 1);
