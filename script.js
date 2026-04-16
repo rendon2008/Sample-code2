@@ -775,6 +775,11 @@ function onDragEnd() {
     }
 }
 
+
+
+
+    
+
 function flyCard(flyX, flyY) {
     if (!topCard) return;
     animating = true;
@@ -787,15 +792,29 @@ function flyCard(flyX, flyY) {
     // Update index immediately
     currentIndex = (currentIndex + 1) % IMAGES.length;
     
-    // Rebuild stack WITHOUT delay - this moves next card into view
+    // Move swiped card to back of stack after animation
     setTimeout(() => {
-        buildStack();
-        shiftCardsForward();
+        topCard.style.transition = 'none';
+        topCard.style.transform = 'none';
+        topCard.style.opacity = '1';
+        topCard.dataset.stackPos = VISIBLE_CARDS - 1;
+        positionCard(topCard, VISIBLE_CARDS - 1, false);
+        
+        // Shift other cards forward
+        const cards = [...cardStack.querySelectorAll('.photo-card')];
+        cards.forEach(card => {
+            const pos = parseInt(card.dataset.stackPos);
+            if (pos < VISIBLE_CARDS - 1 && card !== topCard) {
+                positionCard(card, pos + 1, true);
+            }
+        });
+        
         topCard = null;
         animating = false;
-    }, 100);
+    }, 600);
 }
 
+    
 function shiftCardsForward() {
     const cards = [...cardStack.querySelectorAll('.photo-card')];
     cards.forEach(card => {
