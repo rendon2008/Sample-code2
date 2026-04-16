@@ -647,20 +647,15 @@ function initializeAllCards() {
     cardStack.appendChild(finalCard);
 
     // Create photo cards in reverse so card 0 ends up on top
-    for (let i = IMAGES.length - 1; i >= 0; i--) {
+ for (let i = IMAGES.length - 1; i >= 0; i--) {
         const card = createCard(i);
-        // Hide cards that won't be visible in the initial stack
         if (i > VISIBLE_CARDS - 1) {
             card.style.opacity   = '0';
-         const nudgeX = (Math.random() - 0.5) * 10;
-            const nudgeRot = (Math.random() - 0.5) * 6;
-            card.style.transform = `translateX(${nudgeX}px) translateY(${yOff}px) rotate(${nudgeRot}deg) scale(${scale})`;
             card.style.zIndex    = '0';
         }
         allCards[i] = card;
         cardStack.appendChild(card);
     }
-
     // Set initial stack positions with no animation
     refreshStack(false);
     attachDragListeners(allCards[0]);
@@ -685,8 +680,9 @@ function positionCard(card, stackPos, animate) {
     const TRANS = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
 
     card.style.transition = animate ? TRANS : 'none';
-    card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
-    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
+    const nudgeX = (Math.random() - 0.5) * 10;
+    const nudgeRot = (Math.random() - 0.5) * 6;
+    card.style.transform  = `translateX(${nudgeX}px) translateY(${yOff}px) rotate(${nudgeRot}deg) scale(${scale})`;    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
     card.style.opacity    = '1';
     card.style.boxShadow  = stackPos === 0
         ? '0 12px 40px rgba(0,0,0,0.45)'
