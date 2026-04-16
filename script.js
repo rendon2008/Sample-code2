@@ -887,50 +887,74 @@ function flyCard(flyX, flyY) {
 // Final ILY card
 // -------------------------------------------------------
 function showFinalMessage() {
-    // Dark card fades in first
-    finalCard.style.transition   = 'opacity 0.55s ease';
-    finalCard.style.zIndex       = String(IMAGES.length + VISIBLE_CARDS + 1);
-    finalCard.style.opacity      = '1';
-    finalCard.style.pointerEvents = 'none';
-
-    // Build the text element (once)
-    if (!finalCard.dataset.built) {
-        finalCard.dataset.built = '1';
-        const textElement = document.createElement('div');
-        textElement.style.cssText = `
-            font-size: 4rem;
-            font-weight: 800;
-            text-align: center;
-            background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 3px;
-            padding: 40px;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        `;
-        finalCard.appendChild(textElement);
-
-        // After card fades in, start typewriter
-        setTimeout(() => {
-            textElement.style.opacity = '1';
-            let idx = 0;
-            const typeInterval = setInterval(() => {
-                if (idx < FINAL_MESSAGE.length) {
-                    textElement.textContent += FINAL_MESSAGE[idx++];
-                } else {
-                    clearInterval(typeInterval);
+    const messageContainer = document.createElement('div');
+    messageContainer.style.cssText = `
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
+        animation: fadeInMessage 0.6s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+        padding: 40px;
+    `;
+    
+    const textElement = document.createElement('div');
+    textElement.style.cssText = `
+        font-size: 1.2rem;
+        font-weight: 500;
+        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.5px;
+        line-height: 1.8;
+        white-space: normal;
+        word-wrap: break-word;
+        text-align: left;
+        font-family: 'Georgia', serif;
+        max-height: 100%;
+        overflow-y: auto;
+    `;
+    
+    messageContainer.appendChild(textElement);
+    cardStack.appendChild(messageContainer);
+    
+    // Add animation keyframes
+    if (!document.getElementById('slider-animation-styles')) {
+        const style = document.createElement('style');
+        style.id = 'slider-animation-styles';
+        style.textContent = `
+            @keyframes fadeInMessage {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.95);
                 }
-            }, 100);
-        }, 600);
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(style);
     }
+    
+    // Typewriter animation
+    let index = 0;
+    const typeInterval = setInterval(() => {
+        if (index < FINAL_MESSAGE.length) {
+            textElement.textContent += FINAL_MESSAGE[index];
+            index++;
+        } else {
+            clearInterval(typeInterval);
+        }
+    }, 40); // Adjust speed here (40ms per character - faster for long text)
+}
+
+    
 }
 
 // ---- Open / Close ----
