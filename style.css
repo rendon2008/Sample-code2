@@ -95,6 +95,33 @@ html, body {
 }
 
 
+.retry-btn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #FF2E7A 0%, #FF0033 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 0, 90, 0.55);
+    transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(248, 200, 220, 0.7);
+}
+
+.retry-btn:active {
+    transform: scale(0.98);
+}
+
+
+
+
+
 /* ===================================================
    BIRTHDAY SCENE
    =================================================== */
