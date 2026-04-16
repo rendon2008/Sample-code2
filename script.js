@@ -582,6 +582,10 @@ envOverlay.addEventListener('click', (e) => {
 // CARD SLIDER
 // =====================================================
 
+// =====================================================
+// CARD SLIDER
+// =====================================================
+
 (function () {
 
 const IMAGES = [
@@ -590,6 +594,8 @@ const IMAGES = [
     '9.jpeg', '10.jpeg', '11.jpeg', '12.jpeg',
     '13.jpeg'
 ];
+
+const FINAL_MESSAGE = "I love u"; // EDIT THIS TEXT HERE
     
 const FALLBACK_EMOJI  = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
 const VISIBLE_CARDS   = 4;
@@ -607,6 +613,7 @@ let currentX = 0, currentY = 0;
 let topCard  = null;
 let animating = false;
 let hintTimer = null;
+let hasReachedEnd = false;
 
 // Pre-create all cards at initialization
 const allCards = [];
@@ -620,6 +627,13 @@ function initializeAllCards() {
 
 function buildStack() {
     cardStack.innerHTML = '';
+    
+    // If we've reached the end, show the final message instead
+    if (hasReachedEnd) {
+        showFinalMessage();
+        return;
+    }
+    
     for (let i = VISIBLE_CARDS - 1; i >= 0; i--) {
         const imgIdx = (currentIndex + i) % IMAGES.length;
         const card   = allCards[imgIdx];
@@ -659,8 +673,6 @@ function createCard(imgIdx) {
     return card;
 }
 
-
-    
 function positionCard(card, stackPos, animate) {
     const scale = 1 - stackPos * 0.045;
     const yOff  = stackPos * 12;
@@ -684,7 +696,7 @@ function attachDragListeners(card) {
 }
 
 function onDragStart(e) {
-    if (animating) return;
+    if (animating || hasReachedEnd) return;
     isDragging = true;
     topCard    = e.currentTarget;
 
@@ -711,10 +723,6 @@ function onDragMove(e) {
     const rot = currentX * 0.12;
 
     topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
-    showIndicator(currentX, currentY);
-}
-
-function showIndicator(dx, dy) {
 }
 
 function onDragEnd() {
@@ -744,7 +752,6 @@ function onDragEnd() {
         // Snap back
         topCard.style.transition = 'transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
         topCard.style.transform  = 'translateX(0) translateY(0) rotate(0deg)';
-        topCard.querySelectorAll('.swipe-indicator').forEach(i => i.style.opacity = '0');
         topCard.style.cursor = 'grab';
     }
 }
@@ -758,29 +765,73 @@ function flyCard(flyX, flyY) {
     topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
     topCard.style.opacity    = '0';
 
-    // Update index immediately
-    currentIndex = (currentIndex + 1) % IMAGES.length;
+    // Check if we've reached the last image
+    if (currentIndex === IMAGES.length - 1) {
+        hasReachedEnd = true;
+    } else {
+        // Update index for next card
+        currentIndex = (currentIndex + 1) % IMAGES.length;
+    }
     
-    // Rebuild stack WITHOUT delay - this moves next card into view
     setTimeout(() => {
         buildStack();
-        shiftCardsForward();
         topCard = null;
         animating = false;
-    }, 100);
+    }, 300);
 }
 
-function shiftCardsForward() {
-    const cards = [...cardStack.querySelectorAll('.photo-card')];
-    cards.forEach(card => {
-        const pos = parseInt(card.dataset.stackPos);
-        if (pos > 0) positionCard(card, pos - 1, true);
-    });
+function showFinalMessage() {
+    const messageContainer = document.createElement('div');
+    messageContainer.style.cssText = `
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
+    `;
+    
+    const textElement = document.createElement('div');
+    textElement.style.cssText = `
+        font-size: 4rem;
+        font-weight: 800;
+        text-align: center;
+        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 3px;
+        padding: 40px;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    `;
+    
+    messageContainer.appendChild(textElement);
+    cardStack.appendChild(messageContainer);
+    
+    // Typewriter animation
+    let index = 0;
+    const typeInterval = setInterval(() => {
+        if (index < FINAL_MESSAGE.length) {
+            textElement.textContent += FINAL_MESSAGE[index];
+            index++;
+        } else {
+            clearInterval(typeInterval);
+        }
+    }, 100); // Adjust speed here (100ms per character)
 }
 
 // ---- Open / Close ----
 function openSlider() {
     currentIndex = 0;
+    hasReachedEnd = false;
     buildStack();
     sliderOverlay.classList.add('active');
 
