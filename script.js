@@ -80,13 +80,28 @@ async function requestMicrophoneAccess() {
         isListening = true;
         startBlowDetection();
         transitionToBirthdayScene();
+        
+        // Hide retry button on success
+        const retryBtn = document.getElementById('retry-permission-btn');
+        if (retryBtn) retryBtn.style.display = 'none';
 
     } catch (error) {
-        console.error('Microphone access denied:', error);
+        console.error('Microphone access error:', error);
+        
+        // Show helpful message based on error type
+        if (error.name === 'NotAllowedError') {
+            console.log('Permission was denied. Check browser settings to allow microphone access.');
+            // Show retry button if permission denied
+            const retryBtn = document.getElementById('retry-permission-btn');
+            if (retryBtn) retryBtn.style.display = 'block';
+        } else if (error.name === 'NotFoundError') {
+            console.log('No microphone device found');
+        }
+        
+        // Keep asking every 2 seconds
         setTimeout(requestMicrophoneAccess, 2000);
     }
 }
-
 
 // =====================================================
 // SCENE TRANSITION
