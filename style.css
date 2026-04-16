@@ -688,30 +688,54 @@ html, body {
     100% { transform: translateX(-50%) scale(1);   opacity: 1; }
 }
 
-.message-btn {
+/* Row container for message + photo buttons */
+.bottom-btns {
     position: absolute;
     bottom: 18%;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.bottom-btns.visible {
+    opacity: 1;
+    visibility: visible;
+    animation: buttonAppear 0.5s ease;
+}
+
+.message-btn {
     width: 80px; height: 80px;
     background: transparent;
     border-radius: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 20;
-    opacity: 0;
-    visibility: hidden;
     cursor: pointer;
 }
 
-.message-btn svg { width: 80px; height: 80px; margin-top: 0; }
+.message-btn svg { width: 80px; height: 80px; }
 
-.message-btn.visible {
-    opacity: 1;
-    visibility: visible;
-    animation: buttonAppear 0.5s ease;
+.photo-btn {
+    width: 80px; height: 80px;
+    background: transparent;
+    border-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
+
+.photo-btn svg { width: 80px; height: 80px; }
+
+.photo-btn:hover { transform: scale(1.08); }
+.message-btn:hover { transform: scale(1.08); }
 
 
 /* ===================================================
