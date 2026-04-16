@@ -44,6 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
     requestMicrophoneAccess();
     setupRelightButton();
     
+    // Add retry button listener
+    const retryBtn = document.getElementById('retry-permission-btn');
+    if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+            requestMicrophoneAccess();
+        });
+    }
 });
 
 
