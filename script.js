@@ -887,6 +887,15 @@ function flyCard(flyX, flyY) {
 // Final ILY card
 // -------------------------------------------------------
 function showFinalMessage() {
+    // Load romantic font
+    if (!document.getElementById('final-card-font')) {
+        const link = document.createElement('link');
+        link.id   = 'final-card-font';
+        link.rel  = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap';
+        document.head.appendChild(link);
+    }
+
     // Inject styles once
     if (!document.getElementById('slider-animation-styles')) {
         const style = document.createElement('style');
@@ -902,12 +911,12 @@ function showFinalMessage() {
             }
             .type-cursor {
                 display: inline-block;
-                width: 2px;
-                height: 1.1em;
+                width: 1.5px;
+                height: 1em;
                 background: #FF69B4;
-                margin-left: 2px;
+                margin-left: 1px;
                 vertical-align: text-bottom;
-                animation: blinkCursor 0.8s ease-in-out infinite;
+                animation: blinkCursor 1.1s ease-in-out infinite;
             }
             div::-webkit-scrollbar       { width: 6px; }
             div::-webkit-scrollbar-track { background: rgba(255,255,255,0.07); border-radius: 10px; }
@@ -925,36 +934,41 @@ function showFinalMessage() {
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        background: linear-gradient(160deg, #141414 0%, #1e1e1e 60%, #2a1a20 100%);
         border-radius: 18px;
         overflow: hidden;
         box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
-        animation: fadeInMessage 0.6s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+        animation: fadeInMessage 0.7s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
     `;
 
     const textWrapper = document.createElement('div');
     textWrapper.style.cssText = `
         width: 100%;
         height: 100%;
-        padding: 40px;
+        padding: 36px 38px;
         overflow-y: auto;
         overflow-x: hidden;
         scroll-behavior: smooth;
     `;
 
     // Container for typed lines — each line is a <div>
+    const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
+    const FONT_SIZE_PX = 20; // px — used for Canvas measurement too
+    const LETTER_SPACING = 0.3;
+
     const linesContainer = document.createElement('div');
     linesContainer.style.cssText = `
-        font-size: 1.2rem;
-        font-weight: 500;
-        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 50%, #FFB6C1 100%);
+        font-size: ${FONT_SIZE_PX}px;
+        font-weight: 400;
+        font-style: italic;
+        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 55%, #FFB6C1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        letter-spacing: 0.5px;
-        line-height: 1.8;
+        letter-spacing: ${LETTER_SPACING}px;
+        line-height: 2;
         text-align: left;
-        font-family: 'Georgia', serif;
+        font-family: ${FONT_FAMILY};
         min-height: 100%;
     `;
 
@@ -977,58 +991,68 @@ function showFinalMessage() {
     textWrapper.addEventListener('wheel',     onUserScroll, { passive: true });
     textWrapper.addEventListener('touchmove', onUserScroll, { passive: true });
 
-    // ── Pre-measure: split message into lines that fit the card width ───
-    // We wait one frame after the card is in the DOM so layout is computed.
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            // Measure available width using a hidden ruler span
-            const ruler = document.createElement('span');
-            ruler.style.cssText = `
-                position: absolute;
-                visibility: hidden;
-                white-space: nowrap;
-                font-size: 1.2rem;
-                font-weight: 500;
-                letter-spacing: 0.5px;
-                font-family: 'Georgia', serif;
-                pointer-events: none;
-            `;
-            linesContainer.appendChild(ruler);
+    // ── Pre-measure with Canvas (pixel-perfect, no DOM reflow needed) ───
+    // Wait for font to load (or up to 1.5 s), then measure.
+    const PADDING_H = 76; // 38px each side
+    const SAFETY    = 10; // extra px margin so nothing gets too close to edge
 
-            const availableWidth = linesContainer.clientWidth || (textWrapper.clientWidth - 80);
+    function buildLines(fontReady) {
+        // Canvas measureText is the most reliable cross-browser measurement.
+        const canvas = document.createElement('canvas');
+        const ctx2d  = canvas.getContext('2d');
+        // Use italic weight 400 to match linesContainer style
+        ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
-            // Word-wrap: greedily pack words onto lines
-            const words = FINAL_MESSAGE.split(' ');
-            const lines = [];
-            let currentLine = '';
+        // Available width = card width minus horizontal padding minus safety margin
+        const cardWidth = cardStack.clientWidth || 320;
+        const maxW = cardWidth - PADDING_H - SAFETY;
 
-            for (let i = 0; i < words.length; i++) {
-                const testLine = currentLine ? currentLine + ' ' + words[i] : words[i];
-                ruler.textContent = testLine;
-                if (ruler.offsetWidth > availableWidth && currentLine !== '') {
-                    lines.push(currentLine);
-                    currentLine = words[i];
-                } else {
-                    currentLine = testLine;
-                }
+        const words = FINAL_MESSAGE.split(' ');
+        const lines = [];
+        let cur = '';
+
+        for (let i = 0; i < words.length; i++) {
+            const test = cur ? cur + ' ' + words[i] : words[i];
+            // Add letter-spacing contribution (approximate: spacing × char count)
+            const measured = ctx2d.measureText(test).width + (test.length * LETTER_SPACING);
+            if (measured > maxW && cur !== '') {
+                lines.push(cur);
+                cur = words[i];
+            } else {
+                cur = test;
             }
-            if (currentLine) lines.push(currentLine);
+        }
+        if (cur) lines.push(cur);
+        return lines;
+    }
 
-            linesContainer.removeChild(ruler);
+    // Attempt to wait for Google Font, fall back after timeout
+    const startTyping = (lines) => {
+        setTimeout(() => {
+            typeLines(lines, linesContainer, cursor, textWrapper, () => isUserScrolling);
+        }, 900); // card settles, then typing begins
+    };
 
-            // ── Start typing after card has settled (0.8 s delay) ───────
-            setTimeout(() => {
-                typeLines(lines, linesContainer, cursor, textWrapper, () => { isUserScrolling }, () => isUserScrolling);
-            }, 800);
-        });
-    });
+    if (document.fonts && document.fonts.load) {
+        document.fonts.load(`italic 400 ${FONT_SIZE_PX}px 'Cormorant Garamond'`)
+            .then(() => startTyping(buildLines(true)))
+            .catch(()  => startTyping(buildLines(false)));
+        // Hard timeout fallback in case fonts.load hangs
+        setTimeout(() => {}, 1500);
+    } else {
+        // No fonts API — wait a beat then measure with Georgia as fallback
+        setTimeout(() => startTyping(buildLines(false)), 300);
+    }
 }
 
-// Typed line-by-line so no mid-word reflow ever happens
-function typeLines(lines, container, cursor, wrapper, _unused, getIsScrolling) {
-    let lineIdx  = 0;
-    let charIdx  = 0;
+// Typed line-by-line — no mid-word reflow ever happens
+function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
+    let lineIdx      = 0;
+    let charIdx      = 0;
     let currentLineEl = null;
+
+    // Typing speed: base ms per character, with slight random variance for feel
+    const BASE_MS = 72;
 
     function nextTick() {
         // All lines done
@@ -1037,10 +1061,10 @@ function typeLines(lines, container, cursor, wrapper, _unused, getIsScrolling) {
             return;
         }
 
-        // Start a new line element
+        // Start a new line div — reserve its height immediately so no layout jump
         if (charIdx === 0) {
             currentLineEl = document.createElement('div');
-            currentLineEl.style.minHeight = '1.8em'; // reserve space immediately
+            currentLineEl.style.cssText = 'min-height: 2em; display: block;';
             container.appendChild(currentLineEl);
             currentLineEl.appendChild(cursor);
         }
@@ -1048,22 +1072,25 @@ function typeLines(lines, container, cursor, wrapper, _unused, getIsScrolling) {
         const line = lines[lineIdx];
 
         if (charIdx < line.length) {
-            // Insert char before cursor
-            const textNode = document.createTextNode(line[charIdx]);
-            currentLineEl.insertBefore(textNode, cursor);
+            // Insert character text node before cursor
+            currentLineEl.insertBefore(document.createTextNode(line[charIdx]), cursor);
             charIdx++;
 
-            // Auto-scroll
             if (!getIsScrolling()) {
                 wrapper.scrollTop = wrapper.scrollHeight;
             }
 
-            setTimeout(nextTick, 38);
+            // Slight pause after punctuation for a natural, romantic cadence
+            const ch = line[charIdx - 1];
+            const delay = /[,.]/.test(ch) ? BASE_MS * 6
+                        : /[!?]/.test(ch)  ? BASE_MS * 4
+                        : BASE_MS + (Math.random() * 28 - 10); // gentle variance
+            setTimeout(nextTick, delay);
         } else {
-            // Line complete — move cursor to next line
+            // Line finished — brief breath before next line
             lineIdx++;
             charIdx = 0;
-            setTimeout(nextTick, 38);
+            setTimeout(nextTick, BASE_MS * 3);
         }
     }
 
