@@ -622,7 +622,7 @@ envOverlay.addEventListener('click', (e) => {
         const yOff  = stackPos * 12;
 
         card.style.transition = animate
-            ? 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.35s ease'
+            ? 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.6s ease'
             : 'none';
         card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
         card.style.zIndex     = VISIBLE_CARDS - stackPos;
@@ -725,19 +725,19 @@ envOverlay.addEventListener('click', (e) => {
         animating = true;
 
         const rot = flyX * 0.15;
-        topCard.style.transition = 'transform 0.52s cubic-bezier(0.4,0,1,1), opacity 0.52s ease';
+        topCard.style.transition = 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.6s ease';
         topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
         topCard.style.opacity    = '0';
         topCard.querySelectorAll('.swipe-indicator').forEach(i => i.style.opacity = '0');
 
         shiftCardsForward();
 
-        setTimeout(() => {
-            currentIndex = (currentIndex + 1) % IMAGES.length;
-            topCard      = null;
-            buildStack();
-            animating    = false;
-        }, 520);
+setTimeout(() => {
+    currentIndex = (currentIndex + 1) % IMAGES.length;
+    topCard      = null;
+    buildStack();
+    animating    = false;
+}, 600);
     }
 
     function shiftCardsForward() {
