@@ -957,21 +957,25 @@ function showFinalMessage() {
         animation: fadeInMessage 0.7s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
     `;
 
-    const textWrapper = document.createElement('div');
+
+        const textWrapper = document.createElement('div');
     textWrapper.style.cssText = `
         width: 100%;
         height: 100%;
-        padding: 36px 38px;
+        padding: 30px 32px;
         overflow-y: auto;
         overflow-x: hidden;
         scroll-behavior: smooth;
+        display: flex;
+        flex-direction: column;
     `;
+
 
     const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
     const FONT_SIZE_PX = 20;
     const LETTER_SPACING = 0.3;
 
-    const linesContainer = document.createElement('div');
+     const linesContainer = document.createElement('div');
     linesContainer.style.cssText = `
         font-size: ${FONT_SIZE_PX}px;
         font-weight: 400;
@@ -981,10 +985,14 @@ function showFinalMessage() {
         -webkit-text-fill-color: transparent;
         background-clip: text;
         letter-spacing: ${LETTER_SPACING}px;
-        line-height: 2;
+        line-height: 1.8;
         text-align: left;
         font-family: ${FONT_FAMILY};
         min-height: 100%;
+        width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        padding: 0;
     `;
 
     const cursor = document.createElement('span');
@@ -1004,8 +1012,8 @@ function showFinalMessage() {
     textWrapper.addEventListener('wheel',     onUserScroll, { passive: true });
     textWrapper.addEventListener('touchmove', onUserScroll, { passive: true });
 
-    const PADDING_H = 76;
-    const SAFETY    = 10;
+    const PADDING_H = 64;
+    const SAFETY    = 8;
 
     function buildLines(fontReady) {
         const canvas = document.createElement('canvas');
