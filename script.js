@@ -29,7 +29,6 @@ let blowStartTime = null;
 const permissionScreen   = document.getElementById('permission-screen');
 const birthdayScene      = document.getElementById('birthday-scene');
 const message            = document.getElementById('message');
-const relightBtn         = document.getElementById('relight-btn');
 const candles            = document.querySelectorAll('.candle');
 const confettiCanvas     = document.getElementById('confetti-canvas');
 const balloonsContainer  = document.getElementById('balloons');
@@ -41,7 +40,6 @@ const poppers            = document.querySelectorAll('.popper');
 // =====================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    setupRelightButton();
     
     const requestMicBtn = document.getElementById('request-mic-btn');
     console.log('Mic button found:', requestMicBtn); // Debug log
@@ -216,9 +214,6 @@ function startCelebration() {
     startConfetti();
 
     setTimeout(() => {
-        relightBtn.classList.remove('hidden');
-        relightBtn.classList.add('visible');
-
         const bottomBtns = document.getElementById('bottom-btns');
         bottomBtns.classList.remove('hidden');
         bottomBtns.classList.add('visible');
@@ -490,43 +485,6 @@ function createConfettiPiece(colors, isBurst) {
 // RELIGHT BUTTON
 // =====================================================
 
-function setupRelightButton() {
-    relightBtn.addEventListener('click', () => relightCandles());
-}
-
-function relightCandles() {
-    candlesExtinguished = false;
-    celebrationStarted  = false;
-    blowStartTime       = null;
-
-    candles.forEach(candle => candle.classList.remove('extinguished'));
-
-    message.style.opacity   = '0';
-    message.style.transform = 'translateX(-50%) scale(0.8)';
-
-    setTimeout(() => {
-        message.innerHTML        = 'BLOW THE CANDLES!!';
-        message.style.color      = '';
-        message.style.textShadow = '';
-        message.style.opacity    = '1';
-        message.style.transform  = 'translateX(-50%) scale(1)';
-    }, 400);
-
-    relightBtn.classList.remove('visible');
-    relightBtn.classList.add('hidden');
-
-    const bottomBtns = document.getElementById('bottom-btns');
-    bottomBtns.classList.remove('visible');
-    bottomBtns.classList.add('hidden');
-
-    balloonsContainer.innerHTML = '';
-    startCandleAnimations();
-
-    if (!blowDetectionInterval) {
-        startBlowDetection();
-    }
-}
-
 
 // =====================================================
 // ENVELOPE / LETTER ANIMATION
@@ -627,44 +585,24 @@ let finalCard = null;
 // Build all cards once and append them all to cardStack.
 // Visibility is controlled purely via CSS transforms/opacity/zIndex.
 // -------------------------------------------------------
-function initializeAllCards() {
-    allCards.length = 0;
-    cardStack.innerHTML = '';
+function positionCard(card, stackPos, animate) {
+    const scale = 1 - stackPos * 0.045;
+    const yOff  = stackPos * 12;
+    const xOff  = stackPos * 3 + (Math.sin(stackPos * 0.5) * 2);
+    const rot   = stackPos * 1.5 + (Math.cos(stackPos * 0.3) * 1);
 
-    // Create the ILY final card first (lowest z-index, behind everything)
-    finalCard = document.createElement('div');
-    finalCard.style.cssText = `
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
-        z-index: 0;
-        opacity: 0;
-        pointer-events: none;
-    `;
-    cardStack.appendChild(finalCard);
-
-    // Create photo cards in reverse so card 0 ends up on top
-    for (let i = IMAGES.length - 1; i >= 0; i--) {
-        const card = createCard(i);
-        // Hide cards that won't be visible in the initial stack
-        if (i > VISIBLE_CARDS - 1) {
-            card.style.opacity   = '0';
-            card.style.transform = `translateY(${(VISIBLE_CARDS - 1) * 12}px) scale(${1 - (VISIBLE_CARDS - 1) * 0.045})`;
-            card.style.zIndex    = '0';
-        }
-        allCards[i] = card;
-        cardStack.appendChild(card);
+    if (animate) {
+        card.style.transition = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
+    } else {
+        card.style.transition = 'none';
     }
-
-    // Set initial stack positions with no animation
-    refreshStack(false);
-    attachDragListeners(allCards[0]);
+    
+    card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rot}deg)`;
+    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
+    card.style.opacity    = '1';
+    card.style.boxShadow  = stackPos === 0
+        ? '0 12px 40px rgba(0,0,0,0.45)'
+        : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
 }
 
 // -------------------------------------------------------
@@ -683,10 +621,16 @@ function refreshStack(animate) {
 function positionCard(card, stackPos, animate) {
     const scale = 1 - stackPos * 0.045;
     const yOff  = stackPos * 12;
-    const TRANS = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
+    const xOff  = stackPos * 3 + (Math.sin(stackPos * 0.5) * 2);
+    const rot   = stackPos * 1.5 + (Math.cos(stackPos * 0.3) * 1);
 
-    card.style.transition = animate ? TRANS : 'none';
-    card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
+    if (animate) {
+        card.style.transition = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
+    } else {
+        card.style.transition = 'none';
+    }
+    
+    card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rot}deg)`;
     card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
     card.style.opacity    = '1';
     card.style.boxShadow  = stackPos === 0
