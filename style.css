@@ -694,14 +694,43 @@ background: linear-gradient(180deg,
 /* ===================================================
    BUTTONS
    =================================================== */
-/* hide relight button completely (keeps DOM element so JS doesn't error) */
+
 .relight-btn {
-    display: none !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #FF2E7A 0%, #FF0033 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow:
+        0 4px 15px rgba(255, 0, 90, 0.55),
+        0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
 }
 
+.relight-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    animation: buttonAppear 0.5s ease;
+}
+
+.relight-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow:
+        0 6px 20px rgba(248, 200, 220, 0.7),
+        0 3px 10px rgba(0,0,0,0.15);
+}
+
+.relight-btn:active { transform: translateX(-50%) scale(0.98); }
 
 @keyframes buttonAppear {
     0%   { transform: translateX(-50%) scale(0.8); opacity: 0; }
@@ -709,68 +738,53 @@ background: linear-gradient(180deg,
 }
 
 /* Row container for message + photo buttons */
-
-
-/* Row container for message + photo buttons */
-/* Row container for message + photo buttons */
 .bottom-btns {
     position: absolute;
-    bottom: 12%;
+    bottom: 18%;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 24px;
-    z-index: 9999; /* very high so it sits above other elements/overlays */
+    gap: 20px;
+    z-index: 20;
     opacity: 0;
     visibility: hidden;
-    pointer-events: none; /* disabled until visible */
-    transition: opacity 0.36s ease, visibility 0.36s ease;
 }
 
-/* AFTER */
 .bottom-btns.visible {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto;
-    animation: buttonAppear 0.5s ease forwards;
+    animation: buttonAppear 0.5s ease;
 }
 
-
-
-/* Row container for message + photo buttons */
-.message-btn,
-.photo-btn {
-    width: 64px;
-    height: 64px;
+.message-btn {
+    width: 80px; height: 80px;
     background: transparent;
-    border: none;
-    border-radius: 50%;
+    border-radius: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    pointer-events: auto;
-    transition: transform 0.18s ease, box-shadow 0.18s;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    z-index: 10000; /* ensure the actual button is above the container */
 }
 
-.message-btn svg,
-.photo-btn svg {
-    width: 56px;
-    height: 56px;
+.message-btn svg { width: 80px; height: 80px; }
+
+.photo-btn {
+    width: 80px; height: 80px;
+    background: transparent;
+    border-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.message-btn:active,
-.photo-btn:active {
-    transform: scale(0.95);
-}
-.message-btn:hover,
+.photo-btn svg { width: 80px; height: 80px; }
+
 .photo-btn:hover { transform: scale(1.08); }
+.message-btn:hover { transform: scale(1.08); }
 
 
 /* ===================================================
@@ -1002,14 +1016,14 @@ background: linear-gradient(180deg,
     align-items: center;
     justify-content: center;
     opacity: 0;
-    pointer-events: none; /* default: non-interactive */
+    pointer-events: none;
     transition: opacity 0.4s ease;
 }
+
 .slider-overlay.active {
     opacity: 1;
-    pointer-events: auto; /* only interactive when active */
+    pointer-events: all;
 }
-
 
 .slider-close {
     position: absolute;
@@ -1231,43 +1245,41 @@ background: linear-gradient(180deg,
    =================================================== */
 
 @media (max-width: 768px) {
-    .bottom-btns { bottom: 14%; gap: 20px; }
-    .message-btn, .photo-btn { width: 68px; height: 68px; }
-    .message-btn svg, .photo-btn svg { width: 60px; height: 60px; }
+    .cake         { width: 220px; height: 220px; }
+    .swirl        { width: 35px; height: 28px; }
+    .strawberry   { width: 40px; height: 45px; }
+    .strawberry-body { width: 35px; height: 40px; }
+    .candle-body  { width: 8px; height: 28px; }
+    .main-candle .candle-body { width: 10px; height: 35px; }
+    .flame        { width: 10px; height: 15px; }
+    .piped-dot    { width: 12px; height: 16px; }
+    .side-flower  { width: 25px; height: 25px; }
+    .message      { top: 5%; font-size: 1.5rem; }
+    .relight-btn  { padding: 12px 30px; font-size: 1rem; }
 }
 
 @media (max-width: 480px) {
-    .bottom-btns { bottom: 12%; gap: 16px; }
-    .message-btn, .photo-btn { width: 72px; height: 72px; }
-    .message-btn svg, .photo-btn svg { width: 64px; height: 64px; }
+    .cake         { width: 180px; height: 180px; }
+    .swirl        { width: 28px; height: 22px; }
+    .strawberry   { width: 32px; height: 36px; }
+    .strawberry-body { width: 28px; height: 32px; }
+    .candle-body  { width: 6px; height: 22px; }
+    .main-candle .candle-body { width: 8px; height: 28px; }
+    .flame        { width: 8px; height: 12px; }
+    .piped-dot    { width: 10px; height: 14px; }
+    .side-flower  { width: 20px; height: 20px; }
+    .message      { font-size: 1.2rem; }
+    .permission-text { font-size: 1.1rem; }
+    .microphone-icon { width: 70px; height: 70px; }
 }
+
 @media (max-height: 600px) {
     .cake        { transform: scale(0.85); }
     .message     { top: 3%; }
-    
-    .bottom-btns {
-        bottom: 10%;
-    }
+    .relight-btn { bottom: 3%; }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
     .cake    { transform: scale(0.7); }
     .message { font-size: 1.2rem; top: 2%; }
-    
-    .bottom-btns {
-        bottom: 8%;
-        gap: 12px;
-    }
-    
-    .message-btn,
-    .photo-btn {
-        width: 48px;
-        height: 48px;
-    }
-    
-    .message-btn svg,
-    .photo-btn svg {
-        width: 48px;
-        height: 48px;
-    }
 }
