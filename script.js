@@ -1027,35 +1027,41 @@ function showFinalMessage() {
     const SAFETY = 0;      // extra safety margin for letter-spacing rendering
 
     function buildLines(fontReady) {
-        const canvas = document.createElement('canvas');
-        const ctx2d  = canvas.getContext('2d');
-        ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
+    const canvas = document.createElement('canvas');
+    const ctx2d  = canvas.getContext('2d');
+    ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
-        const cardWidth = cardStack.clientWidth || 320;
-        // Subtract all overhead
-        const maxW = cardWidth - PADDING_H - SCROLLBAR - SAFETY;
+    const cardWidth = cardStack.clientWidth || 320;
+    // Exact padding: 30px left + 32px right + 10px scrollbar + 4px safety
+    const maxW = cardWidth - 76;
 
-        const words = FINAL_MESSAGE.split(' ');
-        const lines = [];
-        let cur = '';
+    const words = FINAL_MESSAGE.split(' ');
+    const lines = [];
+    let cur = '';
 
-        for (let i = 0; i < words.length; i++) {
-            const test = cur ? cur + ' ' + words[i] : words[i];
-            // Measure text more accurately (canvas often underestimates)
-            let measured = ctx2d.measureText(test).width;
-            // Add letter-spacing effect
-            measured += (test.length * LETTER_SPACING * 0.8); // reduced multiplier for better accuracy
-            
-            if (measured > maxW && cur !== '') {
-                lines.push(cur);
-                cur = words[i];
-            } else {
-                cur = test;
-            }
+    for (let i = 0; i < words.length; i++) {
+        const test = cur ? cur + ' ' + words[i] : words[i];
+        // More accurate measurement: canvas.measureText is usually accurate for italic fonts
+        const textWidth = ctx2d.measureText(test).width;
+        // Add letter-spacing accurately (each character contributes spacing except first)
+        const spacingBonus = test.length > 0 ? (test.length - 1) * LETTER_SPACING : 0;
+        const totalWidth = textWidth + spacingBonus;
+        
+        // Only break if text is too long AND we already have content
+        if (totalWidth > maxW && cur !== '') {
+            lines.push(cur);
+            cur = words[i];
+        } else {
+            cur = test;
         }
-        if (cur) lines.push(cur);
-        return lines;
     }
+    if (cur) lines.push(cur);
+    return lines;
+}
+
+    
+
+  
 
     
 
