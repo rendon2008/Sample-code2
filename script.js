@@ -43,15 +43,18 @@ const poppers            = document.querySelectorAll('.popper');
 document.addEventListener('DOMContentLoaded', () => {
     setupRelightButton();
     
-    // Add click listener to request mic button
     const requestMicBtn = document.getElementById('request-mic-btn');
+    console.log('Mic button found:', requestMicBtn); // Debug log
+    
     if (requestMicBtn) {
         requestMicBtn.addEventListener('click', () => {
+            console.log('Mic button clicked!'); // Debug log
             requestMicrophoneAccess();
         });
+    } else {
+        console.error('Mic button not found!'); // Debug log
     }
 });
-
 
 // =====================================================
 // MICROPHONE PERMISSION
