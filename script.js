@@ -797,7 +797,7 @@ function onDragEnd() {
         }
         flyCard(flyX, flyY);
     } else {
-        // Snap back — restore background cards too with proper nudge positioning
+        // Snap back — only snap TOP card, background cards stay pre-nudged
         const TRANS = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
         topCard.style.transition = TRANS;
         
@@ -809,22 +809,7 @@ function onDragEnd() {
         topCard.style.transform = `translateX(${topX}px) translateY(${topY}px) scale(${topScale}) rotate(${topRot}deg)`;
         topCard.style.cursor = 'grab';
 
-        // Restore background cards to their proper nudged positions
-        for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
-            const imgIdx = currentIndex + offset;
-            if (imgIdx >= IMAGES.length) break;
-            const card = allCards[imgIdx];
-            
-            const scale = 1 - offset * 0.045;
-            const yOff  = offset * 12;
-            const xOff  = offset * 3 + (Math.sin(offset * 0.5) * 2);
-            const rot   = offset * 1.5 + (Math.cos(offset * 0.3) * 1);
-            
-            card.style.transition = TRANS;
-            card.style.transform = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rot}deg)`;
-        }
-        
-        // Hide the peek card again
+        // Hide the peek card again (it's already at its pre-nudged position)
         const peekIdx = currentIndex + VISIBLE_CARDS;
         if (peekIdx < IMAGES.length) {
             allCards[peekIdx].style.transition = TRANS;
@@ -843,34 +828,17 @@ function flyCard(flyX, flyY) {
     topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
     topCard.style.opacity    = '0';
 
-    // Slide background cards up immediately, in sync with the fly
-    const SLIDE_TRANS = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS}ms ease, box-shadow ${FLY_MS}ms ease`;
-    for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
-        const imgIdx = currentIndex + offset;
-        if (imgIdx >= IMAGES.length) break;
-        const card = allCards[imgIdx];
-        card.style.transition = SLIDE_TRANS;
-        const scale  = 1 - (offset - 1) * 0.045;
-        const yOff   = (offset - 1) * 12;
-        const zIdx   = String(IMAGES.length + VISIBLE_CARDS - (offset - 1));
-        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
-        card.style.zIndex     = zIdx;
-        card.style.opacity    = '1';
-        card.style.boxShadow  = (offset - 1) === 0
-            ? '0 12px 40px rgba(0,0,0,0.45)'
-            : `0 ${4 + (offset-1)*2}px ${12 + (offset-1)*6}px rgba(0,0,0,0.25)`;
-    }
-
-    // Slide in the next hidden card at the back of the stack
+    // Slide in the next hidden card at the back of the stack (already pre-nudged, just animate z-index and opacity)
     const nextHiddenIdx = currentIndex + VISIBLE_CARDS;
     if (nextHiddenIdx < IMAGES.length) {
         const nextCard = allCards[nextHiddenIdx];
-        const backScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
-        const backY     = (VISIBLE_CARDS - 1) * 12;
+        const SLIDE_TRANS = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS}ms ease, box-shadow ${FLY_MS}ms ease`;
         nextCard.style.transition = SLIDE_TRANS;
-        nextCard.style.transform  = `translateY(${backY}px) scale(${backScale})`;
-        nextCard.style.zIndex     = String(IMAGES.length);
+        
+        // Peek card is already at its pre-nudged position, just fade it in
+        nextCard.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - (VISIBLE_CARDS - 1));
         nextCard.style.opacity    = '1';
+        nextCard.style.boxShadow  = `0 ${4 + (VISIBLE_CARDS - 1) * 2}px ${12 + (VISIBLE_CARDS - 1) * 6}px rgba(0,0,0,0.25)`;
     }
 
     const isLastCard = (currentIndex === IMAGES.length - 1);
