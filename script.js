@@ -962,7 +962,7 @@ const textWrapper = document.createElement('div');
 textWrapper.style.cssText = `
     width: 100%;
     height: 100%;
-    padding: 30px 8px;
+    padding: 30px 15px;
     overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
@@ -970,7 +970,6 @@ textWrapper.style.cssText = `
     flex-direction: column;
     box-sizing: border-box;
 `;
-
     const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
     const FONT_SIZE_PX = 25;
     const LETTER_SPACING = 0.3;
@@ -1023,8 +1022,8 @@ function buildLines(fontReady) {
     ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
     const cardWidth = cardStack.clientWidth || 320;
-    // Tighter calculation: 8px padding + 8px scrollbar only
-    const maxW = cardWidth - 8 - 8;
+    // Ignore scrollbar, just use 15px padding on each side
+    const maxW = cardWidth - 30; // 15px left + 15px right
 
     const words = FINAL_MESSAGE.split(' ');
     const lines = [];
