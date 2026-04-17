@@ -891,7 +891,7 @@ function onDragStart(e) {
             counterDisplay.textContent = `${IMAGES.length + 1}/${IMAGES.length + 1}`;
         } else {
             currentIndex++;
-            updateCounter();
+            window.updateCounter();
             refreshStack(false);
             attachDragListeners(allCards[currentIndex]);
         }
@@ -1115,7 +1115,14 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
 // -------------------------------------------------------
 // Open / Close Slider
 // -------------------------------------------------------
-function openSlider() {
+
+    // Update counter function - INSIDE IIFE so it has access to currentIndex
+window.updateCounter = function() {
+    counterDisplay.textContent = `${currentIndex + 1}/${IMAGES.length + 1}`;
+};
+    
+
+    function openSlider() {
     currentIndex  = 0;
     hasReachedEnd = false;
     animating     = false;
@@ -1124,14 +1131,18 @@ function openSlider() {
     initializeAllCards();
 
     sliderOverlay.classList.add('active');
+    counterDisplay.style.display = 'block';
+    counterDisplay.textContent = `${currentIndex + 1}/${IMAGES.length + 1}`;
 
     clearTimeout(hintTimer);
     sliderHint.classList.remove('fade');
     hintTimer = setTimeout(() => sliderHint.classList.add('fade'), 3000);
 }
 
-function closeSlider() {
+
+    function closeSlider() {
     sliderOverlay.classList.remove('active');
+    counterDisplay.style.display = 'none';
 }
 
 openBtn.addEventListener('click', (e) => {
@@ -1140,36 +1151,29 @@ openBtn.addEventListener('click', (e) => {
 });
 
     // Create counter display
+// Create counter display OUTSIDE the IIFE
 const counterDisplay = document.createElement('div');
 counterDisplay.id = 'slider-counter';
 counterDisplay.style.cssText = `
-    position: absolute;
-    bottom: 10px;
+    position: fixed;
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: #FFB6C1;
     text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    z-index: 999;
+    z-index: 1001;
     pointer-events: none;
+    display: none;
 `;
-cardStack.appendChild(counterDisplay);
+document.body.appendChild(counterDisplay);
 
-// Update counter function
-// Update counter function
-function updateCounter() {
-    counterDisplay.textContent = `${currentIndex + 1}/${IMAGES.length + 1}`;
-}
-
-// Update counter in openSlider
-const originalOpenSlider = openSlider;
-openSlider = function() {
-    originalOpenSlider();
-    updateCounter();
-};
-
+openBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openSlider();
+});
 // Update counter after each card swipe (in flyCard after currentIndex++)
     
 
