@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
 :root {
     /* Cake Colors - Pastel Pink Theme */
     --cake-pink: #F8C8DC;
@@ -231,7 +232,8 @@ background: linear-gradient(180deg,
     left: 50%;
     transform: translateX(-50%);
     font-size: clamp(1.8rem, 5vw, 3.5rem);
-    font-weight: 800;
+    font-weight: 600;
+    font-family: 'Playfair Display', serif;
     text-align: center;
     color: #FF69B4;
     text-shadow:
@@ -244,7 +246,7 @@ background: linear-gradient(180deg,
     width: 90%;
     z-index: 10;
     transition: all 0.8s ease;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
 }
 
 @keyframes messageGlow {
@@ -695,42 +697,7 @@ background: linear-gradient(180deg,
    BUTTONS
    =================================================== */
 
-.relight-btn {
-    position: absolute;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 40px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
-    background: linear-gradient(135deg, #FF2E7A 0%, #FF0033 100%);
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow:
-        0 4px 15px rgba(255, 0, 90, 0.55),
-        0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    z-index: 20;
-    opacity: 0;
-    visibility: hidden;
-}
 
-.relight-btn.visible {
-    opacity: 1;
-    visibility: visible;
-    animation: buttonAppear 0.5s ease;
-}
-
-.relight-btn:hover {
-    transform: translateX(-50%) scale(1.05);
-    box-shadow:
-        0 6px 20px rgba(248, 200, 220, 0.7),
-        0 3px 10px rgba(0,0,0,0.15);
-}
-
-.relight-btn:active { transform: translateX(-50%) scale(0.98); }
 
 @keyframes buttonAppear {
     0%   { transform: translateX(-50%) scale(0.8); opacity: 0; }
@@ -1066,6 +1033,7 @@ background: linear-gradient(180deg,
     touch-action: none;
     will-change: transform;
     background: #1a1a1a;
+    transition: transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease;
 }
 
 .photo-card:active { cursor: grabbing; }
