@@ -586,10 +586,13 @@ let finalCard = null;
 // Visibility is controlled purely via CSS transforms/opacity/zIndex.
 // -------------------------------------------------------
 function positionCard(card, stackPos, animate) {
+    const cardIndex = currentIndex + stackPos;
+    const nudge = getCardNudge(cardIndex);
+    
     const scale = 1 - stackPos * 0.045;
     const yOff  = stackPos * 12;
-    const xOff  = stackPos * 3 + (Math.sin(stackPos * 0.5) * 2);
-    const rot   = stackPos * 1.5 + (Math.cos(stackPos * 0.3) * 1);
+    const xOff  = stackPos * 3 + nudge.xRand;
+    const rot   = stackPos * 1.5 + nudge.rotRand;
 
     if (animate) {
         card.style.transition = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
@@ -619,9 +622,24 @@ function refreshStack(animate) {
 }
 
 
-    function initializeAllCards() {
+// Store random nudges for each card (generated once and reused)
+const cardNudges = {};
+
+function getCardNudge(cardIndex) {
+    // Generate and cache random nudge for this card if not exists
+    if (!cardNudges[cardIndex]) {
+        cardNudges[cardIndex] = {
+            xRand: (Math.random() - 0.5) * 8,  // Random X between -4 and +4
+            rotRand: (Math.random() - 0.5) * 3 // Random rotation between -1.5 and +1.5 deg
+        };
+    }
+    return cardNudges[cardIndex];
+}
+
+function initializeAllCards() {
     allCards.length = 0;
     cardStack.innerHTML = '';
+    cardNudges = {}; // Reset nudges for fresh initialization
 
     // Create the ILY final card first (lowest z-index, behind everything)
     finalCard = document.createElement('div');
@@ -645,12 +663,14 @@ function refreshStack(animate) {
     // Create photo cards in reverse so card 0 ends up on top
     for (let i = IMAGES.length - 1; i >= 0; i--) {
         const card = createCard(i);
-        // Pre-position all cards with natural nudge (no animation on init)
+        // Pre-position all cards with RANDOM natural nudges
         const stackPos = i < VISIBLE_CARDS ? i : VISIBLE_CARDS - 1;
+        const nudge = getCardNudge(i);
+        
         const scale = 1 - stackPos * 0.045;
         const yOff  = stackPos * 12;
-        const xOff  = stackPos * 3 + (Math.sin(stackPos * 0.5) * 2);
-        const rot   = stackPos * 1.5 + (Math.cos(stackPos * 0.3) * 1);
+        const xOff  = stackPos * 3 + nudge.xRand;  // Random X nudge
+        const rot   = stackPos * 1.5 + nudge.rotRand; // Random rotation nudge
         
         card.style.transition = 'none';
         card.style.transform = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rot}deg)`;
@@ -666,6 +686,7 @@ function refreshStack(animate) {
 
     attachDragListeners(allCards[0]);
 }
+    
 
 
 
@@ -732,18 +753,20 @@ function onDragMove(e) {
         const imgIdx = currentIndex + offset;
         if (imgIdx >= IMAGES.length) break;
         const card     = allCards[imgIdx];
+        const nudge = getCardNudge(imgIdx);
         
         // FROM positions (current nudged state)
         const fromScale = 1 - offset * 0.045;
         const fromY     = offset * 12;
-        const fromX     = offset * 3 + (Math.sin(offset * 0.5) * 2);
-        const fromRot   = offset * 1.5 + (Math.cos(offset * 0.3) * 1);
+        const fromX     = offset * 3 + nudge.xRand;
+        const fromRot   = offset * 1.5 + nudge.rotRand;
         
         // TO positions (next nudged state)
+        const nextNudge = getCardNudge(imgIdx - 1);
         const toScale   = 1 - (offset - 1) * 0.045;
         const toY       = (offset - 1) * 12;
-        const toX       = (offset - 1) * 3 + (Math.sin((offset - 1) * 0.5) * 2);
-        const toRot     = (offset - 1) * 1.5 + (Math.cos((offset - 1) * 0.3) * 1);
+        const toX       = (offset - 1) * 3 + nextNudge.xRand;
+        const toRot     = (offset - 1) * 1.5 + nextNudge.rotRand;
         
         // Interpolate between FROM and TO
         const scale     = fromScale + (toScale - fromScale) * progress;
@@ -759,17 +782,17 @@ function onDragMove(e) {
     const peekIdx = currentIndex + VISIBLE_CARDS;
     if (peekIdx < IMAGES.length) {
         const peekCard  = allCards[peekIdx];
+        const peekNudge = getCardNudge(peekIdx);
         const lastScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
         const lastY     = (VISIBLE_CARDS - 1) * 12;
-        const lastX     = (VISIBLE_CARDS - 1) * 3 + (Math.sin((VISIBLE_CARDS - 1) * 0.5) * 2);
-        const lastRot   = (VISIBLE_CARDS - 1) * 1.5 + (Math.cos((VISIBLE_CARDS - 1) * 0.3) * 1);
+        const lastX     = (VISIBLE_CARDS - 1) * 3 + peekNudge.xRand;
+        const lastRot   = (VISIBLE_CARDS - 1) * 1.5 + peekNudge.rotRand;
         peekCard.style.transition = 'none';
         peekCard.style.transform  = `translateX(${lastX}px) translateY(${lastY}px) scale(${lastScale}) rotate(${lastRot}deg)`;
         peekCard.style.zIndex     = String(IMAGES.length);
         peekCard.style.opacity    = String(progress);
     }
 }
-
 
     
 
@@ -802,10 +825,11 @@ function onDragEnd() {
         topCard.style.transition = TRANS;
         
         // Snap top card back to its nudged position (offset 0)
+        const topNudge = getCardNudge(currentIndex);
         const topScale = 1 - 0 * 0.045;
         const topY = 0 * 12;
-        const topX = 0 * 3 + (Math.sin(0 * 0.5) * 2);
-        const topRot = 0 * 1.5 + (Math.cos(0 * 0.3) * 1);
+        const topX = 0 * 3 + topNudge.xRand;
+        const topRot = 0 * 1.5 + topNudge.rotRand;
         topCard.style.transform = `translateX(${topX}px) translateY(${topY}px) scale(${topScale}) rotate(${topRot}deg)`;
         topCard.style.cursor = 'grab';
 
