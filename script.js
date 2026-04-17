@@ -958,17 +958,18 @@ function showFinalMessage() {
     `;
 
 
-        const textWrapper = document.createElement('div');
-    textWrapper.style.cssText = `
-        width: 100%;
-        height: 100%;
-        padding: 30px 32px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        scroll-behavior: smooth;
-        display: flex;
-        flex-direction: column;
-    `;
+const textWrapper = document.createElement('div');
+textWrapper.style.cssText = `
+    width: 100%;
+    height: 100%;
+    padding: 30px 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+`;
 
 
     const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
@@ -977,29 +978,24 @@ function showFinalMessage() {
 
 
 
-        const linesContainer = document.createElement('div');
-    linesContainer.style.cssText = `
-        font-size: ${FONT_SIZE_PX}px;
-        font-weight: 400;
-        font-style: italic;
-        background: linear-gradient(135deg, #FF1493 0%, #FF69B4 55%, #FFB6C1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: ${LETTER_SPACING}px;
-        line-height: 1.8;
-        text-align: left;
-        font-family: ${FONT_FAMILY};
-        min-height: 100%;
-        width: 100%;
-        word-wrap: break-word;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        overflow: hidden;
-        padding: 0;
-        max-width: calc(100% - 8px);
-    `;
-    
+const linesContainer = document.createElement('div');
+linesContainer.style.cssText = `
+    font-size: ${FONT_SIZE_PX}px;
+    font-weight: 400;
+    font-style: italic;
+    background: linear-gradient(135deg, #FF1493 0%, #FF69B4 55%, #FFB6C1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: ${LETTER_SPACING}px;
+    line-height: 1.8;
+    text-align: left;
+    font-family: ${FONT_FAMILY};
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 0;
+`;
 
     const cursor = document.createElement('span');
     cursor.className = 'type-cursor';
@@ -1028,8 +1024,8 @@ function buildLines(fontReady) {
     ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
     const cardWidth = cardStack.clientWidth || 320;
-    // Exact padding: 30px left + 32px right + 10px scrollbar + 4px safety
-    const maxW = cardWidth - 76;
+    // USE 90% OF CARD WIDTH - this is the key
+    const maxW = cardWidth * 0.90;
 
     const words = FINAL_MESSAGE.split(' ');
     const lines = [];
@@ -1037,14 +1033,9 @@ function buildLines(fontReady) {
 
     for (let i = 0; i < words.length; i++) {
         const test = cur ? cur + ' ' + words[i] : words[i];
-        // More accurate measurement: canvas.measureText is usually accurate for italic fonts
-        const textWidth = ctx2d.measureText(test).width;
-        // Add letter-spacing accurately (each character contributes spacing except first)
-        const spacingBonus = test.length > 0 ? (test.length - 1) * LETTER_SPACING : 0;
-        const totalWidth = textWidth + spacingBonus;
+        const measured = ctx2d.measureText(test).width;
         
-        // Only break if text is too long AND we already have content
-        if (totalWidth > maxW && cur !== '') {
+        if (measured > maxW && cur !== '') {
             lines.push(cur);
             cur = words[i];
         } else {
@@ -1054,6 +1045,7 @@ function buildLines(fontReady) {
     if (cur) lines.push(cur);
     return lines;
 }
+    
 
   
 
