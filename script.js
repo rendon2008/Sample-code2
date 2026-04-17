@@ -1022,9 +1022,9 @@ function showFinalMessage() {
 
 
 
-        const PADDING_H = 64;  // 32px left + 32px right
+        const PADDING_H = 30;  // 32px left + 32px right
     const SCROLLBAR = 10;  // scrollbar width
-    const SAFETY = 8;      // extra safety margin for letter-spacing rendering
+    const SAFETY = 0;      // extra safety margin for letter-spacing rendering
 
     function buildLines(fontReady) {
         const canvas = document.createElement('canvas');
