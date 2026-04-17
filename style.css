@@ -1014,13 +1014,12 @@ background: linear-gradient(180deg,
     align-items: center;
     justify-content: center;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: none !important;
     transition: opacity 0.4s ease;
 }
 
 .slider-overlay.active {
     opacity: 1;
-    pointer-events: auto;  /* Change from 'all' to 'auto' */
 }
 
 
