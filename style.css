@@ -758,6 +758,11 @@ background: linear-gradient(180deg,
     animation: buttonAppear 0.5s ease;
 }
 
+#bottom-btns {
+    position: relative;
+    z-index: 100;
+}
+
 .message-btn {
     width: 80px; height: 80px;
     background: transparent;
