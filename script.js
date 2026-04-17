@@ -960,7 +960,8 @@ function showFinalMessage() {
     `;
 
 
-const textWrapper = document.createElement('div');
+
+    const textWrapper = document.createElement('div');
 textWrapper.style.cssText = `
     width: 100%;
     height: 100%;
@@ -971,7 +972,18 @@ textWrapper.style.cssText = `
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    scrollbar-width: none;
 `;
+textWrapper.style.setProperty('overflow-y', 'auto');
+// Hide webkit scrollbar so it doesn't shift layout
+const hideScrollStyle = document.createElement('style');
+hideScrollStyle.textContent = `
+    #msg-text-wrapper::-webkit-scrollbar { display: none; }
+`;
+document.head.appendChild(hideScrollStyle);
+textWrapper.id = 'msg-text-wrapper';
+    
+    
     const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
     const FONT_SIZE_PX = 25;
     const LETTER_SPACING = 0.3;
@@ -1023,9 +1035,11 @@ function buildLines(fontReady) {
     const ctx2d  = canvas.getContext('2d');
     ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
-    const cardWidth = cardStack.clientWidth || 320;
-    // Ignore scrollbar, just use 15px padding on each side
+
+    const cardWidth = cardStack.offsetWidth || 320;
+    // Use full width minus padding, ignoring any scrollbar
     const maxW = cardWidth - 30; // 15px left + 15px right
+    
 
     const words = FINAL_MESSAGE.split(' ');
     const lines = [];
