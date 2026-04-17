@@ -1230,68 +1230,16 @@ background: linear-gradient(180deg,
    =================================================== */
 
 @media (max-width: 768px) {
-    .cake         { width: 220px; height: 220px; }
-    .swirl        { width: 35px; height: 28px; }
-    .strawberry   { width: 40px; height: 45px; }
-    .strawberry-body { width: 35px; height: 40px; }
-    .candle-body  { width: 8px; height: 28px; }
-    .main-candle .candle-body { width: 10px; height: 35px; }
-    .flame        { width: 10px; height: 15px; }
-    .piped-dot    { width: 12px; height: 16px; }
-    .side-flower  { width: 25px; height: 25px; }
-    .message      { top: 5%; font-size: 1.5rem; }
-    
-    .bottom-btns {
-        bottom: 15%;
-        gap: 20px;
-    }
-    
-    .message-btn,
-    .photo-btn {
-        width: 56px;
-        height: 56px;
-    }
-    
-    .message-btn svg,
-    .photo-btn svg {
-        width: 56px;
-        height: 56px;
-    }
+    .bottom-btns { bottom: 14%; gap: 20px; }
+    .message-btn, .photo-btn { width: 68px; height: 68px; }
+    .message-btn svg, .photo-btn svg { width: 60px; height: 60px; }
 }
 
 @media (max-width: 480px) {
-    .cake         { width: 180px; height: 180px; }
-    .swirl        { width: 28px; height: 22px; }
-    .strawberry   { width: 32px; height: 36px; }
-    .strawberry-body { width: 28px; height: 32px; }
-    .candle-body  { width: 6px; height: 22px; }
-    .main-candle .candle-body { width: 8px; height: 28px; }
-    .flame        { width: 8px; height: 12px; }
-    .piped-dot    { width: 10px; height: 14px; }
-    .side-flower  { width: 20px; height: 20px; }
-    .message      { font-size: 1.2rem; }
-    .permission-text { font-size: 1.1rem; }
-    .microphone-icon { width: 70px; height: 70px; }
-    
-    .bottom-btns {
-        bottom: 12%;
-        gap: 16px;
-    }
-    
-    .message-btn,
-    .photo-btn {
-        width: 52px;
-        height: 52px;
-    }
-    
-    .message-btn svg,
-    .photo-btn svg {
-        width: 52px;
-        height: 52px;
-    }
+    .bottom-btns { bottom: 12%; gap: 16px; }
+    .message-btn, .photo-btn { width: 72px; height: 72px; }
+    .message-btn svg, .photo-btn svg { width: 64px; height: 64px; }
 }
-
-
 @media (max-height: 600px) {
     .cake        { transform: scale(0.85); }
     .message     { top: 3%; }
