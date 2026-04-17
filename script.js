@@ -40,18 +40,15 @@ const poppers            = document.querySelectorAll('.popper');
 // INITIALIZATION
 // =====================================================
 
-// =====================================================
-// INITIALIZATION
-// =====================================================
-
-const requestMicBtn = document.getElementById('request-mic-btn');
-if (requestMicBtn) {
-    requestMicBtn.addEventListener('click', () => {
-        requestMicrophoneAccess();
-    });
-} else {
-    console.error('❌ Button with id="request-mic-btn" not found in HTML');
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // Add click listener to request mic button
+    const requestMicBtn = document.getElementById('request-mic-btn');
+    if (requestMicBtn) {
+        requestMicBtn.addEventListener('click', () => {
+            requestMicrophoneAccess();
+        });
+    }
+});
 
 
 // =====================================================
@@ -213,12 +210,11 @@ function startCelebration() {
     firePartyPoppers();
     startConfetti();
 
-setTimeout(() => {
+ setTimeout(() => {
     const bottomBtns = document.getElementById('bottom-btns');
     bottomBtns.classList.remove('hidden');
     bottomBtns.classList.add('visible');
 }, 2000);
-}
 
 function updateMessage() {
     message.style.opacity   = '0';
@@ -486,6 +482,8 @@ function createConfettiPiece(colors, isBurst) {
 // =====================================================
 
 
+
+
 // =====================================================
 // ENVELOPE / LETTER ANIMATION
 // =====================================================
@@ -612,13 +610,8 @@ function initializeAllCards() {
         const card = createCard(i);
         // Hide cards that won't be visible in the initial stack
         if (i > VISIBLE_CARDS - 1) {
-            const stackPos = VISIBLE_CARDS - 1;
-            const scale = 1 - stackPos * 0.045;
-            const yOff  = stackPos * 12;
-            const xOff  = stackPos * 8 * (stackPos % 2 === 0 ? 1 : -1);
-            const rot   = stackPos * 2.5 * (stackPos % 2 === 0 ? 1 : -1);
             card.style.opacity   = '0';
-            card.style.transform = `translateX(${xOff}px) translateY(${yOff}px) rotate(${rot}deg) scale(${scale})`;
+            card.style.transform = `translateY(${(VISIBLE_CARDS - 1) * 12}px) scale(${1 - (VISIBLE_CARDS - 1) * 0.045})`;
             card.style.zIndex    = '0';
         }
         allCards[i] = card;
@@ -659,6 +652,7 @@ function positionCard(card, stackPos, animate) {
         : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
 }
 
+    
 function createCard(imgIdx) {
     const card = document.createElement('div');
     card.className = 'photo-card';
@@ -717,7 +711,7 @@ function onDragMove(e) {
     topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
 
     // Animate background cards toward their next position proportionally
- // Animate background cards toward their next position proportionally
+// Animate background cards toward their next position proportionally
 const progress = Math.min(1, Math.sqrt(currentX * currentX + currentY * currentY) / 120);
 for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
     const imgIdx = currentIndex + offset;
@@ -838,41 +832,26 @@ function flyCard(flyX, flyY) {
 
     const isLastCard = (currentIndex === IMAGES.length - 1);
 
-setTimeout(() => {
-    // Sink the swiped card fully out of sight
-    topCard.style.transition = 'none';
-    topCard.style.zIndex     = '0';
+    setTimeout(() => {
+        // Sink the swiped card fully out of sight
+        topCard.style.transition = 'none';
+        topCard.style.zIndex     = '0';
 
-    if (isLastCard) {
-        hasReachedEnd = true;
-        showFinalMessage();
-    } else {
-        currentIndex++;
-        // Manually position next set of cards with nudges already applied
-        for (let offset = 0; offset < VISIBLE_CARDS; offset++) {
-            const imgIdx = currentIndex + offset;
-            if (imgIdx >= IMAGES.length) break;
-            const card = allCards[imgIdx];
-            
-            const scale = 1 - offset * 0.045;
-            const yOff  = offset * 12;
-            const xOff  = offset * 8 * (offset % 2 === 0 ? 1 : -1);
-            const rot   = offset * 2.5 * (offset % 2 === 0 ? 1 : -1);
-            
-            card.style.transition = 'none';
-            card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) rotate(${rot}deg) scale(${scale})`;
-            card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - offset);
-            card.style.opacity    = '1';
-            card.style.boxShadow  = offset === 0
-                ? '0 12px 40px rgba(0,0,0,0.45)'
-                : `0 ${4 + offset * 2}px ${12 + offset * 6}px rgba(0,0,0,0.25)`;
+        if (isLastCard) {
+            hasReachedEnd = true;
+            showFinalMessage();
+        } else {
+            currentIndex++;
+            // Sync everyone's z-index cleanly for the new order
+            refreshStack(false);
+            attachDragListeners(allCards[currentIndex]);
         }
-        attachDragListeners(allCards[currentIndex]);
-    }
 
-    topCard   = null;
-    animating = false;
-}, FLY_MS + 20);
+        topCard   = null;
+        animating = false;
+    }, FLY_MS + 20);
+}
+
 // -------------------------------------------------------
 // Final ILY card
 // -------------------------------------------------------
