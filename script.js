@@ -545,6 +545,21 @@ document.getElementById('message-btn').addEventListener('click', () => {
 
 document.getElementById('envWrapper').addEventListener('click', (e) => {
     e.stopPropagation();
+    e.preventDefault();
+    if (!envelopeOpened) {
+        heartSeal.classList.add('hidden');
+        envFlap.classList.add('open');
+        setTimeout(() => {
+            envLetter.classList.remove('closing');
+            envLetter.classList.add('risen');
+            envelopeOpened = true;
+        }, 700);
+    }
+});
+
+document.getElementById('envWrapper').addEventListener('touchend', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (!envelopeOpened) {
         heartSeal.classList.add('hidden');
         envFlap.classList.add('open');
