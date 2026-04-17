@@ -1026,9 +1026,9 @@ function showFinalMessage() {
 
     // ── Pre-measure with Canvas (pixel-perfect, no DOM reflow needed) ───
     // Wait for font to load (or up to 1.5 s), then measure.
-    const PADDING_H = 20; // 38px each side, reduced for better fit
-    const SAFETY    = 0;  // minimal margin so text fills the row
-
+        const PADDING_H = 76; // 38px padding on each side
+        const SAFETY    = 16; // small safety buffer
+    
     function buildLines(fontReady) {
         // Canvas measureText is the most reliable cross-browser measurement.
         const canvas = document.createElement('canvas');
