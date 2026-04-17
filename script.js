@@ -548,18 +548,22 @@ envOverlay.addEventListener('click', (e) => {
 // =====================================================
 // Store random nudges for each card (generated once and reused)
 // MUST be outside IIFE so it persists across multiple openings
-const cardNudges = {};
 
-function getCardNudge(cardIndex) {
-    // Generate and cache random nudge for this card if not exists
-    if (!cardNudges[cardIndex]) {
-        cardNudges[cardIndex] = {
-            xRand: (Math.random() - 0.5) * 8,  // Random X between -4 and +4
-            rotRand: (Math.random() - 0.5) * 3 // Random rotation between -1.5 and +1.5 deg
-        };
-    }
-    return cardNudges[cardIndex];
-}
+
+// =====================================================
+// CARD SLIDER
+// =====================================================
+
+// Store random nudges for each card GLOBALLY (outside IIFE)
+// This ensures nudges persist and feel natural/romantic
+function initializeAllCards() {
+    allCards.length = 0;
+    cardStack.innerHTML = '';
+    // DO NOT reset cardNudges - keep them persistent and random across all sessions
+
+// =====================================================
+// CARD SLIDER
+// =====================================================
 
 (function () {
 
