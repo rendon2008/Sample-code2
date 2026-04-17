@@ -650,10 +650,11 @@ function initializeAllCards() {
     // Create photo cards in reverse so card 0 ends up on top
  for (let i = IMAGES.length - 1; i >= 0; i--) {
         const card = createCard(i);
-if (i > VISIBLE_CARDS) {
-    card.style.opacity   = '0';
-    card.style.zIndex    = '0';
-}
+        if (i >= VISIBLE_CARDS) {
+            card.style.opacity   = '0';
+            card.style.zIndex    = '0';
+            card.style.pointerEvents = 'none';
+        }
 
      cardNudges[i] = {
     x: (Math.random() - 0.5) * 22,
@@ -678,6 +679,21 @@ function refreshStack(animate) {
         const card = allCards[imgIdx];
         positionCard(card, offset, animate);
     }
+    // Ensure the peek card (just beyond visible window) is hidden and behind
+    const peekIdx = currentIndex + VISIBLE_CARDS;
+    if (peekIdx < IMAGES.length) {
+        const peekCard = allCards[peekIdx];
+        peekCard.style.transition = animate ? 'opacity 0.3s ease' : 'none';
+        peekCard.style.opacity    = '0';
+        peekCard.style.zIndex     = '1';
+        peekCard.style.pointerEvents = 'none';
+    }
+    // Ensure all cards further back are also fully hidden
+    for (let i = currentIndex + VISIBLE_CARDS + 1; i < IMAGES.length; i++) {
+        allCards[i].style.opacity = '0';
+        allCards[i].style.zIndex  = '0';
+        allCards[i].style.pointerEvents = 'none';
+    }
 }
 
 function positionCard(card, stackPos, animate) {
@@ -692,6 +708,10 @@ function positionCard(card, stackPos, animate) {
     card.style.boxShadow  = stackPos === 0
         ? '0 12px 40px rgba(0,0,0,0.45)'
         : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
+    // z-index: top card gets highest, cards behind get lower — deterministic
+    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
+    card.style.opacity    = '1';
+    card.style.pointerEvents = stackPos === 0 ? 'auto' : 'none';
 }
 
 function createCard(imgIdx) {
@@ -775,7 +795,9 @@ function onDragMove(e) {
         const lastY     = (VISIBLE_CARDS - 1) * 12;
         peekCard.style.transition = 'none';
         const peekNudge = cardNudges[parseInt(peekCard.dataset.imgIdx)] || { x: 0, rot: 0 };
-        peekCard.style.transform  = `translateX(${peekNudge.x}px) translateY(${lastY}px) rotate(${peekNudge.rot}deg) scale(${lastScale})`;        peekCard.style.zIndex     = String(IMAGES.length);
+        peekCard.style.transform  = `translateX(${peekNudge.x}px) translateY(${lastY}px) rotate(${peekNudge.rot}deg) scale(${lastScale})`;
+        // Keep peek card behind all visible stack cards (stack bottom z-index = IMAGES.length + 1)
+        peekCard.style.zIndex     = String(IMAGES.length);
         peekCard.style.opacity    = String(progress);
     }
 }
@@ -820,6 +842,8 @@ function onDragEnd() {
         if (peekIdx < IMAGES.length) {
             allCards[peekIdx].style.transition = TRANS;
             allCards[peekIdx].style.opacity    = '0';
+            allCards[peekIdx].style.zIndex     = '1';
+            allCards[peekIdx].style.pointerEvents = 'none';
         }
     }
 }
@@ -856,21 +880,26 @@ function flyCard(flyX, flyY) {
     // Slide in the next hidden card at the back of the stack
     const nextHiddenIdx = currentIndex + VISIBLE_CARDS;
     if (nextHiddenIdx < IMAGES.length) {
-        const nextCard = allCards[nextHiddenIdx];
+        const nextCard  = allCards[nextHiddenIdx];
         const backScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
         const backY     = (VISIBLE_CARDS - 1) * 12;
+        const nextNudge = cardNudges[parseInt(nextCard.dataset.imgIdx)] || { x: 0, rot: 0 };
         nextCard.style.transition = SLIDE_TRANS;
-        nextCard.style.transform  = `translateY(${backY}px) scale(${backScale})`;
-        nextCard.style.zIndex     = String(IMAGES.length);
+        nextCard.style.transform  = `translateX(${nextNudge.x}px) translateY(${backY}px) rotate(${nextNudge.rot}deg) scale(${backScale})`;
+        // z-index: matches what positionCard would assign for stackPos = VISIBLE_CARDS-1 after index++
+        nextCard.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - (VISIBLE_CARDS - 1));
         nextCard.style.opacity    = '1';
+        nextCard.style.pointerEvents = 'none';
     }
 
     const isLastCard = (currentIndex === IMAGES.length - 1);
 
     setTimeout(() => {
         // Sink the swiped card fully out of sight
-        topCard.style.transition = 'none';
-        topCard.style.zIndex     = '0';
+        topCard.style.transition    = 'none';
+        topCard.style.zIndex        = '0';
+        topCard.style.opacity       = '0';
+        topCard.style.pointerEvents = 'none';
 
         if (isLastCard) {
             hasReachedEnd = true;
