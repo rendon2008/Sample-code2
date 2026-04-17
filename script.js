@@ -888,8 +888,10 @@ function onDragStart(e) {
         if (isLastCard) {
             hasReachedEnd = true;
             showFinalMessage();
+            counterDisplay.textContent = `${currentIndex + 1}/${IMAGES.length + 1}`;
         } else {
             currentIndex++;
+            updateCounter();
             refreshStack(false);
             attachDragListeners(allCards[currentIndex]);
         }
@@ -1136,6 +1138,42 @@ openBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     openSlider();
 });
+
+    // Create counter display
+const counterDisplay = document.createElement('div');
+counterDisplay.id = 'slider-counter';
+counterDisplay.style.cssText = `
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #FF69B4;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    pointer-events: none;
+`;
+sliderOverlay.appendChild(counterDisplay);
+
+// Update counter function
+// Update counter function
+function updateCounter() {
+    counterDisplay.textContent = `${currentIndex + 1}/${IMAGES.length + 1}`;
+}
+
+// Update counter in openSlider
+const originalOpenSlider = openSlider;
+openSlider = function() {
+    originalOpenSlider();
+    updateCounter();
+};
+
+// Update counter after each card swipe (in flyCard after currentIndex++)
+    
+
+    
 
 sliderClose.addEventListener('click', closeSlider);
 
