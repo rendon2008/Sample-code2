@@ -1151,14 +1151,18 @@ function openSlider() {
     initializeAllCards();
 
     sliderOverlay.classList.add('active');
+    sliderOverlay.style.pointerEvents = 'all';  // Add this line
 
     clearTimeout(hintTimer);
     sliderHint.classList.remove('fade');
     hintTimer = setTimeout(() => sliderHint.classList.add('fade'), 3000);
 }
 
+    
+
 function closeSlider() {
     sliderOverlay.classList.remove('active');
+    sliderOverlay.style.pointerEvents = 'none';  // Add this line
 }
 
 openBtn.addEventListener('click', (e) => {
