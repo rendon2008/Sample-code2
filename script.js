@@ -845,25 +845,8 @@ setTimeout(() => {
         showFinalMessage();
     } else {
         currentIndex++;
-        // Manually position next set of cards with nudges already applied
-        for (let offset = 0; offset < VISIBLE_CARDS; offset++) {
-            const imgIdx = currentIndex + offset;
-            if (imgIdx >= IMAGES.length) break;
-            const card = allCards[imgIdx];
-            
-            const scale = 1 - offset * 0.045;
-            const yOff  = offset * 12;
-            const xOff  = offset * 8 * (offset % 2 === 0 ? 1 : -1);
-            const rot   = offset * 2.5 * (offset % 2 === 0 ? 1 : -1);
-            
-            card.style.transition = 'none';
-            card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) rotate(${rot}deg) scale(${scale})`;
-            card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - offset);
-            card.style.opacity    = '1';
-            card.style.boxShadow  = offset === 0
-                ? '0 12px 40px rgba(0,0,0,0.45)'
-                : `0 ${4 + offset * 2}px ${12 + offset * 6}px rgba(0,0,0,0.25)`;
-        }
+        // Sync everyone's z-index cleanly for the new order
+        refreshStack(false);
         attachDragListeners(allCards[currentIndex]);
     }
 
