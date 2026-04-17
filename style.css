@@ -472,11 +472,11 @@ background: linear-gradient(180deg,
     border-radius: 3px;
 }
 
-.swirl-1 { top: 5%;    left: 50%; transform: translateX(-50%); }
-.swirl-2 { top: 25%;   right: 5%; }
-.swirl-3 { bottom: 15%; right: 10%; }
-.swirl-4 { bottom: 15%; left: 10%; }
-.swirl-5 { top: 25%;   left: 5%; }
+.swirl-1 { top: 8%;    left: 50%; transform: translateX(-50%) rotate(-3deg); }
+.swirl-2 { top: 22%;   right: 6%; transform: rotate(4deg); }
+.swirl-3 { bottom: 12%; right: 12%; transform: rotate(-5deg); }
+.swirl-4 { bottom: 12%; left: 12%; transform: rotate(5deg); }
+.swirl-5 { top: 22%;   left: 6%; transform: rotate(-4deg); }
 .swirl-6 { top: 50%;   right: 0%; transform: translateY(-50%); }
 
 /* Strawberry */
