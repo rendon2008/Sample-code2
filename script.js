@@ -224,7 +224,7 @@ function startCelebration() {
 
 function updateMessage() {
     message.style.opacity   = '0';
-    message.style.transform = 'translateX(-50%) scale(0.8)';
+    message.style.transform = 'scale(0.8)';
 
     setTimeout(() => {
        message.innerHTML = '<span style="font-family: \'Cormorant Garamond\', Georgia, serif; font-style: italic; font-weight: 400;">HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span></span>';
@@ -236,7 +236,7 @@ function updateMessage() {
             2px 2px 4px rgba(0,0,0,0.1)
         `;
         message.style.opacity   = '1';
-        message.style.transform = 'translateX(-50%) scale(1)';
+        message.style.transform = 'scale(1)';
     }, 400);
 }
 
@@ -499,14 +499,14 @@ function relightCandles() {
     candles.forEach(candle => candle.classList.remove('extinguished'));
 
     message.style.opacity   = '0';
-    message.style.transform = 'translateX(-50%) scale(0.8)';
+    message.style.transform = 'scale(0.8)';
 
     setTimeout(() => {
         message.innerHTML        = 'BLOW THE CANDLES!!';
         message.style.color      = '';
         message.style.textShadow = '';
         message.style.opacity    = '1';
-        message.style.transform  = 'translateX(-50%) scale(1)';
+        message.style.transform  = 'scale(1)';
     }, 400);
 
     relightBtn.classList.remove('visible');
@@ -573,7 +573,10 @@ document.getElementById('envWrapper').addEventListener('touchend', (e) => {
 
 document.getElementById('letter').addEventListener('click', (e) => {
     e.stopPropagation();
-    envOverlay.click();
+});
+
+document.getElementById('letter').addEventListener('touchend', (e) => {
+    e.stopPropagation();
 });
 
 envOverlay.addEventListener('click', (e) => {
