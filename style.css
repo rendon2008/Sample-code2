@@ -231,8 +231,7 @@ background: linear-gradient(180deg,
     left: 50%;
     transform: translateX(-50%);
     font-size: clamp(1.8rem, 5vw, 3.5rem);
-    font-weight: 600;
-    font-family: 'Cormorant Garamond', 'Georgia', serif;
+    font-weight: 800;
     text-align: center;
     color: #FF69B4;
     text-shadow:
@@ -245,7 +244,7 @@ background: linear-gradient(180deg,
     width: 90%;
     z-index: 10;
     transition: all 0.8s ease;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 }
 
 @keyframes messageGlow {
@@ -472,11 +471,11 @@ background: linear-gradient(180deg,
     border-radius: 3px;
 }
 
-.swirl-1 { top: 8%;    left: 50%; transform: translateX(-50%) rotate(-3deg); }
-.swirl-2 { top: 22%;   right: 6%; transform: rotate(4deg); }
-.swirl-3 { bottom: 12%; right: 12%; transform: rotate(-5deg); }
-.swirl-4 { bottom: 12%; left: 12%; transform: rotate(5deg); }
-.swirl-5 { top: 22%;   left: 6%; transform: rotate(-4deg); }
+.swirl-1 { top: 5%;    left: 50%; transform: translateX(-50%); }
+.swirl-2 { top: 25%;   right: 5%; }
+.swirl-3 { bottom: 15%; right: 10%; }
+.swirl-4 { bottom: 15%; left: 10%; }
+.swirl-5 { top: 25%;   left: 5%; }
 .swirl-6 { top: 50%;   right: 0%; transform: translateY(-50%); }
 
 /* Strawberry */
@@ -696,7 +695,42 @@ background: linear-gradient(180deg,
    BUTTONS
    =================================================== */
 
+.relight-btn {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #FF2E7A 0%, #FF0033 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow:
+        0 4px 15px rgba(255, 0, 90, 0.55),
+        0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+}
 
+.relight-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    animation: buttonAppear 0.5s ease;
+}
+
+.relight-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow:
+        0 6px 20px rgba(248, 200, 220, 0.7),
+        0 3px 10px rgba(0,0,0,0.15);
+}
+
+.relight-btn:active { transform: translateX(-50%) scale(0.98); }
 
 @keyframes buttonAppear {
     0%   { transform: translateX(-50%) scale(0.8); opacity: 0; }
