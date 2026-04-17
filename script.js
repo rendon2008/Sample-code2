@@ -747,7 +747,7 @@ function onDragStart(e) {
     document.addEventListener('touchend',   onDragEnd);
 }
 
-function onDragMove(e) {
+    function onDragMove(e) {
     if (!isDragging || !topCard) return;
     const pt = e.touches ? e.touches[0] : e;
     currentX = pt.clientX - startX;
@@ -757,38 +757,12 @@ function onDragMove(e) {
     const rot = currentX * 0.12;
     topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
 
-    // Animate background cards toward their next position proportionally
+    // Background cards STAY IN PLACE - no movement during drag
+    // They are already at their pre-nudged positions and stay there
+    // Only the peek card fades in as progress increases
     const progress = Math.min(1, Math.sqrt(currentX * currentX + currentY * currentY) / 120);
-    for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
-        const imgIdx = currentIndex + offset;
-        if (imgIdx >= IMAGES.length) break;
-        const card     = allCards[imgIdx];
-        const nudge = getCardNudge(imgIdx);
-        
-        // FROM positions (current nudged state)
-        const fromScale = 1 - offset * 0.045;
-        const fromY     = offset * 12;
-        const fromX     = offset * 3 + nudge.xRand;
-        const fromRot   = offset * 1.5 + nudge.rotRand;
-        
-        // TO positions (next nudged state)
-        const nextNudge = getCardNudge(imgIdx - 1);
-        const toScale   = 1 - (offset - 1) * 0.045;
-        const toY       = (offset - 1) * 12;
-        const toX       = (offset - 1) * 3 + nextNudge.xRand;
-        const toRot     = (offset - 1) * 1.5 + nextNudge.rotRand;
-        
-        // Interpolate between FROM and TO
-        const scale     = fromScale + (toScale - fromScale) * progress;
-        const yOff      = fromY   + (toY   - fromY)   * progress;
-        const xOff      = fromX   + (toX   - fromX)   * progress;
-        const rotation  = fromRot + (toRot - fromRot) * progress;
-        
-        card.style.transition = 'none';
-        card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rotation}deg)`;
-    }
 
-    // Also peek in the next card that's currently hidden
+    // Peek card - fade in as user drags
     const peekIdx = currentIndex + VISIBLE_CARDS;
     if (peekIdx < IMAGES.length) {
         const peekCard  = allCards[peekIdx];
@@ -804,7 +778,8 @@ function onDragMove(e) {
     }
 }
 
-function onDragEnd() {
+
+    function onDragEnd() {
     document.removeEventListener('mousemove',  onDragMove);
     document.removeEventListener('touchmove',  onDragMove);
     document.removeEventListener('mouseup',    onDragEnd);
@@ -828,20 +803,19 @@ function onDragEnd() {
         }
         flyCard(flyX, flyY);
     } else {
-        // Snap back — only snap TOP card, background cards stay pre-nudged
+        // Snap back — smooth animation, background cards stay completely still
         const TRANS = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
         topCard.style.transition = TRANS;
         
-        // Snap top card back to its nudged position (offset 0)
+        // Snap top card back to its pre-nudged position
         const topNudge = getCardNudge(currentIndex);
-        const topScale = 1 - 0 * 0.045;
-        const topY = 0 * 12;
         const topX = 0 * 3 + topNudge.xRand;
+        const topY = 0 * 12;
         const topRot = 0 * 1.5 + topNudge.rotRand;
-        topCard.style.transform = `translateX(${topX}px) translateY(${topY}px) scale(${topScale}) rotate(${topRot}deg)`;
+        topCard.style.transform = `translateX(${topX}px) translateY(${topY}px) scale(1) rotate(${topRot}deg)`;
         topCard.style.cursor = 'grab';
 
-        // Hide the peek card again
+        // Hide peek card - it stays in its pre-nudged position, just fade out
         const peekIdx = currentIndex + VISIBLE_CARDS;
         if (peekIdx < IMAGES.length) {
             allCards[peekIdx].style.transition = TRANS;
