@@ -1012,8 +1012,8 @@ function showFinalMessage() {
     textWrapper.addEventListener('wheel',     onUserScroll, { passive: true });
     textWrapper.addEventListener('touchmove', onUserScroll, { passive: true });
 
-    const PADDING_H = 64;
-    const SAFETY    = 8;
+    const PADDING_H = 76;
+    const SAFETY    = 10
 
     function buildLines(fontReady) {
         const canvas = document.createElement('canvas');
