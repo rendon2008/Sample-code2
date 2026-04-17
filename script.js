@@ -618,25 +618,56 @@ function refreshStack(animate) {
     }
 }
 
-function positionCard(card, stackPos, animate) {
-    const scale = 1 - stackPos * 0.045;
-    const yOff  = stackPos * 12;
-    const xOff  = stackPos * 3 + (Math.sin(stackPos * 0.5) * 2);
-    const rot   = stackPos * 1.5 + (Math.cos(stackPos * 0.3) * 1);
 
-    if (animate) {
-        card.style.transition = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
-    } else {
+    function initializeAllCards() {
+    allCards.length = 0;
+    cardStack.innerHTML = '';
+
+    // Create the ILY final card first (lowest z-index, behind everything)
+    finalCard = document.createElement('div');
+    finalCard.style.cssText = `
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease;
+    `;
+    cardStack.appendChild(finalCard);
+
+    // Create photo cards in reverse so card 0 ends up on top
+    for (let i = IMAGES.length - 1; i >= 0; i--) {
+        const card = createCard(i);
+        // Pre-position all cards with natural nudge (no animation on init)
+        const stackPos = i < VISIBLE_CARDS ? i : VISIBLE_CARDS - 1;
+        const scale = 1 - stackPos * 0.045;
+        const yOff  = stackPos * 12;
+        const xOff  = stackPos * 3 + (Math.sin(stackPos * 0.5) * 2);
+        const rot   = stackPos * 1.5 + (Math.cos(stackPos * 0.3) * 1);
+        
         card.style.transition = 'none';
+        card.style.transform = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rot}deg)`;
+        card.style.zIndex = String(IMAGES.length + VISIBLE_CARDS - stackPos);
+        card.style.opacity = '1';
+        card.style.boxShadow = stackPos === 0
+            ? '0 12px 40px rgba(0,0,0,0.45)'
+            : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
+        
+        allCards[i] = card;
+        cardStack.appendChild(card);
     }
-    
-    card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rot}deg)`;
-    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
-    card.style.opacity    = '1';
-    card.style.boxShadow  = stackPos === 0
-        ? '0 12px 40px rgba(0,0,0,0.45)'
-        : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
+
+    attachDragListeners(allCards[0]);
 }
+
+
 
 function createCard(imgIdx) {
     const card = document.createElement('div');
