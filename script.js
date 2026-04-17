@@ -732,14 +732,27 @@ function onDragMove(e) {
         const imgIdx = currentIndex + offset;
         if (imgIdx >= IMAGES.length) break;
         const card     = allCards[imgIdx];
+        
+        // FROM positions (current nudged state)
         const fromScale = 1 - offset * 0.045;
-        const toScale   = 1 - (offset - 1) * 0.045;
         const fromY     = offset * 12;
+        const fromX     = offset * 3 + (Math.sin(offset * 0.5) * 2);
+        const fromRot   = offset * 1.5 + (Math.cos(offset * 0.3) * 1);
+        
+        // TO positions (next nudged state)
+        const toScale   = 1 - (offset - 1) * 0.045;
         const toY       = (offset - 1) * 12;
+        const toX       = (offset - 1) * 3 + (Math.sin((offset - 1) * 0.5) * 2);
+        const toRot     = (offset - 1) * 1.5 + (Math.cos((offset - 1) * 0.3) * 1);
+        
+        // Interpolate between FROM and TO
         const scale     = fromScale + (toScale - fromScale) * progress;
         const yOff      = fromY   + (toY   - fromY)   * progress;
+        const xOff      = fromX   + (toX   - fromX)   * progress;
+        const rotation  = fromRot + (toRot - fromRot) * progress;
+        
         card.style.transition = 'none';
-        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
+        card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rotation}deg)`;
     }
 
     // Also peek in the next card that's currently hidden
@@ -748,12 +761,17 @@ function onDragMove(e) {
         const peekCard  = allCards[peekIdx];
         const lastScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
         const lastY     = (VISIBLE_CARDS - 1) * 12;
+        const lastX     = (VISIBLE_CARDS - 1) * 3 + (Math.sin((VISIBLE_CARDS - 1) * 0.5) * 2);
+        const lastRot   = (VISIBLE_CARDS - 1) * 1.5 + (Math.cos((VISIBLE_CARDS - 1) * 0.3) * 1);
         peekCard.style.transition = 'none';
-        peekCard.style.transform  = `translateY(${lastY}px) scale(${lastScale})`;
+        peekCard.style.transform  = `translateX(${lastX}px) translateY(${lastY}px) scale(${lastScale}) rotate(${lastRot}deg)`;
         peekCard.style.zIndex     = String(IMAGES.length);
         peekCard.style.opacity    = String(progress);
     }
 }
+
+
+    
 
 function onDragEnd() {
     document.removeEventListener('mousemove',  onDragMove);
@@ -779,17 +797,33 @@ function onDragEnd() {
         }
         flyCard(flyX, flyY);
     } else {
-        // Snap back — restore background cards too
+        // Snap back — restore background cards too with proper nudge positioning
         const TRANS = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
         topCard.style.transition = TRANS;
-        topCard.style.transform  = 'translateX(0) translateY(0) rotate(0deg)';
-        topCard.style.cursor     = 'grab';
+        
+        // Snap top card back to its nudged position (offset 0)
+        const topScale = 1 - 0 * 0.045;
+        const topY = 0 * 12;
+        const topX = 0 * 3 + (Math.sin(0 * 0.5) * 2);
+        const topRot = 0 * 1.5 + (Math.cos(0 * 0.3) * 1);
+        topCard.style.transform = `translateX(${topX}px) translateY(${topY}px) scale(${topScale}) rotate(${topRot}deg)`;
+        topCard.style.cursor = 'grab';
 
+        // Restore background cards to their proper nudged positions
         for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
             const imgIdx = currentIndex + offset;
             if (imgIdx >= IMAGES.length) break;
-            positionCard(allCards[imgIdx], offset, true);
+            const card = allCards[imgIdx];
+            
+            const scale = 1 - offset * 0.045;
+            const yOff  = offset * 12;
+            const xOff  = offset * 3 + (Math.sin(offset * 0.5) * 2);
+            const rot   = offset * 1.5 + (Math.cos(offset * 0.3) * 1);
+            
+            card.style.transition = TRANS;
+            card.style.transform = `translateX(${xOff}px) translateY(${yOff}px) scale(${scale}) rotate(${rot}deg)`;
         }
+        
         // Hide the peek card again
         const peekIdx = currentIndex + VISIBLE_CARDS;
         if (peekIdx < IMAGES.length) {
