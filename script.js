@@ -1151,7 +1151,7 @@ function openSlider() {
     initializeAllCards();
 
     sliderOverlay.classList.add('active');
-    sliderOverlay.style.pointerEvents = 'all';  // Add this line
+    sliderOverlay.style.pointerEvents = 'auto';
 
     clearTimeout(hintTimer);
     sliderHint.classList.remove('fade');
@@ -1162,7 +1162,7 @@ function openSlider() {
 
 function closeSlider() {
     sliderOverlay.classList.remove('active');
-    sliderOverlay.style.pointerEvents = 'none';  // Add this line
+    sliderOverlay.style.pointerEvents = 'none';
 }
 
 openBtn.addEventListener('click', (e) => {
