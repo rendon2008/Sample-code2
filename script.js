@@ -17,8 +17,8 @@ let celebrationStarted = false;
 // CONFIGURATION
 // =====================================================
 
-const BLOW_THRESHOLD = 35;  // Volume threshold for blow detection (0–255)
-const BLOW_DURATION  = 200; // Minimum blow duration in ms
+const BLOW_THRESHOLD = 35;
+const BLOW_DURATION  = 200;
 let blowStartTime = null;
 
 
@@ -42,8 +42,8 @@ const poppers            = document.querySelectorAll('.popper');
 
 document.addEventListener('DOMContentLoaded', () => {
     setupRelightButton();
-    
-    // Add click listener to request mic button
+    setupEnvelopeListeners();
+
     const requestMicBtn = document.getElementById('request-mic-btn');
     if (requestMicBtn) {
         requestMicBtn.addEventListener('click', () => {
@@ -59,17 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function requestMicrophoneAccess() {
     try {
-        console.log('🔍 Requesting microphone access...');
-        
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            console.error('❌ getUserMedia not supported');
             showError('Microphone access not supported in this browser');
             return;
         }
 
-        console.log('✅ Browser supports getUserMedia');
-        console.log('📢 Calling getUserMedia...');
-        
         microphoneStream = await navigator.mediaDevices.getUserMedia({
             audio: {
                 echoCancellation: false,
@@ -78,10 +72,7 @@ async function requestMicrophoneAccess() {
             }
         });
 
-        console.log('✅ Microphone access granted!');
-
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 256;
         analyser.smoothingTimeConstant = 0.3;
@@ -96,23 +87,16 @@ async function requestMicrophoneAccess() {
         transitionToBirthdayScene();
 
     } catch (error) {
-        console.error('❌ Error:', error.name, '-', error.message);
-        
         if (error.name === 'NotAllowedError') {
-            console.error('❌ Permission denied by user');
             alert('You denied microphone access. Please allow it and try again.');
         } else if (error.name === 'NotFoundError') {
-            console.error('❌ No microphone found');
             alert('No microphone device found on this device');
         } else if (error.name === 'NotSupportedError') {
-            console.error('❌ getUserMedia not supported');
             alert('Microphone access not supported on this browser');
         } else {
-            console.error('❌ Unknown error:', error);
             alert('Error: ' + error.message);
         }
-        
-        console.log('⏳ Retrying in 2 seconds...');
+
         setTimeout(requestMicrophoneAccess, 2000);
     }
 }
@@ -217,7 +201,10 @@ function startCelebration() {
         relightBtn.classList.add('visible');
 
         const bottomBtns = document.getElementById('bottom-btns');
-        bottomBtns.classList.remove('hidden');
+        // FIX: Use inline styles to avoid buttonAppear animation resetting translateX(-50%)
+        bottomBtns.style.opacity    = '1';
+        bottomBtns.style.visibility = 'visible';
+        bottomBtns.style.pointerEvents = 'auto';
         bottomBtns.classList.add('visible');
     }, 2000);
 }
@@ -227,7 +214,11 @@ function updateMessage() {
     message.style.transform = 'translateX(-50%) scale(0.8)';
 
     setTimeout(() => {
-       message.innerHTML = '<span style="font-family: \'Cormorant Garamond\', Georgia, serif; font-style: italic; font-weight: 400;">HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span></span>';
+        // FIX: Lock font-weight and font-family via inline style so slider styles can't override
+        message.style.fontFamily  = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        message.style.fontWeight  = '800';
+        message.style.fontStyle   = 'normal';
+        message.innerHTML = '<span style="font-family: \'Cormorant Garamond\', Georgia, serif; font-style: italic; font-weight: 400;">HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span></span>';
         message.style.color      = '#FF69B4';
         message.style.textShadow = `
             0 0 10px rgba(255, 105, 180, 0.8),
@@ -503,6 +494,9 @@ function relightCandles() {
     message.style.transform = 'translateX(-50%) scale(0.8)';
 
     setTimeout(() => {
+        message.style.fontFamily  = '';
+        message.style.fontWeight  = '';
+        message.style.fontStyle   = '';
         message.innerHTML        = 'BLOW THE CANDLES!!';
         message.style.color      = '';
         message.style.textShadow = '';
@@ -514,6 +508,9 @@ function relightCandles() {
     relightBtn.classList.add('hidden');
 
     const bottomBtns = document.getElementById('bottom-btns');
+    bottomBtns.style.opacity       = '';
+    bottomBtns.style.visibility    = '';
+    bottomBtns.style.pointerEvents = '';
     bottomBtns.classList.remove('visible');
     bottomBtns.classList.add('hidden');
 
@@ -527,61 +524,68 @@ function relightCandles() {
 
 
 // =====================================================
-// ENVELOPE / LETTER ANIMATION
+// ENVELOPE / LETTER — setup as a function (called from DOMContentLoaded)
+// FIX: moved setup into a function so it runs after DOM is ready
 // =====================================================
 
-const envOverlay  = document.getElementById('envOverlay');
-const envFlap     = document.getElementById('envFlap');
-const envLetter   = document.getElementById('letter');
-const heartSeal   = document.getElementById('heartSeal');
-let envelopeOpened = false;
+function setupEnvelopeListeners() {
+    const envOverlay  = document.getElementById('envOverlay');
+    const envFlap     = document.getElementById('envFlap');
+    const envLetter   = document.getElementById('letter');
+    const heartSeal   = document.getElementById('heartSeal');
+    let envelopeOpened = false;
 
-document.getElementById('message-btn').addEventListener('click', () => {
-    envOverlay.classList.add('show');
-    envelopeOpened = false;
-    envFlap.classList.remove('open');
-    envLetter.classList.remove('risen', 'closing', 'opened');
-    heartSeal.classList.remove('hidden');
-});
+    document.getElementById('message-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        envOverlay.classList.add('show');
+        envelopeOpened = false;
+        envFlap.classList.remove('open');
+        envLetter.classList.remove('risen', 'closing', 'opened');
+        heartSeal.classList.remove('hidden');
+    });
 
-document.getElementById('envWrapper').addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (!envelopeOpened) {
-        heartSeal.classList.add('hidden');
-        envFlap.classList.add('open');
-        setTimeout(() => {
-            envLetter.classList.remove('closing');
-            envLetter.classList.add('risen');
-            envelopeOpened = true;
-        }, 700);
-    }
-});
+    document.getElementById('envWrapper').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!envelopeOpened) {
+            heartSeal.classList.add('hidden');
+            envFlap.classList.add('open');
+            setTimeout(() => {
+                envLetter.classList.remove('closing');
+                envLetter.classList.add('risen');
+                envelopeOpened = true;
+            }, 700);
+        }
+    });
 
-document.getElementById('letter').addEventListener('click', (e) => {
-    e.stopPropagation();
-    envOverlay.click();
-});
-
-envOverlay.addEventListener('click', (e) => {
-    if (e.target === envOverlay) {
+    envLetter.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Clicking letter closes the overlay
         if (envelopeOpened) {
             envelopeOpened = false;
             envLetter.classList.remove('risen');
             envLetter.classList.add('closing');
-
             setTimeout(() => envFlap.classList.remove('open'), 700);
             setTimeout(() => heartSeal.classList.remove('hidden'), 1100);
             setTimeout(() => envOverlay.classList.remove('show'), 1400);
-        } else {
-            envOverlay.classList.remove('show');
         }
-    }
-});
+    });
 
+    envOverlay.addEventListener('click', (e) => {
+        if (e.target === envOverlay) {
+            if (envelopeOpened) {
+                envelopeOpened = false;
+                envLetter.classList.remove('risen');
+                envLetter.classList.add('closing');
+                setTimeout(() => envFlap.classList.remove('open'), 700);
+                setTimeout(() => heartSeal.classList.remove('hidden'), 1100);
+                setTimeout(() => envOverlay.classList.remove('show'), 1400);
+            } else {
+                envOverlay.classList.remove('show');
+            }
+        }
+    });
+}
 
-// =====================================================
-// CARD SLIDER
-// =====================================================
 
 // =====================================================
 // CARD SLIDER
@@ -596,7 +600,7 @@ const IMAGES = [
     '13.jpeg'
 ];
 
-const FINAL_MESSAGE = "Just look at how much u've grown🥹 I want u to know it saddens me seeing u grow, I keep looking at ur/our old photos and I cant believe how much uve grown, you've matured so much, u r no longer a baby (but will always be my baby in my eyes) and I am proud to be one of the person to be a part of your journy in life and soon to be a whole and not just a part..."; // EDIT THIS TEXT HERE
+const FINAL_MESSAGE = "Just look at how much u've grown🥹 I want u to know it saddens me seeing u grow, I keep looking at ur/our old photos and I cant believe how much uve grown, you've matured so much, u r no longer a baby (but will always be my baby in my eyes) and I am proud to be one of the person to be a part of your journy in life and soon to be a whole and not just a part...";
 
 const FALLBACK_EMOJI = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
 const VISIBLE_CARDS  = 4;
@@ -616,21 +620,17 @@ let animating = false;
 let hintTimer = null;
 let hasReachedEnd = false;
 
-// All cards live in the DOM permanently — never destroyed
-const allCards = [];
+const allCards   = [];
 const cardNudges = [];
-// Final ILY card, also permanent
-let finalCard = null;
+let finalCard    = null;
 
 // -------------------------------------------------------
-// Build all cards once and append them all to cardStack.
-// Visibility is controlled purely via CSS transforms/opacity/zIndex.
+// Build all cards once
 // -------------------------------------------------------
 function initializeAllCards() {
     allCards.length = 0;
     cardStack.innerHTML = '';
 
-    // Create the ILY final card first (lowest z-index, behind everything)
     finalCard = document.createElement('div');
     finalCard.style.cssText = `
         position: absolute;
@@ -648,51 +648,42 @@ function initializeAllCards() {
     `;
     cardStack.appendChild(finalCard);
 
-    // Create photo cards in reverse so card 0 ends up on top
- for (let i = IMAGES.length - 1; i >= 0; i--) {
+    for (let i = IMAGES.length - 1; i >= 0; i--) {
         const card = createCard(i);
         if (i >= VISIBLE_CARDS) {
             card.style.opacity   = '0';
             card.style.zIndex    = '0';
             card.style.pointerEvents = 'none';
         }
-
-     cardNudges[i] = {
-    x: (Math.random() - 0.5) * 22,
-    rot: (Math.random() - 0.5) * 14
-};
+        cardNudges[i] = {
+            x: (Math.random() - 0.5) * 22,
+            rot: (Math.random() - 0.5) * 14
+        };
         allCards[i] = card;
         cardStack.appendChild(card);
     }
-    // Set initial stack positions with no animation
+
     refreshStack(false);
     attachDragListeners(allCards[0]);
 }
 
-// -------------------------------------------------------
-// Set each visible card to its correct stacked position.
-// Cards beyond VISIBLE_CARDS stay hidden behind card[VISIBLE_CARDS-1].
-// -------------------------------------------------------
 function refreshStack(animate) {
     for (let offset = 0; offset < VISIBLE_CARDS; offset++) {
         const imgIdx = currentIndex + offset;
         if (imgIdx >= IMAGES.length) break;
-        const card = allCards[imgIdx];
-        positionCard(card, offset, animate);
+        positionCard(allCards[imgIdx], offset, animate);
     }
-    // Ensure the peek card (just beyond visible window) is hidden and behind
     const peekIdx = currentIndex + VISIBLE_CARDS;
     if (peekIdx < IMAGES.length) {
         const peekCard = allCards[peekIdx];
-        peekCard.style.transition = animate ? 'opacity 0.3s ease' : 'none';
-        peekCard.style.opacity    = '0';
-        peekCard.style.zIndex     = '1';
+        peekCard.style.transition    = animate ? 'opacity 0.3s ease' : 'none';
+        peekCard.style.opacity       = '0';
+        peekCard.style.zIndex        = '1';
         peekCard.style.pointerEvents = 'none';
     }
-    // Ensure all cards further back are also fully hidden
     for (let i = currentIndex + VISIBLE_CARDS + 1; i < IMAGES.length; i++) {
-        allCards[i].style.opacity = '0';
-        allCards[i].style.zIndex  = '0';
+        allCards[i].style.opacity       = '0';
+        allCards[i].style.zIndex        = '0';
         allCards[i].style.pointerEvents = 'none';
     }
 }
@@ -704,14 +695,13 @@ function positionCard(card, stackPos, animate) {
 
     card.style.transition = animate ? TRANS : 'none';
     const imgIdx = parseInt(card.dataset.imgIdx);
-    const nudge = cardNudges[imgIdx] || { x: 0, rot: 0 };
+    const nudge  = cardNudges[imgIdx] || { x: 0, rot: 0 };
     card.style.transform  = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;
     card.style.boxShadow  = stackPos === 0
         ? '0 12px 40px rgba(0,0,0,0.45)'
         : `0 ${4 + stackPos * 2}px ${12 + stackPos * 6}px rgba(0,0,0,0.25)`;
-    // z-index: top card gets highest, cards behind get lower — deterministic
-    card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
-    card.style.opacity    = '1';
+    card.style.zIndex        = String(IMAGES.length + VISIBLE_CARDS - stackPos);
+    card.style.opacity       = '1';
     card.style.pointerEvents = stackPos === 0 ? 'auto' : 'none';
 }
 
@@ -739,11 +729,14 @@ function attachDragListeners(card) {
     card.removeEventListener('mousedown',  onDragStart);
     card.removeEventListener('touchstart', onDragStart);
     card.addEventListener('mousedown',  onDragStart, { passive: true });
-    card.addEventListener('touchstart', onDragStart, { passive: true });
+    card.addEventListener('touchstart', onDragStart, { passive: false }); // FIX: non-passive so we can prevent scroll-jank
 }
 
 function onDragStart(e) {
     if (animating || hasReachedEnd) return;
+    // FIX: prevent page scroll while dragging cards on touch
+    if (e.cancelable) e.preventDefault();
+
     isDragging = true;
     topCard    = e.currentTarget;
 
@@ -757,38 +750,39 @@ function onDragStart(e) {
     topCard.style.cursor     = 'grabbing';
 
     document.addEventListener('mousemove',  onDragMove, { passive: true });
-    document.addEventListener('touchmove',  onDragMove, { passive: true });
+    document.addEventListener('touchmove',  onDragMove, { passive: false }); // FIX: non-passive to prevent scroll jank
     document.addEventListener('mouseup',    onDragEnd);
     document.addEventListener('touchend',   onDragEnd);
 }
 
 function onDragMove(e) {
     if (!isDragging || !topCard) return;
+    // FIX: prevent page scroll while swiping cards
+    if (e.cancelable) e.preventDefault();
+
     const pt = e.touches ? e.touches[0] : e;
     currentX = pt.clientX - startX;
     currentY = pt.clientY - startY;
 
-    // Move top card with finger
     const rot = currentX * 0.12;
     topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
 
-    // Animate background cards toward their next position proportionally
     const progress = Math.min(1, Math.sqrt(currentX * currentX + currentY * currentY) / 120);
     for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
         const imgIdx = currentIndex + offset;
         if (imgIdx >= IMAGES.length) break;
-        const card     = allCards[imgIdx];
+        const card      = allCards[imgIdx];
         const fromScale = 1 - offset * 0.045;
         const toScale   = 1 - (offset - 1) * 0.045;
         const fromY     = offset * 12;
         const toY       = (offset - 1) * 12;
         const scale     = fromScale + (toScale - fromScale) * progress;
-        const yOff      = fromY   + (toY   - fromY)   * progress;
+        const yOff      = fromY + (toY - fromY) * progress;
         card.style.transition = 'none';
         const nudge = cardNudges[parseInt(card.dataset.imgIdx)] || { x: 0, rot: 0 };
-        card.style.transform  = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;    }
+        card.style.transform = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;
+    }
 
-    // Also peek in the next card that's currently hidden
     const peekIdx = currentIndex + VISIBLE_CARDS;
     if (peekIdx < IMAGES.length) {
         const peekCard  = allCards[peekIdx];
@@ -796,10 +790,9 @@ function onDragMove(e) {
         const lastY     = (VISIBLE_CARDS - 1) * 12;
         peekCard.style.transition = 'none';
         const peekNudge = cardNudges[parseInt(peekCard.dataset.imgIdx)] || { x: 0, rot: 0 };
-        peekCard.style.transform  = `translateX(${peekNudge.x}px) translateY(${lastY}px) rotate(${peekNudge.rot}deg) scale(${lastScale})`;
-        // Keep peek card behind all visible stack cards (stack bottom z-index = IMAGES.length + 1)
-        peekCard.style.zIndex     = String(IMAGES.length);
-        peekCard.style.opacity    = String(progress);
+        peekCard.style.transform = `translateX(${peekNudge.x}px) translateY(${lastY}px) rotate(${peekNudge.rot}deg) scale(${lastScale})`;
+        peekCard.style.zIndex    = String(IMAGES.length);
+        peekCard.style.opacity   = String(progress);
     }
 }
 
@@ -827,23 +820,22 @@ function onDragEnd() {
         }
         flyCard(flyX, flyY);
     } else {
-        // Snap back — restore background cards too
         const TRANS = 'transform 0.42s cubic-bezier(0.34,1.56,0.64,1)';
         topCard.style.transition = TRANS;
         const topNudge = cardNudges[parseInt(topCard.dataset.imgIdx)] || { x: 0, rot: 0 };
-        topCard.style.transform  = `translateX(${topNudge.x}px) translateY(0px) rotate(${topNudge.rot}deg)`;        topCard.style.cursor     = 'grab';
+        topCard.style.transform  = `translateX(${topNudge.x}px) translateY(0px) rotate(${topNudge.rot}deg)`;
+        topCard.style.cursor     = 'grab';
 
         for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
             const imgIdx = currentIndex + offset;
             if (imgIdx >= IMAGES.length) break;
             positionCard(allCards[imgIdx], offset, true);
         }
-        // Hide the peek card again
         const peekIdx = currentIndex + VISIBLE_CARDS;
         if (peekIdx < IMAGES.length) {
-            allCards[peekIdx].style.transition = TRANS;
-            allCards[peekIdx].style.opacity    = '0';
-            allCards[peekIdx].style.zIndex     = '1';
+            allCards[peekIdx].style.transition    = TRANS;
+            allCards[peekIdx].style.opacity       = '0';
+            allCards[peekIdx].style.zIndex        = '1';
             allCards[peekIdx].style.pointerEvents = 'none';
         }
     }
@@ -859,44 +851,40 @@ function flyCard(flyX, flyY) {
     topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
     topCard.style.opacity    = '0';
 
-    // Slide background cards up immediately, in sync with the fly
     const SLIDE_TRANS = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS}ms ease, box-shadow ${FLY_MS}ms ease`;
     for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
         const imgIdx = currentIndex + offset;
         if (imgIdx >= IMAGES.length) break;
-        const card = allCards[imgIdx];
-        card.style.transition = SLIDE_TRANS;
-        const scale  = 1 - (offset - 1) * 0.045;
-        const yOff   = (offset - 1) * 12;
-        const zIdx   = String(IMAGES.length + VISIBLE_CARDS - (offset - 1));
+        const card  = allCards[imgIdx];
+        const scale = 1 - (offset - 1) * 0.045;
+        const yOff  = (offset - 1) * 12;
+        const zIdx  = String(IMAGES.length + VISIBLE_CARDS - (offset - 1));
         const nudge = cardNudges[parseInt(card.dataset.imgIdx)] || { x: 0, rot: 0 };
-        card.style.transform  = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;    
-        card.style.zIndex     = zIdx;        
+        card.style.transition = SLIDE_TRANS;
+        card.style.transform  = `translateX(${nudge.x}px) translateY(${yOff}px) rotate(${nudge.rot}deg) scale(${scale})`;
+        card.style.zIndex     = zIdx;
         card.style.opacity    = '1';
         card.style.boxShadow  = (offset - 1) === 0
             ? '0 12px 40px rgba(0,0,0,0.45)'
             : `0 ${4 + (offset-1)*2}px ${12 + (offset-1)*6}px rgba(0,0,0,0.25)`;
     }
 
-    // Slide in the next hidden card at the back of the stack
     const nextHiddenIdx = currentIndex + VISIBLE_CARDS;
     if (nextHiddenIdx < IMAGES.length) {
         const nextCard  = allCards[nextHiddenIdx];
         const backScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
         const backY     = (VISIBLE_CARDS - 1) * 12;
         const nextNudge = cardNudges[parseInt(nextCard.dataset.imgIdx)] || { x: 0, rot: 0 };
-        nextCard.style.transition = SLIDE_TRANS;
-        nextCard.style.transform  = `translateX(${nextNudge.x}px) translateY(${backY}px) rotate(${nextNudge.rot}deg) scale(${backScale})`;
-        // z-index: matches what positionCard would assign for stackPos = VISIBLE_CARDS-1 after index++
-        nextCard.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - (VISIBLE_CARDS - 1));
-        nextCard.style.opacity    = '1';
+        nextCard.style.transition    = SLIDE_TRANS;
+        nextCard.style.transform     = `translateX(${nextNudge.x}px) translateY(${backY}px) rotate(${nextNudge.rot}deg) scale(${backScale})`;
+        nextCard.style.zIndex        = String(IMAGES.length + VISIBLE_CARDS - (VISIBLE_CARDS - 1));
+        nextCard.style.opacity       = '1';
         nextCard.style.pointerEvents = 'none';
     }
 
     const isLastCard = (currentIndex === IMAGES.length - 1);
 
     setTimeout(() => {
-        // Sink the swiped card fully out of sight
         topCard.style.transition    = 'none';
         topCard.style.zIndex        = '0';
         topCard.style.opacity       = '0';
@@ -907,7 +895,6 @@ function flyCard(flyX, flyY) {
             showFinalMessage();
         } else {
             currentIndex++;
-            // Sync everyone's z-index cleanly for the new order
             refreshStack(false);
             attachDragListeners(allCards[currentIndex]);
         }
@@ -921,7 +908,6 @@ function flyCard(flyX, flyY) {
 // Final ILY card
 // -------------------------------------------------------
 function showFinalMessage() {
-    // Load romantic font
     if (!document.getElementById('final-card-font')) {
         const link = document.createElement('link');
         link.id   = 'final-card-font';
@@ -930,7 +916,8 @@ function showFinalMessage() {
         document.head.appendChild(link);
     }
 
-    // Inject styles once
+    // FIX: Scoped styles — use a specific class prefix instead of bare 'div' selectors
+    // to prevent leaking into .message or other divs outside the slider
     if (!document.getElementById('slider-animation-styles')) {
         const style = document.createElement('style');
         style.id = 'slider-animation-styles';
@@ -952,15 +939,14 @@ function showFinalMessage() {
                 vertical-align: text-bottom;
                 animation: blinkCursor 1.1s ease-in-out infinite;
             }
-            div::-webkit-scrollbar       { width: 6px; }
-            div::-webkit-scrollbar-track { background: rgba(255,255,255,0.07); border-radius: 10px; }
-            div::-webkit-scrollbar-thumb { background: rgba(255,105,180,0.45); border-radius: 10px; }
-            div::-webkit-scrollbar-thumb:hover { background: rgba(255,105,180,0.75); }
+            .slider-text-wrapper::-webkit-scrollbar       { width: 6px; }
+            .slider-text-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,0.07); border-radius: 10px; }
+            .slider-text-wrapper::-webkit-scrollbar-thumb { background: rgba(255,105,180,0.45); border-radius: 10px; }
+            .slider-text-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(255,105,180,0.75); }
         `;
         document.head.appendChild(style);
     }
 
-    // ── Card shell — fades in immediately ──────────────────────────────
     const messageContainer = document.createElement('div');
     messageContainer.style.cssText = `
         position: absolute;
@@ -976,6 +962,8 @@ function showFinalMessage() {
     `;
 
     const textWrapper = document.createElement('div');
+    // FIX: Added class 'slider-text-wrapper' so scrollbar styles scope correctly
+    textWrapper.className = 'slider-text-wrapper';
     textWrapper.style.cssText = `
         width: 100%;
         height: 100%;
@@ -985,9 +973,8 @@ function showFinalMessage() {
         scroll-behavior: smooth;
     `;
 
-    // Container for typed lines — each line is a <div>
-    const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
-    const FONT_SIZE_PX = 26; // px — used for Canvas measurement too
+    const FONT_FAMILY    = "'Cormorant Garamond', 'Georgia', serif";
+    const FONT_SIZE_PX   = 26;
     const LETTER_SPACING = 0.3;
 
     const linesContainer = document.createElement('div');
@@ -1006,7 +993,6 @@ function showFinalMessage() {
         min-height: 100%;
     `;
 
-    // Blinking cursor element
     const cursor = document.createElement('span');
     cursor.className = 'type-cursor';
 
@@ -1014,7 +1000,7 @@ function showFinalMessage() {
     messageContainer.appendChild(textWrapper);
     cardStack.appendChild(messageContainer);
 
-    // ── User-scroll detection ───────────────────────────────────────────
+    // User-scroll detection
     let isUserScrolling = false;
     let scrollTimeout;
     const onUserScroll = () => {
@@ -1025,19 +1011,14 @@ function showFinalMessage() {
     textWrapper.addEventListener('wheel',     onUserScroll, { passive: true });
     textWrapper.addEventListener('touchmove', onUserScroll, { passive: true });
 
-    // ── Pre-measure with Canvas (pixel-perfect, no DOM reflow needed) ───
-    // Wait for font to load (or up to 1.5 s), then measure.
-        const PADDING_H = 76; // 38px padding on each side
-        const SAFETY    = 16; // small safety buffer
+    const PADDING_H = 76;
+    const SAFETY    = 16;
 
     function buildLines(fontReady) {
-        // Canvas measureText is the most reliable cross-browser measurement.
         const canvas = document.createElement('canvas');
         const ctx2d  = canvas.getContext('2d');
-        // Use italic weight 400 to match linesContainer style
         ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
-        // Available width = card width minus horizontal padding minus safety margin
         const cardWidth = cardStack.clientWidth || 320;
         const maxW = cardWidth - PADDING_H - SAFETY;
 
@@ -1046,8 +1027,7 @@ function showFinalMessage() {
         let cur = '';
 
         for (let i = 0; i < words.length; i++) {
-            const test = cur ? cur + ' ' + words[i] : words[i];
-            // Add letter-spacing contribution (approximate: spacing × char count)
+            const test     = cur ? cur + ' ' + words[i] : words[i];
             const measured = ctx2d.measureText(test).width + (test.length * LETTER_SPACING);
             if (measured > maxW && cur !== '') {
                 lines.push(cur);
@@ -1060,42 +1040,41 @@ function showFinalMessage() {
         return lines;
     }
 
-    // Attempt to wait for Google Font, fall back after timeout
+    // FIX: Guard against double-firing — track if typing has already started
+    let typingStarted = false;
     const startTyping = (lines) => {
+        if (typingStarted) return;
+        typingStarted = true;
         setTimeout(() => {
             typeLines(lines, linesContainer, cursor, textWrapper, () => isUserScrolling);
-        }, 900); // card settles, then typing begins
+        }, 900);
     };
 
     if (document.fonts && document.fonts.load) {
         document.fonts.load(`italic 400 ${FONT_SIZE_PX}px 'Cormorant Garamond'`)
             .then(() => startTyping(buildLines(true)))
             .catch(()  => startTyping(buildLines(false)));
-        // Hard timeout fallback in case fonts.load hangs
-        setTimeout(() => {}, 1500);
+        // Hard timeout fallback
+        setTimeout(() => startTyping(buildLines(false)), 1500);
     } else {
-        // No fonts API — wait a beat then measure with Georgia as fallback
         setTimeout(() => startTyping(buildLines(false)), 300);
     }
 }
 
-// Typed line-by-line — no mid-word reflow ever happens
+// FIX: Reliable typewriter — uses setTimeout chain (no recursive stack overflow risk)
+// Characters typed one at a time, line breaks handled cleanly
 function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
-    let lineIdx      = 0;
-    let charIdx      = 0;
+    let lineIdx       = 0;
+    let charIdx       = 0;
     let currentLineEl = null;
+    const BASE_MS     = 40;
 
-    // Typing speed: base ms per character, with slight random variance for feel
-    const BASE_MS = 40;
-
-  function nextTick() {
-        // All lines done
+    function nextTick() {
         if (lineIdx >= lines.length) {
             if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
             return;
         }
 
-        // Start a new line div — reserve its height immediately so no layout jump
         if (charIdx === 0) {
             currentLineEl = document.createElement('div');
             currentLineEl.style.cssText = 'min-height: 2em; display: block;';
@@ -1106,9 +1085,12 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
         const line = lines[lineIdx];
 
         if (charIdx < line.length) {
-            // Insert character text node before cursor
             const ch = line[charIdx];
-            if (/\p{Emoji}/u.test(ch)) {
+            // FIX: safer emoji detection with try/catch for browsers that don't support Unicode property escapes
+            let isEmoji = false;
+            try { isEmoji = /\p{Emoji}/u.test(ch); } catch(e) { isEmoji = false; }
+
+            if (isEmoji) {
                 const emojiSpan = document.createElement('span');
                 emojiSpan.style.cssText = '-webkit-text-fill-color: initial; font-style: normal;';
                 emojiSpan.textContent = ch;
@@ -1122,13 +1104,11 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
                 wrapper.scrollTop = wrapper.scrollHeight;
             }
 
-            // Slight pause after punctuation for a natural, romantic cadence
             const delay = /[,.]/.test(ch) ? BASE_MS * 6
                         : /[!?]/.test(ch)  ? BASE_MS * 4
-                        : BASE_MS + (Math.random() * 28 - 10); // gentle variance
-            setTimeout(nextTick, delay);
+                        : BASE_MS + (Math.random() * 28 - 10);
+            setTimeout(nextTick, Math.max(10, delay));
         } else {
-            // Line finished — brief breath before next line
             lineIdx++;
             charIdx = 0;
             setTimeout(nextTick, BASE_MS * 3);
@@ -1137,21 +1117,17 @@ function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
 
     nextTick();
 }
-    
 
-    
+
 // ---- Open / Close ----
 function openSlider() {
-    // Reset everything
     currentIndex  = 0;
     hasReachedEnd = false;
     animating     = false;
     isDragging    = false;
 
-    // Re-init cards fresh
     initializeAllCards();
 
-    // show and enable overlay
     sliderOverlay.classList.add('active');
     sliderOverlay.style.pointerEvents = 'auto';
 
@@ -1159,16 +1135,12 @@ function openSlider() {
     sliderHint.classList.remove('fade');
     hintTimer = setTimeout(() => sliderHint.classList.add('fade'), 3000);
 }
-    
 
 function closeSlider() {
     sliderOverlay.classList.remove('active');
-    // ensure overlay no longer intercepts clicks
     sliderOverlay.style.pointerEvents = 'none';
-    // clean up any transient UI inside cardStack (optional)
     cardStack.innerHTML = '';
 }
-    
 
 openBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -1181,7 +1153,7 @@ sliderOverlay.addEventListener('click', (e) => {
     if (e.target === sliderOverlay) closeSlider();
 });
 
-// Initialize cards on load so images preload
+// Preload cards
 initializeAllCards();
 
 })();
