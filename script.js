@@ -975,7 +975,9 @@ function showFinalMessage() {
     const FONT_SIZE_PX = 20;
     const LETTER_SPACING = 0.3;
 
-     const linesContainer = document.createElement('div');
+
+
+        const linesContainer = document.createElement('div');
     linesContainer.style.cssText = `
         font-size: ${FONT_SIZE_PX}px;
         font-weight: 400;
@@ -991,9 +993,13 @@ function showFinalMessage() {
         min-height: 100%;
         width: 100%;
         word-wrap: break-word;
+        word-break: break-word;
         overflow-wrap: break-word;
+        overflow: hidden;
         padding: 0;
+        max-width: calc(100% - 8px);
     `;
+    
 
     const cursor = document.createElement('span');
     cursor.className = 'type-cursor';
@@ -1013,9 +1019,12 @@ function showFinalMessage() {
     textWrapper.addEventListener('touchmove', onUserScroll, { passive: true });
 
     // Conservative measurement: assume 90% of available width
-    const PADDING_H = 64;  // 32px left + 32px right
-    const SCROLLBAR = 8;
-    const SAFETY = 4;
+
+
+
+        const PADDING_H = 64;  // 32px left + 32px right
+    const SCROLLBAR = 10;  // scrollbar width
+    const SAFETY = 8;      // extra safety margin for letter-spacing rendering
 
     function buildLines(fontReady) {
         const canvas = document.createElement('canvas');
@@ -1023,8 +1032,8 @@ function showFinalMessage() {
         ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
         const cardWidth = cardStack.clientWidth || 320;
+        // Subtract all overhead
         const maxW = cardWidth - PADDING_H - SCROLLBAR - SAFETY;
-        
 
         const words = FINAL_MESSAGE.split(' ');
         const lines = [];
@@ -1032,7 +1041,11 @@ function showFinalMessage() {
 
         for (let i = 0; i < words.length; i++) {
             const test = cur ? cur + ' ' + words[i] : words[i];
-            const measured = ctx2d.measureText(test).width + (test.length * LETTER_SPACING);
+            // Measure text more accurately (canvas often underestimates)
+            let measured = ctx2d.measureText(test).width;
+            // Add letter-spacing effect
+            measured += (test.length * LETTER_SPACING * 0.8); // reduced multiplier for better accuracy
+            
             if (measured > maxW && cur !== '') {
                 lines.push(cur);
                 cur = words[i];
@@ -1043,6 +1056,8 @@ function showFinalMessage() {
         if (cur) lines.push(cur);
         return lines;
     }
+
+    
 
     const startTyping = (lines) => {
         setTimeout(() => {
