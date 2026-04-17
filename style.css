@@ -694,8 +694,12 @@ background: linear-gradient(180deg,
 /* ===================================================
    BUTTONS
    =================================================== */
+/* hide relight button completely (keeps DOM element so JS doesn't error) */
 .relight-btn {
     display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 
@@ -708,6 +712,7 @@ background: linear-gradient(180deg,
 
 
 /* Row container for message + photo buttons */
+/* Row container for message + photo buttons */
 .bottom-btns {
     position: absolute;
     bottom: 12%;
@@ -718,72 +723,54 @@ background: linear-gradient(180deg,
     align-items: center;
     justify-content: center;
     gap: 24px;
-    z-index: 20;
+    z-index: 9999; /* very high so it sits above other elements/overlays */
     opacity: 0;
     visibility: hidden;
-    pointer-events: none;
+    pointer-events: none; /* disabled until visible */
+    transition: opacity 0.36s ease, visibility 0.36s ease;
 }
 
 .bottom-btns.visible {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto;
+    pointer-events: auto; /* enable interaction when visible */
     animation: buttonAppear 0.5s ease;
 }
 
-.message-btn {
-    width: 60px;
-    height: 60px;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    pointer-events: auto;
-    transition: transform 0.2s ease;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-}
 
-.message-btn svg {
-    width: 60px;
-    height: 60px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-}
 
+/* Row container for message + photo buttons */
+.message-btn,
 .photo-btn {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     background: transparent;
     border: none;
-    border-radius: 0;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     pointer-events: auto;
-    transition: transform 0.2s ease;
+    transition: transform 0.18s ease, box-shadow 0.18s;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    z-index: 10000; /* ensure the actual button is above the container */
 }
 
+.message-btn svg,
 .photo-btn svg {
-    width: 60px;
-    height: 60px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    width: 56px;
+    height: 56px;
 }
 
-.photo-btn:hover,
-.message-btn:hover {
-    transform: scale(1.12);
-}
-
-.photo-btn:active,
-.message-btn:active {
+.message-btn:active,
+.photo-btn:active {
     transform: scale(0.95);
 }
+.message-btn:hover,
+.photo-btn:hover { transform: scale(1.08); }
+
 
 /* ===================================================
    ENVELOPE MODAL
@@ -1014,14 +1001,13 @@ background: linear-gradient(180deg,
     align-items: center;
     justify-content: center;
     opacity: 0;
-    pointer-events: none !important;
+    pointer-events: none; /* default: non-interactive */
     transition: opacity 0.4s ease;
 }
-
 .slider-overlay.active {
     opacity: 1;
+    pointer-events: auto; /* only interactive when active */
 }
-
 
 
 .slider-close {
