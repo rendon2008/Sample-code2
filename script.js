@@ -40,15 +40,18 @@ const poppers            = document.querySelectorAll('.popper');
 // INITIALIZATION
 // =====================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Add click listener to request mic button
-    const requestMicBtn = document.getElementById('request-mic-btn');
-    if (requestMicBtn) {
-        requestMicBtn.addEventListener('click', () => {
-            requestMicrophoneAccess();
-        });
-    }
-});
+// =====================================================
+// INITIALIZATION
+// =====================================================
+
+const requestMicBtn = document.getElementById('request-mic-btn');
+if (requestMicBtn) {
+    requestMicBtn.addEventListener('click', () => {
+        requestMicrophoneAccess();
+    });
+} else {
+    console.error('❌ Button with id="request-mic-btn" not found in HTML');
+}
 
 
 // =====================================================
