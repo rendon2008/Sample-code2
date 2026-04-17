@@ -546,6 +546,20 @@ envOverlay.addEventListener('click', (e) => {
 // =====================================================
 // CARD SLIDER
 // =====================================================
+// Store random nudges for each card (generated once and reused)
+// MUST be outside IIFE so it persists across multiple openings
+const cardNudges = {};
+
+function getCardNudge(cardIndex) {
+    // Generate and cache random nudge for this card if not exists
+    if (!cardNudges[cardIndex]) {
+        cardNudges[cardIndex] = {
+            xRand: (Math.random() - 0.5) * 8,  // Random X between -4 and +4
+            rotRand: (Math.random() - 0.5) * 3 // Random rotation between -1.5 and +1.5 deg
+        };
+    }
+    return cardNudges[cardIndex];
+}
 
 (function () {
 
@@ -556,7 +570,7 @@ const IMAGES = [
     '13.jpeg'
 ];
 
-const FINAL_MESSAGE = "Just look at how much u've grown🥹 I want u to know it saddens me seeing u grow, I keep looking at ur/our old photos and I cant believe how much uve grown, you've matured so much, u r no longer a baby (but will always be my baby in my eyes) and I am proud to be one of the person to be a part of your journy in life and soon to be a whole and not just a part..."; // EDIT THIS TEXT HERE
+const FINAL_MESSAGE = "Just look at how much u've grown🥹 I want u to know it saddens me seeing u grow, I keep looking at ur/our old photos and I cant believe how much uve grown, you've matured so much, u r no longer a baby (but will always be my baby in my eyes) and I am proud to be one of the person to be a part of your journy in life and soon to be a whole and not just a part...";
 
 const FALLBACK_EMOJI = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
 const VISIBLE_CARDS  = 4;
@@ -580,6 +594,7 @@ let hasReachedEnd = false;
 const allCards = [];
 // Final ILY card, also permanent
 let finalCard = null;
+
 
 // -------------------------------------------------------
 // Build all cards once and append them all to cardStack.
@@ -623,23 +638,10 @@ function refreshStack(animate) {
 
 
 // Store random nudges for each card (generated once and reused)
-const cardNudges = {};
-
-function getCardNudge(cardIndex) {
-    // Generate and cache random nudge for this card if not exists
-    if (!cardNudges[cardIndex]) {
-        cardNudges[cardIndex] = {
-            xRand: (Math.random() - 0.5) * 8,  // Random X between -4 and +4
-            rotRand: (Math.random() - 0.5) * 3 // Random rotation between -1.5 and +1.5 deg
-        };
-    }
-    return cardNudges[cardIndex];
-}
-
 function initializeAllCards() {
     allCards.length = 0;
     cardStack.innerHTML = '';
-    cardNudges = {}; // Reset nudges for fresh initialization
+    // DO NOT reset cardNudges here - keep the nudges consistent
 
     // Create the ILY final card first (lowest z-index, behind everything)
     finalCard = document.createElement('div');
