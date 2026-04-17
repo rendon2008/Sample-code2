@@ -824,25 +824,59 @@ function onDragStart(e) {
     }
 }
 
-function flyCard(flyX, flyY) {
+    function flyCard(flyX, flyY) {
     if (!topCard) return;
     animating = true;
 
     const rot    = flyX * 0.15;
     const FLY_MS = 420;
+    const TRANS = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS}ms ease, box-shadow ${FLY_MS}ms ease`;
+    
+    // Animate top card flying away
     topCard.style.transition = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS * 0.8}ms ease`;
     topCard.style.transform  = `translateX(${flyX}px) translateY(${flyY}px) rotate(${rot}deg)`;
     topCard.style.opacity    = '0';
 
-    // Slide in the next hidden card at the back of the stack
+    // Animate ALL background cards moving forward smoothly
+    for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
+        const imgIdx = currentIndex + offset;
+        if (imgIdx >= IMAGES.length) break;
+        
+        const card = allCards[imgIdx];
+        const nudge = getCardNudge(imgIdx);
+        
+        // New position when this card moves to offset-1
+        const newScale = 1 - (offset - 1) * 0.045;
+        const newY = (offset - 1) * 12;
+        const newX = (offset - 1) * 3 + nudge.xRand;
+        const newRot = (offset - 1) * 1.5 + nudge.rotRand;
+        const newShadow = (offset - 1) === 0
+            ? '0 12px 40px rgba(0,0,0,0.45)'
+            : `0 ${4 + (offset - 1) * 2}px ${12 + (offset - 1) * 6}px rgba(0,0,0,0.25)`;
+        
+        card.style.transition = TRANS;
+        card.style.transform = `translateX(${newX}px) translateY(${newY}px) scale(${newScale}) rotate(${newRot}deg)`;
+        card.style.boxShadow = newShadow;
+        card.style.zIndex = String(IMAGES.length + VISIBLE_CARDS - (offset - 1));
+        card.style.opacity = '1';
+    }
+
+    // Animate peek card sliding in from behind
     const nextHiddenIdx = currentIndex + VISIBLE_CARDS;
     if (nextHiddenIdx < IMAGES.length) {
         const nextCard = allCards[nextHiddenIdx];
-        const SLIDE_TRANS = `transform ${FLY_MS}ms cubic-bezier(0.25,0.46,0.45,0.94), opacity ${FLY_MS}ms ease, box-shadow ${FLY_MS}ms ease`;
-        nextCard.style.transition = SLIDE_TRANS;
-        nextCard.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - (VISIBLE_CARDS - 1));
-        nextCard.style.opacity    = '1';
-        nextCard.style.boxShadow  = `0 ${4 + (VISIBLE_CARDS - 1) * 2}px ${12 + (VISIBLE_CARDS - 1) * 6}px rgba(0,0,0,0.25)`;
+        const nextNudge = getCardNudge(nextHiddenIdx);
+        const peekScale = 1 - (VISIBLE_CARDS - 1) * 0.045;
+        const peekY = (VISIBLE_CARDS - 1) * 12;
+        const peekX = (VISIBLE_CARDS - 1) * 3 + nextNudge.xRand;
+        const peekRot = (VISIBLE_CARDS - 1) * 1.5 + nextNudge.rotRand;
+        const peekShadow = `0 ${4 + (VISIBLE_CARDS - 1) * 2}px ${12 + (VISIBLE_CARDS - 1) * 6}px rgba(0,0,0,0.25)`;
+        
+        nextCard.style.transition = TRANS;
+        nextCard.style.transform = `translateX(${peekX}px) translateY(${peekY}px) scale(${peekScale}) rotate(${peekRot}deg)`;
+        nextCard.style.zIndex = String(IMAGES.length + VISIBLE_CARDS - (VISIBLE_CARDS - 1));
+        nextCard.style.opacity = '1';
+        nextCard.style.boxShadow = peekShadow;
     }
 
     const isLastCard = (currentIndex === IMAGES.length - 1);
@@ -865,6 +899,7 @@ function flyCard(flyX, flyY) {
     }, FLY_MS + 20);
 }
 
+    
 // -------------------------------------------------------
 // Show Final Message
 // -------------------------------------------------------
