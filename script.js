@@ -1022,7 +1022,7 @@ function showFinalMessage() {
 
 
 
-        const PADDING_H = 20;  // 32px left + 32px right
+        const PADDING_H = 10;  // 32px left + 32px right
     const SCROLLBAR = 10;  // scrollbar width
     const SAFETY = 0;      // extra safety margin for letter-spacing rendering
 
