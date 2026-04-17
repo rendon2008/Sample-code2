@@ -1030,33 +1030,10 @@ linesContainer.style.cssText = `
 
 
 
-function buildLines(fontReady) {
-    const canvas = document.createElement('canvas');
-    const ctx2d  = canvas.getContext('2d');
-    ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
-
-const cardWidth = cardStack.offsetWidth || 320;
-    const maxW = cardWidth - 32; // 16px left + 16px right padding, no scrollbar offset needed
-    
-
-    const words = FINAL_MESSAGE.split(' ');
-    const lines = [];
-    let cur = '';
-
-    for (let i = 0; i < words.length; i++) {
-        const test = cur ? cur + ' ' + words[i] : words[i];
-        const measured = ctx2d.measureText(test).width;
-        
-        if (measured > maxW && cur !== '') {
-            lines.push(cur);
-            cur = words[i];
-        } else {
-            cur = test;
-        }
-    }
-    if (cur) lines.push(cur);
-    return lines;
+    function buildLines() {
+    // Let the browser do the wrapping — split into words only
+    return FINAL_MESSAGE.split(' ');
 }
     
 
@@ -1064,66 +1041,61 @@ const cardWidth = cardStack.offsetWidth || 320;
 
     
 
-    const startTyping = (lines) => {
+const startTyping = () => {
         setTimeout(() => {
-            typeLines(lines, linesContainer, cursor, textWrapper, () => isUserScrolling);
+            typeWordsInline(FINAL_MESSAGE, linesContainer, cursor, textWrapper, () => isUserScrolling);
         }, 900);
     };
 
     if (document.fonts && document.fonts.load) {
         document.fonts.load(`italic 400 ${FONT_SIZE_PX}px 'Cormorant Garamond'`)
-            .then(() => startTyping(buildLines(true)))
-            .catch(()  => startTyping(buildLines(false)));
-        setTimeout(() => {}, 1500);
+            .then(startTyping).catch(startTyping);
     } else {
-        setTimeout(() => startTyping(buildLines(false)), 300);
+        setTimeout(startTyping, 300);
     }
+    
 }
 
-function typeLines(lines, container, cursor, wrapper, getIsScrolling) {
-    let lineIdx      = 0;
-    let charIdx      = 0;
-    let currentLineEl = null;
+
+
+    function typeWordsInline(message, container, cursor, wrapper, getIsScrolling) {
+    // Single flowing <span> — browser wraps naturally, no canvas guessing
+    const textSpan = document.createElement('span');
+    textSpan.style.cssText = `
+        display: inline;
+        white-space: pre-wrap;
+        word-break: break-word;
+    `;
+    container.style.display = 'block';
+    container.style.width = '100%';
+    container.appendChild(textSpan);
+    container.appendChild(cursor);
 
     const BASE_MS = 72;
+    let charIdx = 0;
 
     function nextTick() {
-        if (lineIdx >= lines.length) {
+        if (charIdx >= message.length) {
             if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
             return;
         }
+        textSpan.textContent += message[charIdx];
+        charIdx++;
 
-        if (charIdx === 0) {
-            currentLineEl = document.createElement('div');
-            currentLineEl.style.cssText = 'min-height: 2em; display: block;';
-            container.appendChild(currentLineEl);
-            currentLineEl.appendChild(cursor);
+        if (!getIsScrolling()) {
+            wrapper.scrollTop = wrapper.scrollHeight;
         }
 
-        const line = lines[lineIdx];
-
-        if (charIdx < line.length) {
-            currentLineEl.insertBefore(document.createTextNode(line[charIdx]), cursor);
-            charIdx++;
-
-            if (!getIsScrolling()) {
-                wrapper.scrollTop = wrapper.scrollHeight;
-            }
-
-            const ch = line[charIdx - 1];
-            const delay = /[,.]/.test(ch) ? BASE_MS * 6
-                        : /[!?]/.test(ch)  ? BASE_MS * 4
-                        : BASE_MS + (Math.random() * 28 - 10);
-            setTimeout(nextTick, delay);
-        } else {
-            lineIdx++;
-            charIdx = 0;
-            setTimeout(nextTick, BASE_MS * 3);
-        }
+        const ch = message[charIdx - 1];
+        const delay = /[,.]/.test(ch) ? BASE_MS * 6
+                    : /[!?]/.test(ch)  ? BASE_MS * 4
+                    : BASE_MS + (Math.random() * 28 - 10);
+        setTimeout(nextTick, delay);
     }
 
     nextTick();
 }
+    
 
 // -------------------------------------------------------
 // Open / Close Slider
