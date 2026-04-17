@@ -962,7 +962,7 @@ const textWrapper = document.createElement('div');
 textWrapper.style.cssText = `
     width: 100%;
     height: 100%;
-    padding: 30px 20px;
+    padding: 30px 16px;
     overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
@@ -971,9 +971,8 @@ textWrapper.style.cssText = `
     box-sizing: border-box;
 `;
 
-
     const FONT_FAMILY = "'Cormorant Garamond', 'Georgia', serif";
-    const FONT_SIZE_PX = 20;
+    const FONT_SIZE_PX = 25;
     const LETTER_SPACING = 0.3;
 
 
@@ -1018,14 +1017,15 @@ linesContainer.style.cssText = `
 
 
 
-function buildLines(fontReady) {
+
+    function buildLines(fontReady) {
     const canvas = document.createElement('canvas');
     const ctx2d  = canvas.getContext('2d');
     ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
     const cardWidth = cardStack.clientWidth || 320;
-    // USE 90% OF CARD WIDTH - this is the key
-    const maxW = cardWidth * 0.90;
+    // Use 92% for better text packing with larger font
+    const maxW = cardWidth * 0.92;
 
     const words = FINAL_MESSAGE.split(' ');
     const lines = [];
