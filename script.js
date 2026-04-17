@@ -1022,11 +1022,7 @@ function showFinalMessage() {
 
 
 
-        const PADDING_H = 10;  // 32px left + 32px right
-    const SCROLLBAR = 10;  // scrollbar width
-    const SAFETY = 0;      // extra safety margin for letter-spacing rendering
-
-    function buildLines(fontReady) {
+function buildLines(fontReady) {
     const canvas = document.createElement('canvas');
     const ctx2d  = canvas.getContext('2d');
     ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
@@ -1058,8 +1054,6 @@ function showFinalMessage() {
     if (cur) lines.push(cur);
     return lines;
 }
-
-    
 
   
 
