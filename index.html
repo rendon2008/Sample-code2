@@ -212,26 +212,25 @@
 
         <!-- ===== Envelope Modal ===== -->
         <div class="env-overlay" id="envOverlay">
-            <div class="env-wrapper" id="envWrapper">
-
-                <!-- Letter inside envelope -->
-                <div class="letter" id="letter">
-                    <div class="letter-lines">
-                        <div class="letter-line"></div>
-                        <div class="letter-line"></div>
-                    </div>
-                    <div class="letter-text">
-                        I'm so sorry baby, my cake to u is online 🥹<br>
-                        but every memory we have is real & I made u something special —
-                    </div>
-                    <div class="letter-lines" style="margin-top:10px; margin-bottom:0">
-                        <div class="letter-line"></div>
-                        <div class="letter-line"></div>
-                    </div>
-
-                    <div class="letter-heart">🌸</div>
+            <!-- Letter rendered outside env-wrapper so it never blocks envelope tap -->
+            <div class="letter" id="letter">
+                <div class="letter-lines">
+                    <div class="letter-line"></div>
+                    <div class="letter-line"></div>
+                </div>
+                <div class="letter-text">
+                    I'm so sorry baby, my cake to u is online 🥹<br>
+                    but every memory we have is real & I made u something special —
+                </div>
+                <div class="letter-lines" style="margin-top:10px; margin-bottom:0">
+                    <div class="letter-line"></div>
+                    <div class="letter-line"></div>
                 </div>
 
+                <div class="letter-heart">🌸</div>
+            </div>
+
+            <div class="env-wrapper" id="envWrapper">
                 <!-- Envelope shell -->
                 <div class="envelope">
                     <div class="env-body">
