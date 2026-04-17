@@ -488,6 +488,7 @@ function createConfettiPiece(colors, isBurst) {
 // =====================================================
 
 function setupRelightButton() {
+    if (!relightBtn) return;
     relightBtn.addEventListener('click', () => relightCandles());
 }
 
@@ -1150,6 +1151,7 @@ function openSlider() {
     // Re-init cards fresh
     initializeAllCards();
 
+    // show and enable overlay
     sliderOverlay.classList.add('active');
     sliderOverlay.style.pointerEvents = 'auto';
 
@@ -1157,13 +1159,16 @@ function openSlider() {
     sliderHint.classList.remove('fade');
     hintTimer = setTimeout(() => sliderHint.classList.add('fade'), 3000);
 }
-
     
 
 function closeSlider() {
     sliderOverlay.classList.remove('active');
+    // ensure overlay no longer intercepts clicks
     sliderOverlay.style.pointerEvents = 'none';
+    // clean up any transient UI inside cardStack (optional)
+    cardStack.innerHTML = '';
 }
+    
 
 openBtn.addEventListener('click', (e) => {
     e.stopPropagation();
