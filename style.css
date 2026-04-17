@@ -730,11 +730,12 @@ background: linear-gradient(180deg,
     transition: opacity 0.36s ease, visibility 0.36s ease;
 }
 
+/* AFTER */
 .bottom-btns.visible {
     opacity: 1;
     visibility: visible;
-    pointer-events: auto; /* enable interaction when visible */
-    animation: buttonAppear 0.5s ease;
+    pointer-events: auto;
+    animation: buttonAppear 0.5s ease forwards;
 }
 
 
