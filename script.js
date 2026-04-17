@@ -224,6 +224,7 @@ function startCelebration() {
 
 function updateMessage() {
     message.style.opacity   = '0';
+    message.style.transform = 'translateX(-50%) scale(0.8)';
 
     setTimeout(() => {
        message.innerHTML = '<span style="font-family: \'Cormorant Garamond\', Georgia, serif; font-style: italic; font-weight: 400;">HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span></span>';
@@ -235,6 +236,7 @@ function updateMessage() {
             2px 2px 4px rgba(0,0,0,0.1)
         `;
         message.style.opacity   = '1';
+        message.style.transform = 'translateX(-50%) scale(1)';
     }, 400);
 }
 
@@ -497,12 +499,14 @@ function relightCandles() {
     candles.forEach(candle => candle.classList.remove('extinguished'));
 
     message.style.opacity   = '0';
+    message.style.transform = 'translateX(-50%) scale(0.8)';
 
     setTimeout(() => {
         message.innerHTML        = 'BLOW THE CANDLES!!';
         message.style.color      = '';
         message.style.textShadow = '';
         message.style.opacity    = '1';
+        message.style.transform  = 'translateX(-50%) scale(1)';
     }, 400);
 
     relightBtn.classList.remove('visible');
@@ -552,42 +556,21 @@ document.getElementById('envWrapper').addEventListener('click', (e) => {
     }
 });
 
-document.getElementById('envWrapper').addEventListener('touchend', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (!envelopeOpened) {
-        heartSeal.classList.add('hidden');
-        envFlap.classList.add('open');
-        setTimeout(() => {
-            envLetter.classList.remove('closing');
-            envLetter.classList.add('risen');
-            envelopeOpened = true;
-        }, 700);
-    }
-});
-
-// Letter click/touch — don't stop propagation so overlay can close
 document.getElementById('letter').addEventListener('click', (e) => {
-    e.stopPropagation(); // keep scrolling letter without closing
+    e.stopPropagation();
+    envOverlay.click();
 });
-
-document.getElementById('letter').addEventListener('touchend', (e) => {
-    // allow scroll inside letter; don't preventDefault
-});
-
-function closeEnvelope() {
-    envelopeOpened = false;
-    envLetter.classList.remove('risen');
-    envLetter.classList.add('closing');
-    setTimeout(() => envFlap.classList.remove('open'), 700);
-    setTimeout(() => heartSeal.classList.remove('hidden'), 1100);
-    setTimeout(() => envOverlay.classList.remove('show'), 1400);
-}
 
 envOverlay.addEventListener('click', (e) => {
     if (e.target === envOverlay) {
         if (envelopeOpened) {
-            closeEnvelope();
+            envelopeOpened = false;
+            envLetter.classList.remove('risen');
+            envLetter.classList.add('closing');
+
+            setTimeout(() => envFlap.classList.remove('open'), 700);
+            setTimeout(() => heartSeal.classList.remove('hidden'), 1100);
+            setTimeout(() => envOverlay.classList.remove('show'), 1400);
         } else {
             envOverlay.classList.remove('show');
         }
@@ -1043,9 +1026,9 @@ function showFinalMessage() {
 
     // ── Pre-measure with Canvas (pixel-perfect, no DOM reflow needed) ───
     // Wait for font to load (or up to 1.5 s), then measure.
-        const PADDING_H = 76; // 38px padding on each side
-        const SAFETY    = 16; // small safety buffer
-    
+    const PADDING_H = 20; // 38px each side, reduced for better fit
+    const SAFETY    = 0;  // minimal margin so text fills the row
+
     function buildLines(fontReady) {
         // Canvas measureText is the most reliable cross-browser measurement.
         const canvas = document.createElement('canvas');
