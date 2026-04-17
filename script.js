@@ -937,10 +937,10 @@ function showFinalMessage() {
                 vertical-align: text-bottom;
                 animation: blinkCursor 1.1s ease-in-out infinite;
             }
-            div::-webkit-scrollbar       { width: 6px; }
-            div::-webkit-scrollbar-track { background: rgba(255,255,255,0.07); border-radius: 10px; }
-            div::-webkit-scrollbar-thumb { background: rgba(255,105,180,0.45); border-radius: 10px; }
-            div::-webkit-scrollbar-thumb:hover { background: rgba(255,105,180,0.75); }
+
+            div::-webkit-scrollbar       { width: 0px; }
+            div::-webkit-scrollbar-track { background: transparent; }
+            div::-webkit-scrollbar-thumb { background: transparent; }
         `;
         document.head.appendChild(style);
     }
@@ -1036,9 +1036,8 @@ function buildLines(fontReady) {
     ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
 
-    const cardWidth = cardStack.offsetWidth || 320;
-    // Use full width minus padding, ignoring any scrollbar
-    const maxW = cardWidth - 30; // 15px left + 15px right
+const cardWidth = cardStack.offsetWidth || 320;
+    const maxW = cardWidth - 32; // 16px left + 16px right padding, no scrollbar offset needed
     
 
     const words = FINAL_MESSAGE.split(' ');
