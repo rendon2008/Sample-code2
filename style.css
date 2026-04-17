@@ -1020,8 +1020,10 @@ background: linear-gradient(180deg,
 
 .slider-overlay.active {
     opacity: 1;
-    pointer-events: all;
+    pointer-events: auto;  /* Change from 'all' to 'auto' */
 }
+
+
 
 .slider-close {
     position: absolute;
