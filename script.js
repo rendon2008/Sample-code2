@@ -41,8 +41,6 @@ const poppers            = document.querySelectorAll('.popper');
 // =====================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    setupRelightButton();
-    
     // Add click listener to request mic button
     const requestMicBtn = document.getElementById('request-mic-btn');
     if (requestMicBtn) {
@@ -212,14 +210,11 @@ function startCelebration() {
     firePartyPoppers();
     startConfetti();
 
-    setTimeout(() => {
-        relightBtn.classList.remove('hidden');
-        relightBtn.classList.add('visible');
-
-        const bottomBtns = document.getElementById('bottom-btns');
-        bottomBtns.classList.remove('hidden');
-        bottomBtns.classList.add('visible');
-    }, 2000);
+setTimeout(() => {
+    const bottomBtns = document.getElementById('bottom-btns');
+    bottomBtns.classList.remove('hidden');
+    bottomBtns.classList.add('visible');
+}, 2000);
 }
 
 function updateMessage() {
@@ -487,43 +482,6 @@ function createConfettiPiece(colors, isBurst) {
 // RELIGHT BUTTON
 // =====================================================
 
-function setupRelightButton() {
-    relightBtn.addEventListener('click', () => relightCandles());
-}
-
-function relightCandles() {
-    candlesExtinguished = false;
-    celebrationStarted  = false;
-    blowStartTime       = null;
-
-    candles.forEach(candle => candle.classList.remove('extinguished'));
-
-    message.style.opacity   = '0';
-    message.style.transform = 'translateX(-50%) scale(0.8)';
-
-    setTimeout(() => {
-        message.innerHTML        = 'BLOW THE CANDLES!!';
-        message.style.color      = '';
-        message.style.textShadow = '';
-        message.style.opacity    = '1';
-        message.style.transform  = 'translateX(-50%) scale(1)';
-    }, 400);
-
-    relightBtn.classList.remove('visible');
-    relightBtn.classList.add('hidden');
-
-    const bottomBtns = document.getElementById('bottom-btns');
-    bottomBtns.classList.remove('visible');
-    bottomBtns.classList.add('hidden');
-
-    balloonsContainer.innerHTML = '';
-    startCandleAnimations();
-
-    if (!blowDetectionInterval) {
-        startBlowDetection();
-    }
-}
-
 
 // =====================================================
 // ENVELOPE / LETTER ANIMATION
@@ -680,10 +638,12 @@ function refreshStack(animate) {
 function positionCard(card, stackPos, animate) {
     const scale = 1 - stackPos * 0.045;
     const yOff  = stackPos * 12;
+    const xOff  = stackPos * 8 * (stackPos % 2 === 0 ? 1 : -1); // Natural nudge left/right
+    const rot   = stackPos * 2.5 * (stackPos % 2 === 0 ? 1 : -1); // Slight natural rotation
     const TRANS = 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.42s ease, box-shadow 0.42s ease';
 
     card.style.transition = animate ? TRANS : 'none';
-    card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
+    card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) rotate(${rot}deg) scale(${scale})`;
     card.style.zIndex     = String(IMAGES.length + VISIBLE_CARDS - stackPos);
     card.style.opacity    = '1';
     card.style.boxShadow  = stackPos === 0
@@ -749,20 +709,27 @@ function onDragMove(e) {
     topCard.style.transform = `translateX(${currentX}px) translateY(${currentY}px) rotate(${rot}deg)`;
 
     // Animate background cards toward their next position proportionally
-    const progress = Math.min(1, Math.sqrt(currentX * currentX + currentY * currentY) / 120);
-    for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
-        const imgIdx = currentIndex + offset;
-        if (imgIdx >= IMAGES.length) break;
-        const card     = allCards[imgIdx];
-        const fromScale = 1 - offset * 0.045;
-        const toScale   = 1 - (offset - 1) * 0.045;
-        const fromY     = offset * 12;
-        const toY       = (offset - 1) * 12;
-        const scale     = fromScale + (toScale - fromScale) * progress;
-        const yOff      = fromY   + (toY   - fromY)   * progress;
-        card.style.transition = 'none';
-        card.style.transform  = `translateY(${yOff}px) scale(${scale})`;
-    }
+ // Animate background cards toward their next position proportionally
+const progress = Math.min(1, Math.sqrt(currentX * currentX + currentY * currentY) / 120);
+for (let offset = 1; offset < VISIBLE_CARDS; offset++) {
+    const imgIdx = currentIndex + offset;
+    if (imgIdx >= IMAGES.length) break;
+    const card     = allCards[imgIdx];
+    const fromScale = 1 - offset * 0.045;
+    const toScale   = 1 - (offset - 1) * 0.045;
+    const fromY     = offset * 12;
+    const toY       = (offset - 1) * 12;
+    const fromX     = offset * 8 * (offset % 2 === 0 ? 1 : -1);
+    const toX       = (offset - 1) * 8 * ((offset - 1) % 2 === 0 ? 1 : -1);
+    const fromRot   = offset * 2.5 * (offset % 2 === 0 ? 1 : -1);
+    const toRot     = (offset - 1) * 2.5 * ((offset - 1) % 2 === 0 ? 1 : -1);
+    const scale     = fromScale + (toScale - fromScale) * progress;
+    const yOff      = fromY   + (toY   - fromY)   * progress;
+    const xOff      = fromX   + (toX   - fromX)   * progress;
+    const rot       = fromRot + (toRot - fromRot) * progress;
+    card.style.transition = 'none';
+    card.style.transform  = `translateX(${xOff}px) translateY(${yOff}px) rotate(${rot}deg) scale(${scale})`;
+}
 
     // Also peek in the next card that's currently hidden
     const peekIdx = currentIndex + VISIBLE_CARDS;
