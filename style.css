@@ -1,4 +1,4 @@
-* {
+f* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -694,43 +694,10 @@ background: linear-gradient(180deg,
 /* ===================================================
    BUTTONS
    =================================================== */
-
 .relight-btn {
-    position: absolute;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 40px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
-    background: linear-gradient(135deg, #FF2E7A 0%, #FF0033 100%);
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow:
-        0 4px 15px rgba(255, 0, 90, 0.55),
-        0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    z-index: 20;
-    opacity: 0;
-    visibility: hidden;
+    display: none !important;
 }
 
-.relight-btn.visible {
-    opacity: 1;
-    visibility: visible;
-    animation: buttonAppear 0.5s ease;
-}
-
-.relight-btn:hover {
-    transform: translateX(-50%) scale(1.05);
-    box-shadow:
-        0 6px 20px rgba(248, 200, 220, 0.7),
-        0 3px 10px rgba(0,0,0,0.15);
-}
-
-.relight-btn:active { transform: translateX(-50%) scale(0.98); }
 
 @keyframes buttonAppear {
     0%   { transform: translateX(-50%) scale(0.8); opacity: 0; }
@@ -738,54 +705,85 @@ background: linear-gradient(180deg,
 }
 
 /* Row container for message + photo buttons */
+
+
+/* Row container for message + photo buttons */
 .bottom-btns {
     position: absolute;
-    bottom: 18%;
+    bottom: 12%;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 20px;
+    justify-content: center;
+    gap: 24px;
     z-index: 20;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
 }
 
 .bottom-btns.visible {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
     animation: buttonAppear 0.5s ease;
 }
 
 .message-btn {
-    width: 80px; height: 80px;
+    width: 60px;
+    height: 60px;
     background: transparent;
+    border: none;
     border-radius: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    pointer-events: auto;
+    transition: transform 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.message-btn svg { width: 80px; height: 80px; }
+.message-btn svg {
+    width: 60px;
+    height: 60px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
 
 .photo-btn {
-    width: 80px; height: 80px;
+    width: 60px;
+    height: 60px;
     background: transparent;
+    border: none;
     border-radius: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    pointer-events: auto;
     transition: transform 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.photo-btn svg { width: 80px; height: 80px; }
+.photo-btn svg {
+    width: 60px;
+    height: 60px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
 
-.photo-btn:hover { transform: scale(1.08); }
-.message-btn:hover { transform: scale(1.08); }
+.photo-btn:hover,
+.message-btn:hover {
+    transform: scale(1.12);
+}
 
+.photo-btn:active,
+.message-btn:active {
+    transform: scale(0.95);
+}
 
 /* ===================================================
    ENVELOPE MODAL
@@ -1255,7 +1253,23 @@ background: linear-gradient(180deg,
     .piped-dot    { width: 12px; height: 16px; }
     .side-flower  { width: 25px; height: 25px; }
     .message      { top: 5%; font-size: 1.5rem; }
-    .relight-btn  { padding: 12px 30px; font-size: 1rem; }
+    
+    .bottom-btns {
+        bottom: 15%;
+        gap: 20px;
+    }
+    
+    .message-btn,
+    .photo-btn {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .message-btn svg,
+    .photo-btn svg {
+        width: 56px;
+        height: 56px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1271,15 +1285,53 @@ background: linear-gradient(180deg,
     .message      { font-size: 1.2rem; }
     .permission-text { font-size: 1.1rem; }
     .microphone-icon { width: 70px; height: 70px; }
+    
+    .bottom-btns {
+        bottom: 12%;
+        gap: 16px;
+    }
+    
+    .message-btn,
+    .photo-btn {
+        width: 52px;
+        height: 52px;
+    }
+    
+    .message-btn svg,
+    .photo-btn svg {
+        width: 52px;
+        height: 52px;
+    }
 }
+
 
 @media (max-height: 600px) {
     .cake        { transform: scale(0.85); }
     .message     { top: 3%; }
-    .relight-btn { bottom: 3%; }
+    
+    .bottom-btns {
+        bottom: 10%;
+    }
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
     .cake    { transform: scale(0.7); }
     .message { font-size: 1.2rem; top: 2%; }
+    
+    .bottom-btns {
+        bottom: 8%;
+        gap: 12px;
+    }
+    
+    .message-btn,
+    .photo-btn {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .message-btn svg,
+    .photo-btn svg {
+        width: 48px;
+        height: 48px;
+    }
 }
