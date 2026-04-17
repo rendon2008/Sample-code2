@@ -1012,8 +1012,10 @@ function showFinalMessage() {
     textWrapper.addEventListener('wheel',     onUserScroll, { passive: true });
     textWrapper.addEventListener('touchmove', onUserScroll, { passive: true });
 
-    const PADDING_H = 76;
-    const SAFETY    = 10
+    // Conservative measurement: assume 90% of available width
+    const PADDING_H = 64;  // 32px left + 32px right
+    const SCROLLBAR = 8;
+    const SAFETY = 4;
 
     function buildLines(fontReady) {
         const canvas = document.createElement('canvas');
@@ -1021,7 +1023,8 @@ function showFinalMessage() {
         ctx2d.font = `italic 400 ${FONT_SIZE_PX}px ${fontReady ? "'Cormorant Garamond'" : 'Georgia'}, serif`;
 
         const cardWidth = cardStack.clientWidth || 320;
-        const maxW = cardWidth - PADDING_H - SAFETY;
+        const maxW = cardWidth - PADDING_H - SCROLLBAR - SAFETY;
+        
 
         const words = FINAL_MESSAGE.split(' ');
         const lines = [];
