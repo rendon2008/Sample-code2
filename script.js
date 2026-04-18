@@ -23,12 +23,23 @@
         });
     });
 
-    enterBtn.addEventListener('click', () => {
-        const entered = digits.join('');
-        if (entered === PASSWORD) {
-            screen.classList.add('hidden');
-            setTimeout(() => screen.remove(), 1000);
 } else {
+            const padlock  = document.querySelector('.padlock');
+
+            // Red glow around padlock
+            padlock.style.transition = 'transform 0.1s ease, filter 0.05s ease';
+            padlock.style.filter = 'drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 24px #ff0000)';
+
+            // Shake only padlock
+            padlock.style.transform = 'translateX(-8px)';
+            setTimeout(() => padlock.style.transform = 'translateX(8px)',  100);
+            setTimeout(() => padlock.style.transform = 'translateX(-6px)', 200);
+            setTimeout(() => padlock.style.transform = 'translateX(6px)',  300);
+            setTimeout(() => padlock.style.transform = 'translateX(0)',    400);
+
+            // Remove glow
+            setTimeout(() => { padlock.style.filter = ''; }, 500);
+        }
             const padlock = document.querySelector('.padlock');
             const heart   = document.querySelector('.padlock-heart');
             const enterBtn = document.getElementById('enter-btn');
