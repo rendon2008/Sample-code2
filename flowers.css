@@ -52,11 +52,13 @@
 }
 
 /* ---- Flowers container ---- */
+
 #bouquet-scene .flowers {
   position: relative;
   transform: scale(0.9);
   opacity: 0;
   transition: opacity 1s ease 1s;
+  pointer-events: none;
 }
 
 #bouquet-scene.active .flowers {
