@@ -251,19 +251,13 @@ background: linear-gradient(180deg,
 
 
 .mic-indicator {
-    position: absolute;
-    top: calc(12% + 70px);
-    left: 50%;
-    transform: translateX(-50%);
+    display: block;
     font-size: 1.3rem;
     font-weight: 600;
     color: rgba(255, 105, 180, 0.7);
     letter-spacing: 3px;
-    z-index: 10;
     transition: opacity 0.8s ease;
-    animation: messageGlow 2s ease-in-out infinite;
 }
-
 
 
 @keyframes messageGlow {
