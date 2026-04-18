@@ -106,6 +106,12 @@ html, body {
     padding-bottom: 63px;
 }
 
+.padlock-heart-wrapper {
+    position: relative;
+    border-radius: 50% 50% 0 0;
+    transition: filter 0.2s ease;
+}
+
 .digit-slots {
     display: flex;
     flex-direction: row;
