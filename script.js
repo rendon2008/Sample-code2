@@ -582,7 +582,7 @@ const IMAGES = [
     '13.jpeg'
 ];
 
-const FINAL_MESSAGE = "Just look at how much u've grown🥹 I want u to know it saddens me seeing u grow, I keep looking at ur/our old photos and I cant believe how much uve grown, you've matured so much, u r no longer a baby (but will always be my baby in my eyes) and I am proud to be one of the person to be a part of your journy in life and soon to be a whole and not just a part...";
+const FINAL_MESSAGE = "ur now 17 years old!! Just look at how much u've grown. I want u to know it saddens me seeing u grow, I keep looking at ur/our old photos and I cant believe how much uve grown, you've matured so much, u r no longer a baby (but will always be my baby in my eyes) u r so much more capable than u think u r. And please don't forget that even if uve grown up that doesn't mean u cant be young again. and I am proud to be one of the people to be a part of your journy in life and soon to be a whole and not just a part. And as u grow old baby I want u to know, eventually u'll come to realize how challenging life can be. I know ur still not an adult but I see how ur slowly turning into one. As u grow please know u r not alone, I am here with u till the end of the line. Despite ur fears, challenges, circumstances, and anxiety, u chose to move forward into this new and exciting chapter of ur life. As I'm still breathing I'll be with u to face all the mysteries u'll encounter. I LOVE U IN EVERY UNIVERSE....";
 
 const FALLBACK_EMOJI = ['💖','🌸','✨','🎀','💝','🎉','🥰','🌺'];
 const VISIBLE_CARDS  = 4;
