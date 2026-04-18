@@ -1189,6 +1189,7 @@ function showError(msg) {
 // BOUQUET BUTTON — Launch flower scene
 // =====================================================
 
+
 document.getElementById('bouquet-btn').addEventListener('click', () => {
     const bouquetScene  = document.getElementById('bouquet-scene');
     const flowerRoot    = bouquetScene.querySelector('.flowers');
@@ -1201,11 +1202,13 @@ document.getElementById('bouquet-btn').addEventListener('click', () => {
     const poppers       = document.querySelector('.party-poppers');
     const confetti      = document.getElementById('confetti-canvas');
 
+    const elementsToFade = [cakeContainer, msgEl, bottomBtns, bgGrad, sparkles, balloons, poppers, confetti];
+
     // Fade out everything on the birthday scene
-    [cakeContainer, msgEl, bottomBtns, bgGrad, sparkles, balloons, poppers, confetti].forEach(el => {
+    elementsToFade.forEach(el => {
         if (!el) return;
-        el.style.transition  = 'opacity 0.9s ease';
-        el.style.opacity     = '0';
+        el.style.transition    = 'opacity 0.9s ease';
+        el.style.opacity       = '0';
         el.style.pointerEvents = 'none';
     });
 
@@ -1219,6 +1222,31 @@ document.getElementById('bouquet-btn').addEventListener('click', () => {
         }, 1000);
 
     }, 1000);
+
+    // Click anywhere on bouquet scene to go back
+    bouquetScene.addEventListener('click', function goBack() {
+        bouquetScene.removeEventListener('click', goBack);
+
+        // Fade out bouquet scene
+        bouquetScene.style.transition = 'opacity 1s ease';
+        bouquetScene.style.opacity    = '0';
+
+        setTimeout(() => {
+            // Reset bouquet scene
+            bouquetScene.classList.remove('active');
+            bouquetScene.style.opacity    = '';
+            bouquetScene.style.transition = '';
+            flowerRoot.classList.add('not-loaded');
+
+            // Fade everything back in
+            elementsToFade.forEach(el => {
+                if (!el) return;
+                el.style.transition    = 'opacity 0.9s ease';
+                el.style.opacity       = '1';
+                el.style.pointerEvents = '';
+            });
+        }, 1000);
+    });
 });
 
 
