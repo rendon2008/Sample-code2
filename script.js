@@ -36,20 +36,21 @@
 
             // Red glow around the padlock
 
-            padlock.style.transition = 'filter 0.05s ease';
-padlock.style.filter = 'drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 24px #ff0000)';
 
-// Shake only the heart
-heart.style.transition = 'transform 0.1s ease';
-heart.style.transform  = 'translateX(-8px)';
-setTimeout(() => heart.style.transform = 'translateX(8px)',  100);
-setTimeout(() => heart.style.transform = 'translateX(-6px)', 200);
-setTimeout(() => heart.style.transform = 'translateX(6px)',  300);
-setTimeout(() => heart.style.transform = 'translateX(0)',    400);
+            // Red glow on heart only
+heart.style.transition = 'transform 0.1s ease, filter 0.05s ease';
+heart.style.filter = 'drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 24px #ff0000)';
 
-// Remove red glow
-setTimeout(() => { padlock.style.filter = ''; }, 500);
-        }
+// Shake the whole padlock (shackle + heart together)
+padlock.style.transition = 'transform 0.1s ease';
+padlock.style.transform  = 'translateX(-8px)';
+setTimeout(() => padlock.style.transform = 'translateX(8px)',  100);
+setTimeout(() => padlock.style.transform = 'translateX(-6px)', 200);
+setTimeout(() => padlock.style.transform = 'translateX(6px)',  300);
+setTimeout(() => padlock.style.transform = 'translateX(0)',    400);
+
+// Remove red glow from heart only
+setTimeout(() => { heart.style.filter = ''; }, 500);
 
         
     });
