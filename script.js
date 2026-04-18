@@ -1209,27 +1209,40 @@ function getElementsToFade() {
 }
 
 // Click anywhere on bouquet scene to go back — registered ONCE
-bouquetScene.addEventListener('click', () => {
-    if (!bouquetActive) return;
-    bouquetActive = false;
 
-    bouquetScene.style.transition = 'opacity 1s ease';
-    bouquetScene.style.opacity    = '0';
+let bouquetOpenTimeout1 = null;
+let bouquetOpenTimeout2 = null;
 
-    setTimeout(() => {
-        bouquetScene.classList.remove('active');
-        bouquetScene.style.opacity    = '';
-        bouquetScene.style.transition = '';
-        flowerRoot.classList.add('not-loaded');
+document.getElementById('bouquet-btn').addEventListener('click', () => {
+    if (bouquetActive) return;
 
-        getElementsToFade().forEach(el => {
-            if (!el) return;
-            el.style.transition    = 'opacity 0.9s ease';
-            el.style.opacity       = '1';
-            el.style.pointerEvents = '';
-        });
+    // Cancel any in-progress open animation from a previous spam click
+    clearTimeout(bouquetOpenTimeout1);
+    clearTimeout(bouquetOpenTimeout2);
+
+    // Force-reset bouquet scene state before starting
+    bouquetScene.classList.remove('active');
+    bouquetScene.style.opacity    = '';
+    bouquetScene.style.transition = '';
+    flowerRoot.classList.add('not-loaded');
+
+    getElementsToFade().forEach(el => {
+        if (!el) return;
+        el.style.transition    = 'opacity 0.9s ease';
+        el.style.opacity       = '0';
+        el.style.pointerEvents = 'none';
+    });
+
+    bouquetOpenTimeout1 = setTimeout(() => {
+        bouquetScene.classList.add('active');
+
+        bouquetOpenTimeout2 = setTimeout(() => {
+            bouquetActive = true;
+            flowerRoot.classList.remove('not-loaded');
+        }, 1000);
     }, 1000);
 });
+
 
 document.getElementById('bouquet-btn').addEventListener('click', () => {
     if (bouquetActive) return;
