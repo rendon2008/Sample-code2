@@ -725,8 +725,10 @@ background: linear-gradient(180deg,
     animation: buttonAppear 0.5s ease;
 }
 
+
+
 .bouquet-btn {
-    width: 65px; height: 65px;
+    width: 55px; height: 75px;
     background: transparent;
     border-radius: 0;
     display: flex;
@@ -736,7 +738,8 @@ background: linear-gradient(180deg,
     transition: transform 0.2s ease;
 }
 
-.bouquet-btn svg { width: 65px; height: 65px; }
+.bouquet-btn svg { width: 55px; height: 75px; }
+
 
 .message-btn {
     width: 90px; height: 90px;
