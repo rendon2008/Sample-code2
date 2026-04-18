@@ -33,11 +33,16 @@ const heart = document.querySelector('.padlock-heart-wrapper');
             // Green glow on heart for 2 seconds, then proceed
             heart.style.transition = 'filter 0.2s ease';
             heart.style.filter = 'drop-shadow(0 0 12px #00ff00) drop-shadow(0 0 28px #00cc00)';
+            
+
             setTimeout(() => {
-                heart.style.filter = '';
-                screen.classList.add('hidden');
-                setTimeout(() => screen.remove(), 1000);
-            }, 2000);
+    heart.style.filter = '';
+    // Fade out the password screen smoothly
+    screen.style.transition = 'opacity 0.8s ease';
+    screen.style.opacity = '0';
+    setTimeout(() => screen.remove(), 800);
+}, 1000);
+            
         } else {
             // Red glow on heart + shackle area only
             heart.style.transition = 'filter 0.05s ease';
