@@ -249,6 +249,21 @@ background: linear-gradient(180deg,
     letter-spacing: 1px;
 }
 
+
+.mic-indicator {
+    position: absolute;
+    top: calc(12% + 65px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 105, 180, 0.7);
+    letter-spacing: 2px;
+    z-index: 10;
+}
+
+
+
 @keyframes messageGlow {
     0%, 100% {
         text-shadow:
@@ -707,9 +722,9 @@ background: linear-gradient(180deg,
 /* Row container for message + photo buttons */
 .bottom-btns {
     position: absolute;
-    bottom: 18%;
+    bottom: 15%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% + 8px));
     display: flex;
     flex-direction: row;
     align-items: center;
