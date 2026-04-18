@@ -1250,7 +1250,7 @@ fadeEls().forEach(el => {
     el.style.pointerEvents = '';
     el.style.zIndex        = '';
 });
-            });
+            
         }, 1000);
     });
 }());
