@@ -29,25 +29,22 @@
             screen.classList.add('hidden');
             setTimeout(() => screen.remove(), 1000);
 } else {
-            // Wrong — shake heart AND shackle with red flash
+            const padlock = document.querySelector('.padlock');
             const heart   = document.querySelector('.padlock-heart');
-            const shackle = document.querySelector('.padlock-shackle');
 
-            // Red flash overlay on heart
-            heart.style.filter = 'brightness(1) saturate(1)';
-            heart.style.transition = 'filter 0.05s ease, transform 0.1s ease';
+            // Red flash on heart
+            heart.style.transition = 'filter 0.05s ease';
             heart.style.filter = 'hue-rotate(300deg) saturate(3) brightness(1.3)';
 
-            // Shake both together
-            [heart, shackle].forEach(el => {
-                el.style.transition = 'transform 0.1s ease';
-            });
-            [heart, shackle].forEach(el => el.style.transform = 'translateX(-8px)');
-            setTimeout(() => [heart, shackle].forEach(el => el.style.transform = 'translateX(8px)'),  100);
-            setTimeout(() => [heart, shackle].forEach(el => el.style.transform = 'translateX(-6px)'), 200);
-            setTimeout(() => [heart, shackle].forEach(el => el.style.transform = 'translateX(6px)'),  300);
-            setTimeout(() => [heart, shackle].forEach(el => el.style.transform = 'translateX(0)'),    400);
-            // Remove red flash after shake
+            // Shake the whole padlock (heart + shackle move together)
+            padlock.style.transition = 'transform 0.1s ease';
+            padlock.style.transform  = 'translateX(-8px)';
+            setTimeout(() => padlock.style.transform = 'translateX(8px)',  100);
+            setTimeout(() => padlock.style.transform = 'translateX(-6px)', 200);
+            setTimeout(() => padlock.style.transform = 'translateX(6px)',  300);
+            setTimeout(() => padlock.style.transform = 'translateX(0)',    400);
+
+            // Remove red flash
             setTimeout(() => { heart.style.filter = ''; }, 500);
         }
     });
