@@ -31,22 +31,25 @@
 } else {
             const padlock = document.querySelector('.padlock');
             const heart   = document.querySelector('.padlock-heart');
+            const enterBtn = document.getElementById('enter-btn');
 
-            // Red flash on heart
-            heart.style.transition = 'filter 0.05s ease';
-            heart.style.filter = 'hue-rotate(300deg) saturate(3) brightness(1.3)';
+            // Red glow around the padlock
+            padlock.style.transition = 'transform 0.1s ease, filter 0.05s ease';
+            padlock.style.filter = 'drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 24px #ff0000)';
 
-            // Shake the whole padlock (heart + shackle move together)
-            padlock.style.transition = 'transform 0.1s ease';
+            // Shake only the padlock, not the enter button
+            enterBtn.style.transform = 'none';
             padlock.style.transform  = 'translateX(-8px)';
             setTimeout(() => padlock.style.transform = 'translateX(8px)',  100);
             setTimeout(() => padlock.style.transform = 'translateX(-6px)', 200);
             setTimeout(() => padlock.style.transform = 'translateX(6px)',  300);
             setTimeout(() => padlock.style.transform = 'translateX(0)',    400);
 
-            // Remove red flash
-            setTimeout(() => { heart.style.filter = ''; }, 500);
+            // Remove red glow
+            setTimeout(() => { padlock.style.filter = ''; }, 500);
         }
+
+        
     });
 }());
 
