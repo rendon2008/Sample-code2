@@ -55,6 +55,7 @@ html, body {
     align-items: center;
     z-index: 2000;
     gap: 36px;
+    overflow: visible;
     transition: opacity 0.9s ease;
 }
 
@@ -77,6 +78,7 @@ html, body {
     flex-direction: column;
     align-items: center;
     position: relative;
+    padding: 20px;
 }
 
 .padlock-shackle {
@@ -110,6 +112,8 @@ html, body {
     position: relative;
     border-radius: 50% 50% 0 0;
     transition: filter 0.2s ease;
+    padding: 18px;
+    margin: -18px;
 }
 
 .password-hint {
