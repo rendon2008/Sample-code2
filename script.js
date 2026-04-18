@@ -1216,11 +1216,13 @@ function showError(msg) {
         if (state !== 'idle') return;
         state = 'open'; // lock immediately so spam clicks do nothing
 
-        fadeEls().forEach(el => {
-            el.style.transition    = 'opacity 0.9s ease';
-            el.style.opacity       = '0';
-            el.style.pointerEvents = 'none';
-        });
+fadeEls().forEach(el => {
+    el.style.transition    = 'opacity 0.9s ease';
+    el.style.opacity       = '0';
+    el.style.pointerEvents = 'none';
+    el.style.zIndex        = '0';
+});
+        
 
         setTimeout(() => {
             bouquetScene.classList.add('active');
@@ -1241,10 +1243,13 @@ function showError(msg) {
             bouquetScene.style.opacity    = '';
             bouquetScene.style.transition = '';
 
+
             fadeEls().forEach(el => {
-                el.style.transition    = 'opacity 0.9s ease';
-                el.style.opacity       = '1';
-                el.style.pointerEvents = '';
+    el.style.transition    = 'opacity 0.9s ease';
+    el.style.opacity       = '1';
+    el.style.pointerEvents = '';
+    el.style.zIndex        = '';
+});
             });
         }, 1000);
     });
