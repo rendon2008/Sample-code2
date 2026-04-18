@@ -728,7 +728,7 @@ background: linear-gradient(180deg,
 
 
 .bouquet-btn {
-    width: 55px; height: 75px;
+    width: 48px; height: 65px;
     background: transparent;
     border-radius: 0;
     display: flex;
@@ -738,11 +738,10 @@ background: linear-gradient(180deg,
     transition: transform 0.2s ease;
 }
 
-.bouquet-btn svg { width: 55px; height: 75px; }
-
+.bouquet-btn svg { width: 48px; height: 65px; }
 
 .message-btn {
-    width: 90px; height: 90px;
+    width: 100px; height: 100px;
     background: transparent;
     border-radius: 0;
     display: flex;
@@ -751,7 +750,9 @@ background: linear-gradient(180deg,
     cursor: pointer;
 }
 
-.message-btn svg { width: 90px; height: 90px; }
+.message-btn svg { width: 100px; height: 100px; }
+
+
 
 .photo-btn {
     width: 65px; height: 65px;
