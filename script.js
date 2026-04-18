@@ -45,7 +45,11 @@ const heart = document.querySelector('.padlock-heart-wrapper');
             
         } else {
             // Red glow on heart + shackle area only
-            heart.style.transition = 'filter 0.05s ease';
+// Vibrate on wrong answer
+if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+
+// Red glow on heart + shackle area only
+heart.style.transition = 'filter 0.05s ease';            
             heart.style.filter = 'drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 24px #ff0000)';
 
             // Shake the padlock (shackle + heart), enter button is now outside so it won't move
