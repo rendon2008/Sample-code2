@@ -55,8 +55,8 @@ html, body {
     align-items: center;
     z-index: 2000;
     gap: 36px;
-    overflow: visible;
     transition: opacity 0.9s ease;
+    overflow: visible;
 }
 
 .password-screen.hidden {
@@ -112,8 +112,8 @@ html, body {
     position: relative;
     border-radius: 50% 50% 0 0;
     transition: filter 0.2s ease;
-    padding: 18px;
-    margin: -18px;
+    padding: 30px;
+    margin: -30px;
 }
 
 .password-hint {
