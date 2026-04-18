@@ -1186,6 +1186,43 @@ function showError(msg) {
 
 
 // =====================================================
+// BOUQUET BUTTON — Launch flower scene
+// =====================================================
+
+document.getElementById('bouquet-btn').addEventListener('click', () => {
+    const bouquetScene  = document.getElementById('bouquet-scene');
+    const flowerRoot    = bouquetScene.querySelector('.flowers');
+    const bottomBtns    = document.getElementById('bottom-btns');
+    const cakeContainer = document.querySelector('.cake-container');
+    const msgEl         = document.getElementById('message');
+    const bgGrad        = document.querySelector('.bg-gradient');
+    const sparkles      = document.querySelector('.sparkles');
+    const balloons      = document.getElementById('balloons');
+    const poppers       = document.querySelector('.party-poppers');
+    const confetti      = document.getElementById('confetti-canvas');
+
+    // Fade out everything on the birthday scene
+    [cakeContainer, msgEl, bottomBtns, bgGrad, sparkles, balloons, poppers, confetti].forEach(el => {
+        if (!el) return;
+        el.style.transition  = 'opacity 0.9s ease';
+        el.style.opacity     = '0';
+        el.style.pointerEvents = 'none';
+    });
+
+    // After fade out, activate bouquet scene overlay
+    setTimeout(() => {
+        bouquetScene.classList.add('active');
+
+        // After the scene fades in, unfreeze flower animations
+        setTimeout(() => {
+            flowerRoot.classList.remove('not-loaded');
+        }, 1000);
+
+    }, 1000);
+});
+
+
+// =====================================================
 // CLEANUP
 // =====================================================
 
