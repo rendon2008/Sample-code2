@@ -100,9 +100,9 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 15px;
     z-index: 1;
-    padding-top: 10px;
+    padding-top: 0px;
     padding-top: 0px;
 }
 
