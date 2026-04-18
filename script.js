@@ -5,10 +5,11 @@
 // PASSWORD SCREEN
 // =====================================================
 
+
 (function () {
-    const screen  = document.getElementById('password-screen');
+    const screen   = document.getElementById('password-screen');
     const enterBtn = document.getElementById('enter-btn');
-    const digits  = [0, 0, 0];
+    const digits   = [0, 0, 0];
     const PASSWORD = '107';
 
     document.querySelectorAll('.digit-btn').forEach(btn => {
@@ -23,40 +24,38 @@
         });
     });
 
-
     enterBtn.addEventListener('click', () => {
         const entered = digits.join('');
+        const padlock = document.querySelector('.padlock');
+        const heart   = document.querySelector('.padlock-heart');
+
         if (entered === PASSWORD) {
-            screen.classList.add('hidden');
-            setTimeout(() => screen.remove(), 1000);
+            // Green glow on heart for 2 seconds, then proceed
+            heart.style.transition = 'filter 0.2s ease';
+            heart.style.filter = 'drop-shadow(0 0 12px #00ff00) drop-shadow(0 0 28px #00cc00)';
+            setTimeout(() => {
+                heart.style.filter = '';
+                screen.classList.add('hidden');
+                setTimeout(() => screen.remove(), 1000);
+            }, 2000);
         } else {
-            const padlock = document.querySelector('.padlock');
-            const heart   = document.querySelector('.padlock-heart');
-            const enterBtn = document.getElementById('enter-btn');
+            // Red glow on heart + shackle area only
+            heart.style.transition = 'filter 0.05s ease';
+            heart.style.filter = 'drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 24px #ff0000)';
 
-            // Red glow around the padlock
+            // Shake the padlock (shackle + heart), enter button is now outside so it won't move
+            padlock.style.transition = 'transform 0.1s ease';
+            padlock.style.transform = 'translateX(-8px)';
+            setTimeout(() => padlock.style.transform = 'translateX(8px)',  100);
+            setTimeout(() => padlock.style.transform = 'translateX(-6px)', 200);
+            setTimeout(() => padlock.style.transform = 'translateX(6px)',  300);
+            setTimeout(() => padlock.style.transform = 'translateX(0)',    400);
 
-
-            // Red glow on heart only
-heart.style.transition = 'transform 0.1s ease, filter 0.05s ease';
-heart.style.filter = 'drop-shadow(0 0 12px #ff0000) drop-shadow(0 0 24px #ff0000)';
-
-// Shake the whole padlock (shackle + heart together)
-padlock.style.transition = 'transform 0.1s ease';
-padlock.style.transform  = 'translateX(-8px)';
-setTimeout(() => padlock.style.transform = 'translateX(8px)',  100);
-setTimeout(() => padlock.style.transform = 'translateX(-6px)', 200);
-setTimeout(() => padlock.style.transform = 'translateX(6px)',  300);
-setTimeout(() => padlock.style.transform = 'translateX(0)',    400);
-
-// Remove red glow from heart only
-setTimeout(() => { heart.style.filter = ''; }, 500);
-
-        
-}
+            // Remove red glow
+            setTimeout(() => { heart.style.filter = ''; }, 500);
+        }
     });
 }());
-
 
 let audioContext = null;
 let microphoneStream = null;
