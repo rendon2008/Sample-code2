@@ -112,8 +112,8 @@ html, body {
     position: relative;
     border-radius: 50% 50% 0 0;
     transition: filter 0.2s ease;
-    padding: 30px;
-    margin: -30px;
+    padding: 50px;
+    margin: -50px;
 }
 
 .password-hint {
