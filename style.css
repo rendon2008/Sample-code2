@@ -100,9 +100,10 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 18px;
+    gap: 12px;
     z-index: 1;
-    padding-top: 20px;
+    padding-top: 0px;
+    padding-top: 30px;
 }
 
 .digit-slots {
@@ -115,13 +116,13 @@ html, body {
 .digit-slot {
     background: #fff;
     border-radius: 12px;
-    width: 52px;
-    height: 72px;
+    width: 58px;
+    height: 90px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 0;
+    padding: 8px 0;
 }
 
 
