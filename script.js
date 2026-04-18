@@ -1190,13 +1190,15 @@ function showError(msg) {
 // =====================================================
 
 
-const bouquetScene  = document.getElementById('bouquet-scene');
-const flowerRoot    = bouquetScene.querySelector('.flowers');
 
-let bouquetActive = false;
+// =====================================================
+// BOUQUET BUTTON — Launch flower scene
+// =====================================================
 
-function getElementsToFade() {
-    return [
+(function () {
+    const bouquetScene = document.getElementById('bouquet-scene');
+    const flowerRoot   = bouquetScene.querySelector('.flowers');
+    const fadeEls = () => [
         document.querySelector('.cake-container'),
         document.getElementById('message'),
         document.getElementById('bottom-btns'),
@@ -1205,64 +1207,51 @@ function getElementsToFade() {
         document.getElementById('balloons'),
         document.querySelector('.party-poppers'),
         document.getElementById('confetti-canvas')
-    ];
-}
+    ].filter(Boolean);
 
-// Click anywhere on bouquet scene to go back — registered ONCE
+    // state: 'idle' | 'open'
+    let state = 'idle';
 
-let bouquetOpenTimeout1 = null;
-let bouquetOpenTimeout2 = null;
+    document.getElementById('bouquet-btn').addEventListener('click', () => {
+        if (state !== 'idle') return;
+        state = 'open'; // lock immediately so spam clicks do nothing
 
-document.getElementById('bouquet-btn').addEventListener('click', () => {
-    if (bouquetActive) return;
-
-    // Cancel any in-progress open animation from a previous spam click
-    clearTimeout(bouquetOpenTimeout1);
-    clearTimeout(bouquetOpenTimeout2);
-
-    // Force-reset bouquet scene state before starting
-    bouquetScene.classList.remove('active');
-    bouquetScene.style.opacity    = '';
-    bouquetScene.style.transition = '';
-    flowerRoot.classList.add('not-loaded');
-
-    getElementsToFade().forEach(el => {
-        if (!el) return;
-        el.style.transition    = 'opacity 0.9s ease';
-        el.style.opacity       = '0';
-        el.style.pointerEvents = 'none';
-    });
-
-    bouquetOpenTimeout1 = setTimeout(() => {
-        bouquetScene.classList.add('active');
-
-        bouquetOpenTimeout2 = setTimeout(() => {
-            bouquetActive = true;
-            flowerRoot.classList.remove('not-loaded');
-        }, 1000);
-    }, 1000);
-});
-
-
-document.getElementById('bouquet-btn').addEventListener('click', () => {
-    if (bouquetActive) return;
-
-    getElementsToFade().forEach(el => {
-        if (!el) return;
-        el.style.transition    = 'opacity 0.9s ease';
-        el.style.opacity       = '0';
-        el.style.pointerEvents = 'none';
-    });
-
-    setTimeout(() => {
-        bouquetScene.classList.add('active');
-        bouquetActive = true;
+        fadeEls().forEach(el => {
+            el.style.transition    = 'opacity 0.9s ease';
+            el.style.opacity       = '0';
+            el.style.pointerEvents = 'none';
+        });
 
         setTimeout(() => {
-            flowerRoot.classList.remove('not-loaded');
+            bouquetScene.classList.add('active');
+            setTimeout(() => flowerRoot.classList.remove('not-loaded'), 1000);
         }, 1000);
-    }, 1000);
-});
+    });
+
+    bouquetScene.addEventListener('click', () => {
+        if (state !== 'open') return;
+        state = 'idle'; // lock immediately so double-taps do nothing
+
+        flowerRoot.classList.add('not-loaded');
+        bouquetScene.style.transition = 'opacity 1s ease';
+        bouquetScene.style.opacity    = '0';
+
+        setTimeout(() => {
+            bouquetScene.classList.remove('active');
+            bouquetScene.style.opacity    = '';
+            bouquetScene.style.transition = '';
+
+            fadeEls().forEach(el => {
+                el.style.transition    = 'opacity 0.9s ease';
+                el.style.opacity       = '1';
+                el.style.pointerEvents = '';
+            });
+        }, 1000);
+    });
+}());
+
+
+
 
 
 
