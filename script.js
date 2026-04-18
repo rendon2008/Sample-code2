@@ -29,19 +29,25 @@
         const padlock = document.querySelector('.padlock');
         
 const heart = document.querySelector('.padlock-heart-wrapper');
-        if (entered === PASSWORD) {
-            // Green glow on heart for 2 seconds, then proceed
-            heart.style.transition = 'filter 0.2s ease';
-            heart.style.filter = 'drop-shadow(0 0 12px #00ff00) drop-shadow(0 0 28px #00cc00)';
-            
+        
+if (entered === PASSWORD) {
+    const shackle = document.querySelector('.padlock-shackle');
 
-            setTimeout(() => {
-    heart.style.filter = '';
-    // Fade out the password screen smoothly
-    screen.style.transition = 'opacity 0.8s ease';
-    screen.style.opacity = '0';
-    setTimeout(() => screen.remove(), 800);
-}, 1000);
+    heart.style.transition = 'filter 0.2s ease';
+    heart.style.filter = 'drop-shadow(0 0 12px #00ff00) drop-shadow(0 0 28px #00cc00)';
+
+    // Animate shackle opening after a short pause
+    setTimeout(() => {
+        shackle.classList.add('open');
+    }, 300);
+
+    setTimeout(() => {
+        heart.style.filter = '';
+        screen.style.transition = 'opacity 0.8s ease';
+        screen.style.opacity = '0';
+        setTimeout(() => screen.remove(), 800);
+    }, 1000);
+}
             
         } else {
             // Red glow on heart + shackle area only
