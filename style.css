@@ -102,8 +102,8 @@ html, body {
     justify-content: center;
     gap: 15px;
     z-index: 1;
-    padding-top: 50px;
     padding-top: 0px;
+    padding-bottom: 40px;
 }
 
 .digit-slots {
