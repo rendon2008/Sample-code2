@@ -103,7 +103,7 @@ html, body {
     gap: 8px;
     z-index: 1;
     padding-top: 0px;
-    padding-top: 60px;
+    padding-top: 0px;
 }
 
 .digit-slots {
