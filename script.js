@@ -221,8 +221,10 @@ function startCelebration() {
 }
 
 function updateMessage() {
+    const micIndicator = document.getElementById('mic-indicator');
     message.style.opacity   = '0';
     message.style.transform = 'translateX(-50%) scale(0.8)';
+    if (micIndicator) micIndicator.style.opacity = '0';
 
     setTimeout(() => {
         message.innerHTML = 'HAPPIEST 17TH BIRTHDAY BABYY RIRI<br><span style="font-size: 0.7em;">I LOVE U 3000</span>';
@@ -235,9 +237,9 @@ function updateMessage() {
         `;
         message.style.opacity   = '1';
         message.style.transform = 'translateX(-50%) scale(1)';
+        if (micIndicator) micIndicator.style.display = 'none';
     }, 400);
 }
-
 
 // =====================================================
 // SOUNDS
