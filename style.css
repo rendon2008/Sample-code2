@@ -112,6 +112,19 @@ html, body {
     transition: filter 0.2s ease;
 }
 
+.password-hint {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #666;
+    font-size: 0.75rem;
+    font-style: italic;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+
 .digit-slots {
     display: flex;
     flex-direction: row;
