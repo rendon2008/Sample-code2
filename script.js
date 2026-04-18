@@ -1190,64 +1190,69 @@ function showError(msg) {
 // =====================================================
 
 
+const bouquetScene  = document.getElementById('bouquet-scene');
+const flowerRoot    = bouquetScene.querySelector('.flowers');
+
+let bouquetActive = false;
+
+function getElementsToFade() {
+    return [
+        document.querySelector('.cake-container'),
+        document.getElementById('message'),
+        document.getElementById('bottom-btns'),
+        document.querySelector('.bg-gradient'),
+        document.querySelector('.sparkles'),
+        document.getElementById('balloons'),
+        document.querySelector('.party-poppers'),
+        document.getElementById('confetti-canvas')
+    ];
+}
+
+// Click anywhere on bouquet scene to go back — registered ONCE
+bouquetScene.addEventListener('click', () => {
+    if (!bouquetActive) return;
+    bouquetActive = false;
+
+    bouquetScene.style.transition = 'opacity 1s ease';
+    bouquetScene.style.opacity    = '0';
+
+    setTimeout(() => {
+        bouquetScene.classList.remove('active');
+        bouquetScene.style.opacity    = '';
+        bouquetScene.style.transition = '';
+        flowerRoot.classList.add('not-loaded');
+
+        getElementsToFade().forEach(el => {
+            if (!el) return;
+            el.style.transition    = 'opacity 0.9s ease';
+            el.style.opacity       = '1';
+            el.style.pointerEvents = '';
+        });
+    }, 1000);
+});
+
 document.getElementById('bouquet-btn').addEventListener('click', () => {
-    const bouquetScene  = document.getElementById('bouquet-scene');
-    const flowerRoot    = bouquetScene.querySelector('.flowers');
-    const bottomBtns    = document.getElementById('bottom-btns');
-    const cakeContainer = document.querySelector('.cake-container');
-    const msgEl         = document.getElementById('message');
-    const bgGrad        = document.querySelector('.bg-gradient');
-    const sparkles      = document.querySelector('.sparkles');
-    const balloons      = document.getElementById('balloons');
-    const poppers       = document.querySelector('.party-poppers');
-    const confetti      = document.getElementById('confetti-canvas');
+    if (bouquetActive) return;
 
-    const elementsToFade = [cakeContainer, msgEl, bottomBtns, bgGrad, sparkles, balloons, poppers, confetti];
-
-    // Fade out everything on the birthday scene
-    elementsToFade.forEach(el => {
+    getElementsToFade().forEach(el => {
         if (!el) return;
         el.style.transition    = 'opacity 0.9s ease';
         el.style.opacity       = '0';
         el.style.pointerEvents = 'none';
     });
 
-    // After fade out, activate bouquet scene overlay
     setTimeout(() => {
         bouquetScene.classList.add('active');
+        bouquetActive = true;
 
-        // After the scene fades in, unfreeze flower animations
         setTimeout(() => {
             flowerRoot.classList.remove('not-loaded');
         }, 1000);
-
     }, 1000);
-
-    // Click anywhere on bouquet scene to go back
-    bouquetScene.addEventListener('click', function goBack() {
-        bouquetScene.removeEventListener('click', goBack);
-
-        // Fade out bouquet scene
-        bouquetScene.style.transition = 'opacity 1s ease';
-        bouquetScene.style.opacity    = '0';
-
-        setTimeout(() => {
-            // Reset bouquet scene
-            bouquetScene.classList.remove('active');
-            bouquetScene.style.opacity    = '';
-            bouquetScene.style.transition = '';
-            flowerRoot.classList.add('not-loaded');
-
-            // Fade everything back in
-            elementsToFade.forEach(el => {
-                if (!el) return;
-                el.style.transition    = 'opacity 0.9s ease';
-                el.style.opacity       = '1';
-                el.style.pointerEvents = '';
-            });
-        }, 1000);
-    });
 });
+
+
+
 
 
 // =====================================================
