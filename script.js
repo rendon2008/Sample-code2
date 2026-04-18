@@ -47,7 +47,7 @@ if (entered === PASSWORD) {
         screen.style.opacity = '0';
         setTimeout(() => screen.remove(), 800);
     }, 1000);
-}
+
             
         } else {
             // Red glow on heart + shackle area only
