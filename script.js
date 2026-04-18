@@ -53,6 +53,7 @@ setTimeout(() => padlock.style.transform = 'translateX(0)',    400);
 setTimeout(() => { heart.style.filter = ''; }, 500);
 
         
+}
     });
 }());
 
