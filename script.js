@@ -27,8 +27,8 @@
     enterBtn.addEventListener('click', () => {
         const entered = digits.join('');
         const padlock = document.querySelector('.padlock');
-        const heart   = document.querySelector('.padlock-heart');
-
+        
+const heart = document.querySelector('.padlock-heart-wrapper');
         if (entered === PASSWORD) {
             // Green glow on heart for 2 seconds, then proceed
             heart.style.transition = 'filter 0.2s ease';
