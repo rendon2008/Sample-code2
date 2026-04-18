@@ -1,6 +1,46 @@
 // =====================================================
 // STATE VARIABLES
 // =====================================================
+// =====================================================
+// PASSWORD SCREEN
+// =====================================================
+
+(function () {
+    const screen  = document.getElementById('password-screen');
+    const enterBtn = document.getElementById('enter-btn');
+    const digits  = [0, 0, 0];
+    const PASSWORD = '107';
+
+    document.querySelectorAll('.digit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const i = parseInt(btn.dataset.index);
+            if (btn.classList.contains('plus')) {
+                digits[i] = (digits[i] + 1) % 10;
+            } else {
+                digits[i] = (digits[i] + 9) % 10;
+            }
+            document.querySelector(`.digit-display[data-index="${i}"]`).textContent = digits[i];
+        });
+    });
+
+    enterBtn.addEventListener('click', () => {
+        const entered = digits.join('');
+        if (entered === PASSWORD) {
+            screen.classList.add('hidden');
+            setTimeout(() => screen.remove(), 1000);
+        } else {
+            // Wrong — shake the heart
+            const heart = document.querySelector('.padlock-heart');
+            heart.style.transition = 'transform 0.1s ease';
+            heart.style.transform  = 'translateX(-8px)';
+            setTimeout(() => heart.style.transform = 'translateX(8px)',  100);
+            setTimeout(() => heart.style.transform = 'translateX(-6px)', 200);
+            setTimeout(() => heart.style.transform = 'translateX(6px)',  300);
+            setTimeout(() => heart.style.transform = 'translateX(0)',    400);
+        }
+    });
+}());
+
 
 let audioContext = null;
 let microphoneStream = null;
