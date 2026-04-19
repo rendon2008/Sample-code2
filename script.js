@@ -1435,7 +1435,7 @@ function showError(msg) {
 
                                 // Phase 3 — paragraph
                                 typeParagraph(
-                                    'I sincerely apologize my flowers to u baby are virtual🥹 as much as i wanna give u something real and special i am limited by budget and opportunities to get materials 🥹 so i made something that i can do for free and doesn\'t require the need to go outside. I hope u like itt, but no amount of flowers ever get to level ur beauty. I love u pretty baby.',
+                                    'Haii lovee, I apologize my flowers to u baby are virtual🥹 as much as i wanna give u something real and special i am limited by budget and opportunities to get materials 🥹 so i made something that i can do for free and doesn\'t require the need to go outside. I hope u like itt, but no amount of flowers ever get to level ur beauty. I love u pretty baby.',
                                     poemText
                                 );
                             }, 750);
