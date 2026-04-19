@@ -1461,9 +1461,12 @@ function showError(msg) {
         poemOverlay.style.opacity = '0';
         poemText.innerHTML        = '';
 
+
         flowerRoot.classList.add('not-loaded');
+        void flowerRoot.offsetWidth; // force reflow so animations reset
         bouquetScene.style.transition = 'opacity 1s ease';
         bouquetScene.style.opacity    = '0';
+        
 
         setTimeout(() => {
             bouquetScene.classList.remove('active');
