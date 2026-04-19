@@ -1411,19 +1411,24 @@ function showError(msg) {
         poemOverlay.style.opacity = '1';
 
         // Phase 1 — "Like flowers, we bloom when the time is right."
+
+        // Phase 1 — "Like flowers, we bloom when the time is right."
         typeBlurWords('Like flowers, we bloom when the time is right.', poemText, 480, () => {
             setTimeout(() => {
-                poemText.style.transition = 'opacity 0.7s ease';
+                poemText.style.transition = 'opacity 0.4s ease';
                 poemText.style.opacity = '0';
+                
                 setTimeout(() => {
                     poemText.innerHTML = '';
                     poemText.style.opacity = '1';
 
                     // Phase 2 — "even at night.."
                     typeBlurWords('even at night..', poemText, 520, () => {
+                        
                         setTimeout(() => {
                             poemText.style.transition = 'opacity 0.7s ease';
                             poemText.style.opacity = '0';
+                            
                             setTimeout(() => {
                                 poemText.innerHTML = '';
                                 poemText.style.opacity = '1';
@@ -1437,7 +1442,7 @@ function showError(msg) {
                         }, 2200);
                     });
                 }, 750);
-            }, 2800);
+            }, 800);
         });
     }
 
