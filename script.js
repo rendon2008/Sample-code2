@@ -1263,8 +1263,10 @@ function showError(msg) {
 // =====================================================
 
 (function () {
-    const bouquetScene = document.getElementById('bouquet-scene');
-    const flowerRoot   = bouquetScene.querySelector('.flowers');
+    const bouquetScene  = document.getElementById('bouquet-scene');
+    // Keep a reference to the ORIGINAL flowers HTML so we can clone it fresh every open
+    const flowersOriginalHTML = bouquetScene.querySelector('.flowers').outerHTML;
+
     const fadeEls = () => [
         document.querySelector('.cake-container'),
         document.getElementById('message'),
@@ -1276,10 +1278,11 @@ function showError(msg) {
         document.getElementById('confetti-canvas')
     ].filter(Boolean);
 
-    let state = 'idle'; // 'idle' | 'opening' | 'open' | 'closing'
+    // 'idle' | 'opening' | 'open' | 'closing'
+    let state      = 'idle';
     let poemSession = 0; // incremented on every close to kill in-flight timers
 
-    // ── Poem overlay — sits in top 45% of screen so it never covers flowers ──
+    // ── Poem overlay — sits in top 45% so it never covers the flowers ────
     const poemOverlay = document.createElement('div');
     poemOverlay.style.cssText = `
         position: fixed;
@@ -1288,28 +1291,33 @@ function showError(msg) {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0;
         pointer-events: none;
         z-index: 9999;
         opacity: 0;
         transition: opacity 0.8s ease;
     `;
-
     const poemText = document.createElement('div');
-    poemText.style.cssText = `
-        font-family: 'Cormorant Garamond', 'Georgia', serif;
-        font-size: clamp(1.5rem, 5.5vw, 2.2rem);
-        font-style: italic;
-        color: #ffe0f0;
-        text-align: center;
-        letter-spacing: 0.06em;
-        line-height: 1.8;
-        text-shadow: 0 2px 18px rgba(255,100,180,0.55), 0 0 40px rgba(255,180,220,0.25);
-        padding: 0 28px;
-        max-width: 540px;
-    `;
     poemOverlay.appendChild(poemText);
     document.body.appendChild(poemOverlay);
+
+    // ── Hard-reset flowers: remove old node, clone fresh from original HTML ──
+    function hardResetFlowers() {
+        const old = bouquetScene.querySelector('.flowers');
+        if (old) old.remove();
+
+        // Parse the original HTML string back into a real DOM node
+        const tmp = document.createElement('div');
+        tmp.innerHTML = flowersOriginalHTML;
+        const freshFlowers = tmp.firstElementChild;
+
+        // Make sure it starts paused (not-loaded class)
+        freshFlowers.classList.add('not-loaded');
+
+        // Insert before the last child so it sits in the right z-order
+        // (night div is first child, flowers goes after it)
+        bouquetScene.appendChild(freshFlowers);
+        return freshFlowers;
+    }
 
     // ── Word-by-word blur typewriter ─────────────────────────────────────
     function typeBlurWords(text, msPerWord, blurPx, transTime, opacTime, session, onDone) {
@@ -1342,26 +1350,26 @@ function showError(msg) {
         next();
     }
 
-    // ── Fade poemText out, clear it, call cb ─────────────────────────────
+    // ── Fade poemText out, wipe it, then call cb ─────────────────────────
     function fadeOutThen(session, cb) {
         if (poemSession !== session) return;
         poemText.style.transition = 'opacity 0.4s ease';
         poemText.style.opacity    = '0';
         setTimeout(() => {
             if (poemSession !== session) return;
-            poemText.innerHTML = '';
+            poemText.innerHTML        = '';
             poemText.style.transition = '';
             poemText.style.opacity    = '1';
             cb();
         }, 450);
     }
 
-    // ── Full sequence ─────────────────────────────────────────────────────
+    // ── Full poem sequence — always starts from phase 1 ──────────────────
     function startPoemSequence() {
         const session = ++poemSession;
         poemOverlay.style.opacity = '1';
 
-        // Phase 1 — poem line, large romantic font
+        // Phase 1 — large romantic font
         poemText.style.cssText = `
             font-family: 'Cormorant Garamond', 'Georgia', serif;
             font-size: clamp(1.5rem, 5.5vw, 2.2rem);
@@ -1378,10 +1386,10 @@ function showError(msg) {
             'Like flowers, we bloom when the time is right.',
             480, '8px', '1.1s', '0.9s', session,
             () => {
-                // 800ms pause then fade to phase 2
                 setTimeout(() => {
                     fadeOutThen(session, () => {
-                        // Phase 2 — "even at night.." same font
+
+                        // Phase 2 — "even at night.." same large font
                         poemText.style.cssText = `
                             font-family: 'Cormorant Garamond', 'Georgia', serif;
                             font-size: clamp(1.5rem, 5.5vw, 2.2rem);
@@ -1398,10 +1406,10 @@ function showError(msg) {
                             'even at night..',
                             520, '8px', '1.1s', '0.9s', session,
                             () => {
-                                // 2200ms pause then fade to phase 3
                                 setTimeout(() => {
                                     fadeOutThen(session, () => {
-                                        // Phase 3 — paragraph, smaller font, faster typing
+
+                                        // Phase 3 — paragraph, smaller font, fast typing
                                         poemText.style.cssText = `
                                             font-family: 'Cormorant Garamond', 'Georgia', serif;
                                             font-size: clamp(0.95rem, 3.4vw, 1.15rem);
@@ -1443,9 +1451,15 @@ function showError(msg) {
 
         setTimeout(() => {
             bouquetScene.classList.add('active');
+
+            // Hard-reset: clone a brand-new flowers node every single open
+            const freshFlowers = hardResetFlowers();
+
             setTimeout(() => {
-                flowerRoot.classList.remove('not-loaded');
+                // Remove not-loaded to kick off all CSS animations fresh
+                freshFlowers.classList.remove('not-loaded');
                 state = 'open';
+                // Wait for bloom (~4.5s) then start poem
                 setTimeout(startPoemSequence, 4500);
             }, 1000);
         }, 1000);
@@ -1456,22 +1470,23 @@ function showError(msg) {
         if (state !== 'open') return;
         state = 'closing';
 
-        // Kill any running poem timers
+        // Kill poem immediately
         poemSession++;
         poemOverlay.style.opacity = '0';
         poemText.innerHTML        = '';
 
-
-        flowerRoot.classList.add('not-loaded');
-        void flowerRoot.offsetWidth; // force reflow so animations reset
+        // Fade bouquet scene out
         bouquetScene.style.transition = 'opacity 1s ease';
         bouquetScene.style.opacity    = '0';
-        
 
         setTimeout(() => {
             bouquetScene.classList.remove('active');
             bouquetScene.style.opacity    = '';
             bouquetScene.style.transition = '';
+
+            // Remove the current flowers node — next open will clone a fresh one
+            const currentFlowers = bouquetScene.querySelector('.flowers');
+            if (currentFlowers) currentFlowers.remove();
 
             fadeEls().forEach(el => {
                 el.style.transition    = 'opacity 0.9s ease';
@@ -1484,6 +1499,9 @@ function showError(msg) {
         }, 1000);
     });
 }());
+
+
+
 
 
 // =====================================================
