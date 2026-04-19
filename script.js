@@ -1267,6 +1267,11 @@ function showError(msg) {
 // BOUQUET BUTTON — Launch flower scene
 // =====================================================
 
+
+// =====================================================
+// BOUQUET BUTTON — Launch flower scene
+// =====================================================
+
 (function () {
     const bouquetScene = document.getElementById('bouquet-scene');
     const flowerRoot   = bouquetScene.querySelector('.flowers');
@@ -1284,45 +1289,190 @@ function showError(msg) {
     // state: 'idle' | 'open'
     let state = 'idle';
 
+    // ── Create the poem overlay ──────────────────────────────────────────
+    const poemOverlay = document.createElement('div');
+    poemOverlay.id = 'poem-overlay';
+    poemOverlay.style.cssText = `
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 48px;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+    `;
+    const poemText = document.createElement('div');
+    poemText.id = 'poem-text';
+    poemText.style.cssText = `
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.1rem, 4vw, 1.6rem);
+        color: #ffe0f0;
+        text-align: center;
+        letter-spacing: 0.04em;
+        line-height: 1.7;
+        text-shadow: 0 2px 18px rgba(255,100,180,0.45), 0 0 40px rgba(255,180,220,0.2);
+        padding: 0 24px;
+        max-width: 520px;
+    `;
+    poemOverlay.appendChild(poemText);
+    document.body.appendChild(poemOverlay);
+
+    // ── Word-by-word blur-then-fadein typewriter ─────────────────────────
+    function typeBlurWords(text, el, msPerWord, onDone) {
+        el.innerHTML = '';
+        const words = text.split(' ');
+        let i = 0;
+        function next() {
+            if (i >= words.length) {
+                if (onDone) setTimeout(onDone, 600);
+                return;
+            }
+            const span = document.createElement('span');
+            span.textContent = (i === 0 ? '' : ' ') + words[i];
+            span.style.cssText = `
+                display: inline;
+                filter: blur(8px);
+                opacity: 0;
+                transition: filter 1.1s ease, opacity 0.9s ease;
+            `;
+            el.appendChild(span);
+            // trigger reflow then fade in
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                span.style.filter  = 'blur(0px)';
+                span.style.opacity = '1';
+            }));
+            i++;
+            setTimeout(next, msPerWord);
+        }
+        next();
+    }
+
+    // ── Fade-out helper ──────────────────────────────────────────────────
+    function fadeOutPoem(el, cb) {
+        el.style.transition = 'opacity 0.7s ease';
+        el.style.opacity    = '0';
+        setTimeout(cb, 750);
+    }
+
+    // ── Paragraph typewriter (reuses existing typeWordsInline logic but inline here) ──
+    function typeParagraph(text, el) {
+        el.innerHTML = '';
+        el.style.cssText = `
+            font-family: 'Georgia', serif;
+            font-size: clamp(0.88rem, 3.2vw, 1.05rem);
+            color: #ffd6ec;
+            text-align: center;
+            line-height: 1.75;
+            letter-spacing: 0.01em;
+            padding: 0 20px;
+            max-width: 520px;
+            text-shadow: 0 1px 10px rgba(255,100,180,0.3);
+        `;
+        const words = text.split(' ');
+        let i = 0;
+        function next() {
+            if (i >= words.length) return;
+            const span = document.createElement('span');
+            span.textContent = (i === 0 ? '' : ' ') + words[i];
+            span.style.cssText = `
+                display: inline;
+                filter: blur(6px);
+                opacity: 0;
+                transition: filter 0.8s ease, opacity 0.7s ease;
+            `;
+            el.appendChild(span);
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                span.style.filter  = 'blur(0px)';
+                span.style.opacity = '1';
+            }));
+            i++;
+            setTimeout(next, 210);
+        }
+        next();
+    }
+
+    // ── Sequence after flowers bloom ─────────────────────────────────────
+    function startPoemSequence() {
+        // Show overlay
+        poemOverlay.style.opacity = '1';
+
+        // Phase 1 — "Like flowers, we bloom when the time is right."
+        typeBlurWords('Like flowers, we bloom when the time is right.', poemText, 480, () => {
+            // pause, then swap to phase 2
+            setTimeout(() => {
+                fadeOutPoem(poemText, () => {
+                    poemText.innerHTML = '';
+                    poemOverlay.style.opacity = '1';
+
+                    // Phase 2 — "even at night.."
+                    typeBlurWords('even at night..', poemText, 500, () => {
+                        // pause, then swap to phase 3
+                        setTimeout(() => {
+                            fadeOutPoem(poemText, () => {
+                                poemText.innerHTML = '';
+                                poemOverlay.style.opacity = '1';
+
+                                // Phase 3 — the full paragraph
+                                typeParagraph(
+                                    'I sincerely apologize my flowers to u baby are virtual🥹 as much as i wanna give u something real and special i am limited by budget and opportunities to get materials 🥹 so i made something that i can do for free and doesn\'t require the need to go outside. I hope u like itt, but no amount of flowers ever get to level ur beauty. I love u pretty baby.',
+                                    poemText
+                                );
+                            });
+                        }, 2200);
+                    });
+                });
+            }, 2800);
+        });
+    }
+
     document.getElementById('bouquet-btn').addEventListener('click', () => {
         if (state !== 'idle') return;
-        state = 'open'; // lock immediately so spam clicks do nothing
+        state = 'open';
 
-fadeEls().forEach(el => {
-    el.style.transition    = 'opacity 0.9s ease';
-    el.style.opacity       = '0';
-    el.style.pointerEvents = 'none';
-    el.style.zIndex        = '0';
-});
-        
+        fadeEls().forEach(el => {
+            el.style.transition    = 'opacity 0.9s ease';
+            el.style.opacity       = '0';
+            el.style.pointerEvents = 'none';
+            el.style.zIndex        = '0';
+        });
 
         setTimeout(() => {
             bouquetScene.classList.add('active');
-            setTimeout(() => flowerRoot.classList.remove('not-loaded'), 1000);
+            setTimeout(() => {
+                flowerRoot.classList.remove('not-loaded');
+                // flowers bloom animation is roughly 4–5s; start poem after
+                setTimeout(startPoemSequence, 4500);
+            }, 1000);
         }, 1000);
     });
 
     bouquetScene.addEventListener('click', () => {
         if (state !== 'open') return;
-        state = 'idle'; // lock immediately so double-taps do nothing
+        state = 'idle';
 
         flowerRoot.classList.add('not-loaded');
         bouquetScene.style.transition = 'opacity 1s ease';
         bouquetScene.style.opacity    = '0';
+
+        // Hide poem too
+        poemOverlay.style.opacity = '0';
+        poemText.innerHTML = '';
 
         setTimeout(() => {
             bouquetScene.classList.remove('active');
             bouquetScene.style.opacity    = '';
             bouquetScene.style.transition = '';
 
-
             fadeEls().forEach(el => {
-    el.style.transition    = 'opacity 0.9s ease';
-    el.style.opacity       = '1';
-    el.style.pointerEvents = '';
-    el.style.zIndex        = '';
-});
-            
+                el.style.transition    = 'opacity 0.9s ease';
+                el.style.opacity       = '1';
+                el.style.pointerEvents = '';
+                el.style.zIndex        = '';
+            });
         }, 1000);
     });
 }());
