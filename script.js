@@ -566,6 +566,12 @@ function createConfettiPiece(colors, isBurst) {
 // ENVELOPE / LETTER ANIMATION — DUAL INDEPENDENT
 // =====================================================
 
+
+
+// =====================================================
+// ENVELOPE / LETTER ANIMATION — DUAL INDEPENDENT
+// =====================================================
+
 const envOverlay = document.getElementById('envOverlay');
 
 const envFlap1   = document.getElementById('envFlap1');
@@ -577,6 +583,26 @@ const envFlap2   = document.getElementById('envFlap2');
 const envLetter2 = document.getElementById('letter2');
 const heartSeal2 = document.getElementById('heartSeal2');
 let envelope2Opened = false;
+
+// Closes envelope 1 letter without closing the overlay
+function closeEnvelope1() {
+    if (!envelope1Opened) return;
+    envelope1Opened = false;
+    envLetter1.classList.remove('risen');
+    envLetter1.classList.add('closing');
+    setTimeout(() => envFlap1.classList.remove('open'), 700);
+    setTimeout(() => heartSeal1.classList.remove('hidden'), 1100);
+}
+
+// Closes envelope 2 letter without closing the overlay
+function closeEnvelope2() {
+    if (!envelope2Opened) return;
+    envelope2Opened = false;
+    envLetter2.classList.remove('risen');
+    envLetter2.classList.add('closing');
+    setTimeout(() => envFlap2.classList.remove('open'), 700);
+    setTimeout(() => heartSeal2.classList.remove('hidden'), 1100);
+}
 
 document.getElementById('message-btn').addEventListener('click', () => {
     envOverlay.classList.add('show');
@@ -595,6 +621,8 @@ document.getElementById('message-btn').addEventListener('click', () => {
 document.getElementById('envWrapper1').addEventListener('click', (e) => {
     e.stopPropagation();
     if (!envelope1Opened) {
+        // Close envelope 2 first if it's open
+        closeEnvelope2();
         heartSeal1.classList.add('hidden');
         envFlap1.classList.add('open');
         setTimeout(() => {
@@ -605,14 +633,17 @@ document.getElementById('envWrapper1').addEventListener('click', (e) => {
     }
 });
 
+// Clicking letter 1 only closes that letter, not the overlay
 document.getElementById('letter1').addEventListener('click', (e) => {
     e.stopPropagation();
-    envOverlay.click();
+    closeEnvelope1();
 });
 
 document.getElementById('envWrapper2').addEventListener('click', (e) => {
     e.stopPropagation();
     if (!envelope2Opened) {
+        // Close envelope 1 first if it's open
+        closeEnvelope1();
         heartSeal2.classList.add('hidden');
         envFlap2.classList.add('open');
         setTimeout(() => {
@@ -623,38 +654,19 @@ document.getElementById('envWrapper2').addEventListener('click', (e) => {
     }
 });
 
+// Clicking letter 2 only closes that letter, not the overlay
 document.getElementById('letter2').addEventListener('click', (e) => {
     e.stopPropagation();
-    envOverlay.click();
+    closeEnvelope2();
 });
 
+// Clicking the dark overlay background closes everything and exits
 envOverlay.addEventListener('click', (e) => {
     if (e.target !== envOverlay) return;
-
-    const anyOpen = envelope1Opened || envelope2Opened;
-
-    if (anyOpen) {
-        if (envelope1Opened) {
-            envelope1Opened = false;
-            envLetter1.classList.remove('risen');
-            envLetter1.classList.add('closing');
-            setTimeout(() => envFlap1.classList.remove('open'), 700);
-            setTimeout(() => heartSeal1.classList.remove('hidden'), 1100);
-        }
-        if (envelope2Opened) {
-            envelope2Opened = false;
-            envLetter2.classList.remove('risen');
-            envLetter2.classList.add('closing');
-            setTimeout(() => envFlap2.classList.remove('open'), 700);
-            setTimeout(() => heartSeal2.classList.remove('hidden'), 1100);
-        }
-        setTimeout(() => envOverlay.classList.remove('show'), 1400);
-    } else {
-        envOverlay.classList.remove('show');
-    }
+    closeEnvelope1();
+    closeEnvelope2();
+    setTimeout(() => envOverlay.classList.remove('show'), 1400);
 });
-
-
 
 
 // =====================================================
