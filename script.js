@@ -1327,14 +1327,22 @@ function showError(msg) {
     poemOverlay.appendChild(poemText);
     document.body.appendChild(poemOverlay);
 
+
+
+    
     // ── Word-by-word blur-then-fadein typewriter ─────────────────────────
-    function typeBlurWords(text, el, msPerWord, onDone) {
+    // ── Cancellation token — incremented on every close ─────────────────
+    let poemSession = 0;
+
+    // ── Word-by-word blur-then-fadein typewriter ─────────────────────────
+    function typeBlurWords(text, el, msPerWord, onDone, session) {
         el.innerHTML = '';
         const words = text.split(' ');
         let i = 0;
         function next() {
+            if (poemSession !== session) return; // cancelled
             if (i >= words.length) {
-                if (onDone) setTimeout(onDone, 600);
+                if (onDone) setTimeout(() => { if (poemSession === session) onDone(); }, 600);
                 return;
             }
             const span = document.createElement('span');
@@ -1346,8 +1354,8 @@ function showError(msg) {
                 transition: filter 1.1s ease, opacity 0.9s ease;
             `;
             el.appendChild(span);
-            // trigger reflow then fade in
             requestAnimationFrame(() => requestAnimationFrame(() => {
+                if (poemSession !== session) return;
                 span.style.filter  = 'blur(0px)';
                 span.style.opacity = '1';
             }));
@@ -1357,16 +1365,8 @@ function showError(msg) {
         next();
     }
 
-    // ── Fade-out helper ──────────────────────────────────────────────────
-    function fadeOutPoem(el, cb) {
-        el.style.transition = 'opacity 0.7s ease';
-        el.style.opacity    = '0';
-        setTimeout(cb, 750);
-    }
-
-    // ── Paragraph typewriter (reuses existing typeWordsInline logic but inline here) ──
-
-    function typeParagraph(text, el) {
+    // ── Paragraph typewriter ─────────────────────────────────────────────
+    function typeParagraph(text, el, session) {
         el.innerHTML = '';
         el.style.cssText = `
             font-family: 'Cormorant Garamond', 'Georgia', serif;
@@ -1383,6 +1383,7 @@ function showError(msg) {
         const words = text.split(' ');
         let i = 0;
         function next() {
+            if (poemSession !== session) return; // cancelled
             if (i >= words.length) return;
             const span = document.createElement('span');
             span.textContent = (i === 0 ? '' : ' ') + words[i];
@@ -1394,6 +1395,7 @@ function showError(msg) {
             `;
             el.appendChild(span);
             requestAnimationFrame(() => requestAnimationFrame(() => {
+                if (poemSession !== session) return;
                 span.style.filter  = 'blur(0px)';
                 span.style.opacity = '1';
             }));
@@ -1403,49 +1405,47 @@ function showError(msg) {
         next();
     }
 
-    
-    // ── Sequence after flowers bloom ─────────────────────────────────────
-
     // ── Sequence after flowers bloom ─────────────────────────────────────
     function startPoemSequence() {
+        const session = poemSession; // capture current session
         poemOverlay.style.opacity = '1';
 
-        // Phase 1 — "Like flowers, we bloom when the time is right."
-
-        // Phase 1 — "Like flowers, we bloom when the time is right."
         typeBlurWords('Like flowers, we bloom when the time is right.', poemText, 480, () => {
+            if (poemSession !== session) return;
             setTimeout(() => {
+                if (poemSession !== session) return;
                 poemText.style.transition = 'opacity 0.4s ease';
                 poemText.style.opacity = '0';
-                
                 setTimeout(() => {
+                    if (poemSession !== session) return;
                     poemText.innerHTML = '';
                     poemText.style.opacity = '1';
 
-                    // Phase 2 — "even at night.."
                     typeBlurWords('even at night..', poemText, 520, () => {
-                        
+                        if (poemSession !== session) return;
                         setTimeout(() => {
+                            if (poemSession !== session) return;
                             poemText.style.transition = 'opacity 0.7s ease';
                             poemText.style.opacity = '0';
-                            
                             setTimeout(() => {
+                                if (poemSession !== session) return;
                                 poemText.innerHTML = '';
                                 poemText.style.opacity = '1';
-
-                                // Phase 3 — paragraph
                                 typeParagraph(
                                     'Haii lovee, I apologize my flowers to u baby are virtual🥹 as much as i wanna give u something real and special i am limited by budget and opportunities to get materials 🥹 so i made something that i can do for free and doesn\'t require the need to go outside. I hope u like itt, but no amount of flowers ever get to level ur beauty. I love u pretty baby.',
-                                    poemText
+                                    poemText,
+                                    session
                                 );
                             }, 750);
                         }, 2200);
-                    });
+                    }, session);
                 }, 750);
             }, 800);
-        });
+        }, session);
     }
+    
 
+    
 
     
 
@@ -1479,6 +1479,8 @@ function showError(msg) {
         bouquetScene.style.opacity    = '0';
 
         // Hide poem too
+// Cancel any running poem sequence and reset
+        poemSession++;
         poemOverlay.style.opacity = '0';
         poemText.innerHTML = '';
 
