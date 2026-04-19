@@ -562,53 +562,99 @@ function createConfettiPiece(colors, isBurst) {
 // ENVELOPE / LETTER ANIMATION
 // =====================================================
 
-const envOverlay  = document.getElementById('envOverlay');
-const envFlap     = document.getElementById('envFlap');
-const envLetter   = document.getElementById('letter');
-const heartSeal   = document.getElementById('heartSeal');
-let envelopeOpened = false;
+// =====================================================
+// ENVELOPE / LETTER ANIMATION — DUAL INDEPENDENT
+// =====================================================
+
+const envOverlay = document.getElementById('envOverlay');
+
+const envFlap1   = document.getElementById('envFlap1');
+const envLetter1 = document.getElementById('letter1');
+const heartSeal1 = document.getElementById('heartSeal1');
+let envelope1Opened = false;
+
+const envFlap2   = document.getElementById('envFlap2');
+const envLetter2 = document.getElementById('letter2');
+const heartSeal2 = document.getElementById('heartSeal2');
+let envelope2Opened = false;
 
 document.getElementById('message-btn').addEventListener('click', () => {
     envOverlay.classList.add('show');
-    envelopeOpened = false;
-    envFlap.classList.remove('open');
-    envLetter.classList.remove('risen', 'closing', 'opened');
-    heartSeal.classList.remove('hidden');
+    // Reset both on open
+    envelope1Opened = false;
+    envFlap1.classList.remove('open');
+    envLetter1.classList.remove('risen', 'closing', 'opened');
+    heartSeal1.classList.remove('hidden');
+
+    envelope2Opened = false;
+    envFlap2.classList.remove('open');
+    envLetter2.classList.remove('risen', 'closing', 'opened');
+    heartSeal2.classList.remove('hidden');
 });
 
-document.getElementById('envWrapper').addEventListener('click', (e) => {
+document.getElementById('envWrapper1').addEventListener('click', (e) => {
     e.stopPropagation();
-    if (!envelopeOpened) {
-        heartSeal.classList.add('hidden');
-        envFlap.classList.add('open');
+    if (!envelope1Opened) {
+        heartSeal1.classList.add('hidden');
+        envFlap1.classList.add('open');
         setTimeout(() => {
-            envLetter.classList.remove('closing');
-            envLetter.classList.add('risen');
-            envelopeOpened = true;
+            envLetter1.classList.remove('closing');
+            envLetter1.classList.add('risen');
+            envelope1Opened = true;
         }, 700);
     }
 });
 
-document.getElementById('letter').addEventListener('click', (e) => {
+document.getElementById('letter1').addEventListener('click', (e) => {
+    e.stopPropagation();
+    envOverlay.click();
+});
+
+document.getElementById('envWrapper2').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!envelope2Opened) {
+        heartSeal2.classList.add('hidden');
+        envFlap2.classList.add('open');
+        setTimeout(() => {
+            envLetter2.classList.remove('closing');
+            envLetter2.classList.add('risen');
+            envelope2Opened = true;
+        }, 700);
+    }
+});
+
+document.getElementById('letter2').addEventListener('click', (e) => {
     e.stopPropagation();
     envOverlay.click();
 });
 
 envOverlay.addEventListener('click', (e) => {
-    if (e.target === envOverlay) {
-        if (envelopeOpened) {
-            envelopeOpened = false;
-            envLetter.classList.remove('risen');
-            envLetter.classList.add('closing');
+    if (e.target !== envOverlay) return;
 
-            setTimeout(() => envFlap.classList.remove('open'), 700);
-            setTimeout(() => heartSeal.classList.remove('hidden'), 1100);
-            setTimeout(() => envOverlay.classList.remove('show'), 1400);
-        } else {
-            envOverlay.classList.remove('show');
+    const anyOpen = envelope1Opened || envelope2Opened;
+
+    if (anyOpen) {
+        if (envelope1Opened) {
+            envelope1Opened = false;
+            envLetter1.classList.remove('risen');
+            envLetter1.classList.add('closing');
+            setTimeout(() => envFlap1.classList.remove('open'), 700);
+            setTimeout(() => heartSeal1.classList.remove('hidden'), 1100);
         }
+        if (envelope2Opened) {
+            envelope2Opened = false;
+            envLetter2.classList.remove('risen');
+            envLetter2.classList.add('closing');
+            setTimeout(() => envFlap2.classList.remove('open'), 700);
+            setTimeout(() => heartSeal2.classList.remove('hidden'), 1100);
+        }
+        setTimeout(() => envOverlay.classList.remove('show'), 1400);
+    } else {
+        envOverlay.classList.remove('show');
     }
 });
+
+
 
 
 // =====================================================
