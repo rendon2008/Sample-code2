@@ -660,14 +660,20 @@ document.getElementById('letter2').addEventListener('click', (e) => {
     closeEnvelope2();
 });
 
-// Clicking the dark overlay background closes everything and exits
+
+// First click on background closes any open letter, second click exits overlay
 envOverlay.addEventListener('click', (e) => {
     if (e.target !== envOverlay) return;
-    closeEnvelope1();
-    closeEnvelope2();
-    setTimeout(() => envOverlay.classList.remove('show'), 1400);
-});
 
+    if (envelope1Opened || envelope2Opened) {
+        // Just close the open letter, stay in the envelope scene
+        closeEnvelope1();
+        closeEnvelope2();
+    } else {
+        // No letter open — exit the overlay entirely
+        envOverlay.classList.remove('show');
+    }
+});
 
 // =====================================================
 // CARD SLIDER
