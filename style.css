@@ -1088,12 +1088,13 @@ background: linear-gradient(180deg,
 .heart-seal.hidden { opacity: 0; }
 
 /* Letter */
+
 .letter {
     position: absolute;
     left: 50%; bottom: 10px;
     transform: translateX(-50%) translateY(0);
     width: min(500px, 85vw);
-    max-height: 80vh;
+    max-height: 50vh;
     overflow-y: auto;
     background: #fff;
     border-radius: 4px;
