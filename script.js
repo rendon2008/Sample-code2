@@ -562,11 +562,16 @@ function createConfettiPiece(colors, isBurst) {
 // ENVELOPE / LETTER ANIMATION
 // =====================================================
 
+
 const envOverlay  = document.getElementById('envOverlay');
 const envFlap     = document.getElementById('envFlap');
 const envLetter   = document.getElementById('letter');
 const heartSeal   = document.getElementById('heartSeal');
+const envFlap2    = document.getElementById('envFlap2');
+const envLetter2  = document.getElementById('letter2');
+const heartSeal2  = document.getElementById('heartSeal2');
 let envelopeOpened = false;
+
 
 document.getElementById('message-btn').addEventListener('click', () => {
     envOverlay.classList.add('show');
@@ -574,16 +579,24 @@ document.getElementById('message-btn').addEventListener('click', () => {
     envFlap.classList.remove('open');
     envLetter.classList.remove('risen', 'closing', 'opened');
     heartSeal.classList.remove('hidden');
+    envFlap2.classList.remove('open');
+    envLetter2.classList.remove('risen', 'closing', 'opened');
+    heartSeal2.classList.remove('hidden');
 });
+
 
 document.getElementById('envWrapper').addEventListener('click', (e) => {
     e.stopPropagation();
     if (!envelopeOpened) {
         heartSeal.classList.add('hidden');
         envFlap.classList.add('open');
+        heartSeal2.classList.add('hidden');
+        envFlap2.classList.add('open');
         setTimeout(() => {
             envLetter.classList.remove('closing');
             envLetter.classList.add('risen');
+            envLetter2.classList.remove('closing');
+            envLetter2.classList.add('risen');
             envelopeOpened = true;
         }, 700);
     }
@@ -594,21 +607,25 @@ document.getElementById('letter').addEventListener('click', (e) => {
     envOverlay.click();
 });
 
+
 envOverlay.addEventListener('click', (e) => {
     if (e.target === envOverlay) {
         if (envelopeOpened) {
             envelopeOpened = false;
             envLetter.classList.remove('risen');
             envLetter.classList.add('closing');
+            envLetter2.classList.remove('risen');
+            envLetter2.classList.add('closing');
 
-            setTimeout(() => envFlap.classList.remove('open'), 700);
-            setTimeout(() => heartSeal.classList.remove('hidden'), 1100);
+            setTimeout(() => { envFlap.classList.remove('open'); envFlap2.classList.remove('open'); }, 700);
+            setTimeout(() => { heartSeal.classList.remove('hidden'); heartSeal2.classList.remove('hidden'); }, 1100);
             setTimeout(() => envOverlay.classList.remove('show'), 1400);
         } else {
             envOverlay.classList.remove('show');
         }
     }
 });
+
 
 
 // =====================================================
