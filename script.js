@@ -1257,11 +1257,6 @@ function showError(msg) {
 }
 
 
-// =====================================================
-// BOUQUET BUTTON — Launch flower scene
-// =====================================================
-
-
 
 // =====================================================
 // BOUQUET BUTTON — Launch flower scene
@@ -1286,14 +1281,11 @@ function showError(msg) {
         document.getElementById('confetti-canvas')
     ].filter(Boolean);
 
-    // state: 'idle' | 'open'
+    // 'idle' | 'opening' | 'open' | 'closing'
     let state = 'idle';
 
-    // ── Create the poem overlay ──────────────────────────────────────────
+    // ── Poem overlay elements ────────────────────────────────────────────
     const poemOverlay = document.createElement('div');
-    poemOverlay.id = 'poem-overlay';
-    
-
     poemOverlay.style.cssText = `
         position: fixed;
         top: 0; left: 0;
@@ -1305,11 +1297,9 @@ function showError(msg) {
         pointer-events: none;
         z-index: 9999;
         opacity: 0;
-        transition: opacity 0.8s ease;
+        transition: opacity 0.6s ease;
     `;
-
     const poemText = document.createElement('div');
-    poemText.id = 'poem-text';
     poemText.style.cssText = `
         font-family: 'Cormorant Garamond', 'Georgia', serif;
         font-size: clamp(1.4rem, 5vw, 2rem);
@@ -1322,52 +1312,92 @@ function showError(msg) {
         padding: 0 28px;
         max-width: 540px;
     `;
-
-    
     poemOverlay.appendChild(poemText);
     document.body.appendChild(poemOverlay);
 
-
-
-
-    // ── Cancellation token — incremented on every close ─────────────────
-    let poemSession = 0;
-
     // ── Resume state ─────────────────────────────────────────────────────
-    let poemPhase = 0;       // 0 = phase1, 1 = phase2, 2 = phase3
-    let poemWordIndex = 0;   // how many words already typed in current phase
-    
-    // ── Word-by-word blur-then-fadein typewriter ─────────────────────────
+    // phase: 0=phase1, 1=phase2, 2=phase3
+    // wordIndex: next word to type (already-typed words = 0..wordIndex-1)
+    let poemPhase     = 0;
+    let poemWordIndex = 0;
+    let poemSession   = 0; // incremented on close to cancel in-flight timers
 
-    function typeBlurWords(text, el, msPerWord, onDone, session, startWord = 0) {
+    const PHASE_TEXTS = [
+        'Like flowers, we bloom when the time is right.',
+        'even at night..',
+        'Haii lovee, I apologize my flowers to u baby are virtual🥹 as much as i wanna give u something real and special i am limited by budget and opportunities to get materials 🥹 so i made something that i can do for free and doesn\'t require the need to go outside. I hope u like itt, but no amount of flowers ever get to level ur beauty. I love u pretty baby.'
+    ];
+
+    // ── Render already-typed words instantly ─────────────────────────────
+    function renderExisting(words, count, el) {
+        for (let r = 0; r < count; r++) {
+            const s = document.createElement('span');
+            s.textContent = (r === 0 ? '' : ' ') + words[r];
+            s.style.cssText = 'display:inline;filter:blur(0);opacity:1;';
+            el.appendChild(s);
+        }
+    }
+
+    // ── Type words with blur-fade-in ─────────────────────────────────────
+    function typeWords(phaseIndex, startWord, msPerWord, onDone, session) {
+        const text  = PHASE_TEXTS[phaseIndex];
         const words = text.split(' ');
 
-        // Re-render already-typed words instantly (no animation)
-        el.innerHTML = '';
-        for (let r = 0; r < startWord; r++) {
-            const span = document.createElement('span');
-            span.textContent = (r === 0 ? '' : ' ') + words[r];
-            span.style.cssText = `display: inline; filter: blur(0px); opacity: 1;`;
-            el.appendChild(span);
+        poemText.innerHTML = '';
+
+        // Apply paragraph style for phase 3
+        if (phaseIndex === 2) {
+            poemText.style.cssText = `
+                font-family: 'Cormorant Garamond', 'Georgia', serif;
+                font-size: clamp(0.95rem, 3.4vw, 1.15rem);
+                font-style: italic;
+                color: #ffd6ec;
+                text-align: center;
+                line-height: 1.75;
+                letter-spacing: 0.01em;
+                padding: 0 20px;
+                max-width: 520px;
+                text-shadow: 0 1px 10px rgba(255,100,180,0.3);
+            `;
+        } else {
+            poemText.style.cssText = `
+                font-family: 'Cormorant Garamond', 'Georgia', serif;
+                font-size: clamp(1.4rem, 5vw, 2rem);
+                font-style: italic;
+                color: #ffe0f0;
+                text-align: center;
+                letter-spacing: 0.06em;
+                line-height: 1.8;
+                text-shadow: 0 2px 18px rgba(255,100,180,0.55), 0 0 40px rgba(255,180,220,0.25);
+                padding: 0 28px;
+                max-width: 540px;
+            `;
         }
 
+        renderExisting(words, startWord, poemText);
+
         let i = startWord;
+        const blurAmount = phaseIndex === 2 ? '5px' : '8px';
+        const transSpeed = phaseIndex === 2 ? '0.4s' : '1.1s';
+        const opacSpeed  = phaseIndex === 2 ? '0.35s' : '0.9s';
+
         function next() {
-            if (poemSession !== session) return;
+            if (poemSession !== session) return; // cancelled
             if (i >= words.length) {
-                if (onDone) setTimeout(() => { if (poemSession === session) onDone(); }, 600);
+                poemWordIndex = words.length; // mark complete
+                if (onDone) setTimeout(() => { if (poemSession === session) onDone(); }, 500);
                 return;
             }
-            poemWordIndex = i; // track progress
+            poemWordIndex = i + 1; // save AFTER appending this word
             const span = document.createElement('span');
             span.textContent = (i === 0 ? '' : ' ') + words[i];
             span.style.cssText = `
                 display: inline;
-                filter: blur(8px);
+                filter: blur(${blurAmount});
                 opacity: 0;
-                transition: filter 1.1s ease, opacity 0.9s ease;
+                transition: filter ${transSpeed} ease, opacity ${opacSpeed} ease;
             `;
-            el.appendChild(span);
+            poemText.appendChild(span);
             requestAnimationFrame(() => requestAnimationFrame(() => {
                 if (poemSession !== session) return;
                 span.style.filter  = 'blur(0px)';
@@ -1379,126 +1409,47 @@ function showError(msg) {
         next();
     }
 
-    
-    // ── Paragraph typewriter ─────────────────────────────────────────────
-
-    function typeParagraph(text, el, session, startWord = 0) {
-        const words = text.split(' ');
-
-        // Re-render already-typed words instantly
-        el.innerHTML = '';
-        el.style.cssText = `
-            font-family: 'Cormorant Garamond', 'Georgia', serif;
-            font-size: clamp(0.95rem, 3.4vw, 1.15rem);
-            font-style: italic;
-            color: #ffd6ec;
-            text-align: center;
-            line-height: 1.75;
-            letter-spacing: 0.01em;
-            padding: 0 20px;
-            max-width: 520px;
-            text-shadow: 0 1px 10px rgba(255,100,180,0.3);
-        `;
-        for (let r = 0; r < startWord; r++) {
-            const span = document.createElement('span');
-            span.textContent = (r === 0 ? '' : ' ') + words[r];
-            span.style.cssText = `display: inline; filter: blur(0px); opacity: 1;`;
-            el.appendChild(span);
-        }
-
-        let i = startWord;
-        function next() {
+    // ── Crossfade between phases ──────────────────────────────────────────
+    function fadeToNext(session, cb) {
+        poemText.style.transition = 'opacity 0.4s ease';
+        poemText.style.opacity    = '0';
+        setTimeout(() => {
             if (poemSession !== session) return;
-            if (i >= words.length) return;
-            poemWordIndex = i; // track progress
-            const span = document.createElement('span');
-            span.textContent = (i === 0 ? '' : ' ') + words[i];
-            span.style.cssText = `
-                display: inline;
-                filter: blur(5px);
-                opacity: 0;
-                transition: filter 0.4s ease, opacity 0.35s ease;
-            `;
-            el.appendChild(span);
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                if (poemSession !== session) return;
-                span.style.filter  = 'blur(0px)';
-                span.style.opacity = '1';
-            }));
-            i++;
-            setTimeout(next, 120);
-        }
-        next();
+            poemText.style.opacity = '1';
+            cb();
+        }, 450);
     }
-    
 
-    // ── Sequence after flowers bloom ─────────────────────────────────────
-    // ── Sequence after flowers bloom ─────────────────────────────────────
+    // ── Main sequence ────────────────────────────────────────────────────
+    function runPhase(phaseIndex, startWord, session) {
+        if (poemSession !== session) return;
+        poemPhase = phaseIndex;
+
+        const speeds   = [480, 520, 110];
+        const delays   = [800, 2200];   // pause after phase 0, pause after phase 1
+
+        typeWords(phaseIndex, startWord, speeds[phaseIndex], () => {
+            if (phaseIndex >= 2) return; // phase 3 has no next
+            setTimeout(() => {
+                if (poemSession !== session) return;
+                fadeToNext(session, () => {
+                    poemWordIndex = 0;
+                    runPhase(phaseIndex + 1, 0, session);
+                });
+            }, delays[phaseIndex]);
+        }, session);
+    }
+
     function startPoemSequence() {
-        const session = poemSession;
+        const session = ++poemSession;
         poemOverlay.style.opacity = '1';
-
-        if (poemPhase === 0) {
-            resumePhase1(session, poemWordIndex);
-        } else if (poemPhase === 1) {
-            resumePhase2(session, poemWordIndex);
-        } else if (poemPhase === 2) {
-            resumePhase3(session, poemWordIndex);
-        }
+        runPhase(poemPhase, poemWordIndex, session);
     }
 
-    function resumePhase1(session, startWord) {
-        const text = 'Like flowers, we bloom when the time is right.';
-        typeBlurWords(text, poemText, 480, () => {
-            if (poemSession !== session) return;
-            poemPhase = 1; poemWordIndex = 0;
-            setTimeout(() => {
-                if (poemSession !== session) return;
-                poemText.style.transition = 'opacity 0.4s ease';
-                poemText.style.opacity = '0';
-                setTimeout(() => {
-                    if (poemSession !== session) return;
-                    poemText.innerHTML = '';
-                    poemText.style.opacity = '1';
-                    resumePhase2(session, 0);
-                }, 750);
-            }, 800);
-        }, session, startWord);
-    }
-
-    function resumePhase2(session, startWord) {
-        const text = 'even at night..';
-        typeBlurWords(text, poemText, 520, () => {
-            if (poemSession !== session) return;
-            poemPhase = 2; poemWordIndex = 0;
-            setTimeout(() => {
-                if (poemSession !== session) return;
-                poemText.style.transition = 'opacity 0.7s ease';
-                poemText.style.opacity = '0';
-                setTimeout(() => {
-                    if (poemSession !== session) return;
-                    poemText.innerHTML = '';
-                    poemText.style.opacity = '1';
-                    resumePhase3(session, 0);
-                }, 750);
-            }, 2200);
-        }, session, startWord);
-    }
-
-    function resumePhase3(session, startWord) {
-        typeParagraph(
-            'Haii lovee, I apologize my flowers to u baby are virtual🥹 as much as i wanna give u something real and special i am limited by budget and opportunities to get materials 🥹 so i made something that i can do for free and doesn\'t require the need to go outside. I hope u like itt, but no amount of flowers ever get to level ur beauty. I love u pretty baby.',
-            poemText,
-            session,
-            startWord
-        );
-    }
-    
-    
-
+    // ── Open ─────────────────────────────────────────────────────────────
     document.getElementById('bouquet-btn').addEventListener('click', () => {
         if (state !== 'idle') return;
-        state = 'open';
+        state = 'opening';
 
         fadeEls().forEach(el => {
             el.style.transition    = 'opacity 0.9s ease';
@@ -1511,26 +1462,26 @@ function showError(msg) {
             bouquetScene.classList.add('active');
             setTimeout(() => {
                 flowerRoot.classList.remove('not-loaded');
-                // flowers bloom animation is roughly 4–5s; start poem after
-                setTimeout(startPoemSequence, 4500);
+                state = 'open';
+                // First open: wait for bloom. Returning: resume immediately.
+                const delay = (poemPhase === 0 && poemWordIndex === 0) ? 4500 : 600;
+                setTimeout(startPoemSequence, delay);
             }, 1000);
         }, 1000);
     });
 
+    // ── Close ─────────────────────────────────────────────────────────────
     bouquetScene.addEventListener('click', () => {
         if (state !== 'open') return;
-        state = 'idle';
+        state = 'closing';
+
+        // Cancel poem — preserve poemPhase and poemWordIndex for resume
+        poemSession++;
+        poemOverlay.style.opacity = '0';
 
         flowerRoot.classList.add('not-loaded');
         bouquetScene.style.transition = 'opacity 1s ease';
         bouquetScene.style.opacity    = '0';
-
-        // Hide poem too
-// Cancel any running poem sequence and reset
-// Cancel running sequence but preserve resume state
-        poemSession++;
-        poemOverlay.style.opacity = '0';
-        // Don't clear poemText yet — will be redrawn on resume
 
         setTimeout(() => {
             bouquetScene.classList.remove('active');
@@ -1543,12 +1494,11 @@ function showError(msg) {
                 el.style.pointerEvents = '';
                 el.style.zIndex        = '';
             });
+
+            state = 'idle';
         }, 1000);
     });
 }());
-
-
-
 
 
 
