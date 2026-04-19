@@ -562,9 +562,6 @@ function createConfettiPiece(colors, isBurst) {
 // ENVELOPE / LETTER ANIMATION
 // =====================================================
 
-
-
-// ── Envelope 1 (top) ─────────────────────────────────
 const envOverlay  = document.getElementById('envOverlay');
 const envFlap     = document.getElementById('envFlap');
 const envLetter   = document.getElementById('letter');
@@ -603,60 +600,12 @@ envOverlay.addEventListener('click', (e) => {
             envelopeOpened = false;
             envLetter.classList.remove('risen');
             envLetter.classList.add('closing');
+
             setTimeout(() => envFlap.classList.remove('open'), 700);
             setTimeout(() => heartSeal.classList.remove('hidden'), 1100);
             setTimeout(() => envOverlay.classList.remove('show'), 1400);
         } else {
             envOverlay.classList.remove('show');
-        }
-    }
-});
-
-// ── Envelope 2 (bottom) ──────────────────────────────
-const envOverlay2  = document.getElementById('envOverlay2');
-const envFlap2     = document.getElementById('envFlap2');
-const envLetter2   = document.getElementById('letter2');
-const heartSeal2   = document.getElementById('heartSeal2');
-let envelopeOpened2 = false;
-
-document.getElementById('message-btn-2').addEventListener('click', (e) => {
-    e.stopPropagation();
-    envOverlay2.classList.add('show');
-    envelopeOpened2 = false;
-    envFlap2.classList.remove('open');
-    envLetter2.classList.remove('risen', 'closing', 'opened');
-    heartSeal2.classList.remove('hidden');
-});
-
-document.getElementById('envWrapper2').addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (!envelopeOpened2) {
-        heartSeal2.classList.add('hidden');
-        envFlap2.classList.add('open');
-        setTimeout(() => {
-            envLetter2.classList.remove('closing');
-            envLetter2.classList.add('risen');
-            envelopeOpened2 = true;
-        }, 700);
-    }
-});
-
-document.getElementById('letter2').addEventListener('click', (e) => {
-    e.stopPropagation();
-    envOverlay2.click();
-});
-
-envOverlay2.addEventListener('click', (e) => {
-    if (e.target === envOverlay2) {
-        if (envelopeOpened2) {
-            envelopeOpened2 = false;
-            envLetter2.classList.remove('risen');
-            envLetter2.classList.add('closing');
-            setTimeout(() => envFlap2.classList.remove('open'), 700);
-            setTimeout(() => heartSeal2.classList.remove('hidden'), 1100);
-            setTimeout(() => envOverlay2.classList.remove('show'), 1400);
-        } else {
-            envOverlay2.classList.remove('show');
         }
     }
 });
